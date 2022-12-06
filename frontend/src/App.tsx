@@ -1,5 +1,3 @@
-import React from "react"
-import Menu from "./components/Menu"
 import Home from "./pages/Home"
 import {Route, BrowserRouter, Routes} from "react-router-dom"
 

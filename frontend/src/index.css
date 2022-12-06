@@ -6,10 +6,7 @@
     html {
         font-family: "Roboto", system-ui, sans-serif;
         @apply text-slate-800;
-        @apply bg-slate-200;
+        @apply bg-slate-100;
     }
 
-    /*button {*/
-    /*    @apply bg-violet-700 rounded-2xl text-white p-3;*/
-    /*}*/
 }

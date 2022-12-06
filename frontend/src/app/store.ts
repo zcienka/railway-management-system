@@ -1,11 +1,13 @@
 import {configureStore} from '@reduxjs/toolkit'
 import {setupListeners} from "@reduxjs/toolkit/query"
-
+import {reservationsApi} from "../services/reservationsApi"
 
 const store = configureStore({
-    reducer: {},
+    reducer: {
+        [reservationsApi.reducerPath]: reservationsApi.reducer,
+    },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(),
+        getDefaultMiddleware().concat(reservationsApi.middleware),
 })
 
 setupListeners(store.dispatch)
