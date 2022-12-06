@@ -1,5 +1,6 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
 import {fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react"
+import {Reservation} from "../types"
 
 export const reservationsApi = createApi({
     reducerPath: "reservationsApi",
@@ -7,9 +8,15 @@ export const reservationsApi = createApi({
         baseUrl: "https://localhost:7249/api"
     }),
     endpoints: (builder) => ({
-        getReservations: builder.query({
+        getReservations: builder.query<Reservation[], null>({
             query: () => ({
-                url: "/rezerwacja",
+                url: "/reservation",
+                method: "GET",
+            }),
+        }),
+        getSingleReservation: builder.query<Reservation[], string | undefined>({
+            query: (id) => ({
+                url: `/reservation/${id}`,
                 method: "GET",
             }),
         }),
@@ -25,5 +32,6 @@ export const reservationsApi = createApi({
 
 export const {
     useGetReservationsQuery,
+    useGetSingleReservationQuery,
     // useCreateReservationMutation
 } = reservationsApi
