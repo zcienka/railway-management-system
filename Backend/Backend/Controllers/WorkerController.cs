@@ -8,17 +8,17 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PracownikController : ControllerBase
+    public class WorkerController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public PracownikController(IConfiguration configuration)
+        public WorkerController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
         [HttpGet]
-        public ActionResult<Pracownik> Get()
+        public IActionResult Get()
         {
             string query = @"
                             select  *  from
