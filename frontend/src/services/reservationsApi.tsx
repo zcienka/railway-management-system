@@ -36,15 +36,15 @@ export const reservationsApi = createApi({
             }),
             invalidatesTags: ["Reservation", "SingleReservation"]
         }),
-        createReservation: builder.mutation({
+        createReservation: builder.mutation<Reservation, Reservation>({
             query: (body) => ({
                 url: "/reservation",
                 method: "POST",
-                body: body.reservation
+                body: body
             }),
             invalidatesTags: ["Reservation"]
         }),
-        seachReservations: builder.query<Reservation[], string | undefined>({
+        searchReservations: builder.query<Reservation[], string | undefined>({
             query: (searchValue) => ({
                 url: `/reservation/search/${searchValue}`,
                 method: "GET",
@@ -58,5 +58,6 @@ export const {
     useGetReservationsQuery,
     useGetSingleReservationQuery,
     useDeleteReservationMutation,
-    useUpdateReservationMutation
+    useUpdateReservationMutation,
+    useCreateReservationMutation,
 } = reservationsApi

@@ -40,7 +40,7 @@ export const stationApi = createApi({
             query: (body) => ({
                 url: "/station",
                 method: "POST",
-                body: body.station
+                body: body
             }),
             invalidatesTags: ["Station"]
         }),

@@ -40,7 +40,7 @@ export const trainStopApi = createApi({
             query: (body) => ({
                 url: "/train-stop",
                 method: "POST",
-                body: body.trainStop
+                body: body
             }),
             invalidatesTags: ["TrainStop"]
         }),

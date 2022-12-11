@@ -4,12 +4,13 @@ import {
     useGetSingleReservationQuery,
     useDeleteReservationMutation,
     useUpdateReservationMutation
-} from "../services/reservationsApi"
-import {Discount, Reservation} from "../types"
-import Menu from "../components/Menu"
-import {ReactComponent as ExclamationMark} from "../icons/exclamationMark.svg"
-import {useGetDiscountsQuery} from "../services/discountsApi"
+} from "../../services/reservationsApi"
+import {Discount, Reservation} from "../../types"
+import Menu from "../../components/Menu"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
+import {useGetDiscountsQuery} from "../../services/discountsApi"
 import {v4 as uuidv4} from 'uuid'
+import Loading from "../../components/Loading";
 
 
 const EditReservations = () => {
@@ -33,9 +34,7 @@ const EditReservations = () => {
         skip: id === undefined
     })
 
-    const {
-        data: getDiscountData
-    } = useGetDiscountsQuery(null)
+    const {data: getDiscountData} = useGetDiscountsQuery(null)
 
     const [deleteReservation] = useDeleteReservationMutation()
     const [updateReservation] = useUpdateReservationMutation()
@@ -59,10 +58,9 @@ const EditReservations = () => {
         }
     }
 
-    console.log({isNameValidLength})
     const deleteSingleReservation = async () => {
         await deleteReservation(id)
-        navigate('/reservations')
+        navigate("/reservations")
     }
 
     const handleDiscountChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -115,7 +113,7 @@ const EditReservations = () => {
     if (reservation !== undefined && getDiscountData !== undefined) {
         const discounts = getDiscountData.map((discount: Discount) => {
             return <option key={uuidv4()} value={discount.nazwaznizki}>
-                {discount.nazwaznizki}
+                {discount.nazwaznizki} ({discount.procentznizki} %)
             </option>
         })
 
@@ -178,7 +176,7 @@ const EditReservations = () => {
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                        <div className={`flex w-full items-center ${lastName === "" && isLastNameValidLength ? 
+                        <div className={`flex items-center ${lastName === "" && isLastNameValidLength ? 
                             "visible w-full" : "invisible absolute"}`}>
                             <ExclamationMark className={"h-5 mr-2"}/>
                             <p className={"w-full"}>
@@ -231,7 +229,7 @@ const EditReservations = () => {
                     </div>
 
                     <div className={"flex mt-8"}>
-                        <button onClick={() => navigate('/reservations')}>Anuluj</button>
+                        <button onClick={() => navigate("/reservations")}>Anuluj</button>
                         <div className={"flex justify-end w-full"}>
                             <button className={"mr-2 bg-red-600 border-red-700 text-white"}
                                     onClick={() => deleteSingleReservation()}>
@@ -249,7 +247,7 @@ const EditReservations = () => {
             </div>
         </div>
     } else {
-        return <div>loading..</div>
+        return <Loading/>
     }
 }
 

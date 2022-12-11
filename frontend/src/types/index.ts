@@ -13,10 +13,26 @@ export type Discount = {
 }
 
 export type TrainStop = {
-
+    numerprzystanku: number,
+    nazwastacji: string,
+    idlinii: number,
 }
 
-
 export type Station = {
+    nazwa: string,
+    adres: string,
+}
 
+export type TrainRoute = {
+    id: number,
+    dataodjazdu: Date,
+    dataprzyjazdu: Date,
+    idkonduktora: number,
+    idmaszynisty: number,
+    idliniiprzejazdu: number,
+    idpociagu: number,
+}
+
+export type TrainRouteLine = {
+    id: number,
 }
