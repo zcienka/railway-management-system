@@ -1,37 +1,62 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react"
 import {Reservation} from "../types"
+import BaseQuery from "../utils/baseQuery"
 
 export const reservationsApi = createApi({
     reducerPath: "reservationsApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: "https://localhost:7249/api"
-    }),
+    baseQuery: BaseQuery,
+    tagTypes: ["Reservation", "SingleReservation"],
     endpoints: (builder) => ({
         getReservations: builder.query<Reservation[], null>({
             query: () => ({
                 url: "/reservation",
                 method: "GET",
             }),
+            providesTags: ["Reservation"]
         }),
         getSingleReservation: builder.query<Reservation[], string | undefined>({
             query: (id) => ({
                 url: `/reservation/${id}`,
                 method: "GET",
             }),
+            providesTags: ["SingleReservation"]
         }),
-        // createReservation: builder.mutation({
-        //     query: (body) => ({
-        //         url: "/reservation",
-        //         method: "POST",
-        //         body: body.users,
-        //     }),
-        // }),
+        deleteReservation: builder.mutation({
+            query: (id) => ({
+                url: `/reservation/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Reservation", "SingleReservation"]
+        }),
+        updateReservation: builder.mutation({
+            query: (body) => ({
+                url: "/reservation",
+                method: "PATCH",
+                body: body
+            }),
+            invalidatesTags: ["Reservation", "SingleReservation"]
+        }),
+        createReservation: builder.mutation({
+            query: (body) => ({
+                url: "/reservation",
+                method: "POST",
+                body: body.reservation
+            }),
+            invalidatesTags: ["Reservation"]
+        }),
+        seachReservations: builder.query<Reservation[], string | undefined>({
+            query: (searchValue) => ({
+                url: `/reservation/search/${searchValue}`,
+                method: "GET",
+            }),
+            providesTags: ["SingleReservation"]
+        }),
     }),
 })
 
 export const {
     useGetReservationsQuery,
     useGetSingleReservationQuery,
-    // useCreateReservationMutation
+    useDeleteReservationMutation,
+    useUpdateReservationMutation
 } = reservationsApi

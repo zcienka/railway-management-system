@@ -3,6 +3,7 @@ import {useGetReservationsQuery} from "../services/reservationsApi"
 import Home from "./Home"
 import {Reservation} from "../types"
 import {useNavigate} from "react-router-dom"
+import {v4 as uuidv4} from 'uuid'
 
 const Reservations = () => {
     const [reservations, setReservations] = useState<Reservation[] | undefined>(undefined)
@@ -25,15 +26,16 @@ const Reservations = () => {
         return <div>loading..</div>
     } else {
         const allReservations = Object.values(reservations).map((reservation: Reservation, index: number) => {
-            return <tr key={index}>
+            return <tr key={uuidv4()}>
                 <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{reservation.id}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.imie}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.nazwisko}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200 "}>{reservation.idPrzejazdu}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200 "}>{reservation.znizka}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.idprzejazdu}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.znizka}</th>
+
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/reservations/${reservation.id}`, {replace: false})}>
-                    <div className={"px-3 py-1 border-2 rounded-md cursor-pointer"}>Edit</div>
+                    <div className={"px-3 py-1 border-2 rounded-md cursor-pointer"}>Edytuj</div>
                 </th>
             </tr>
         })

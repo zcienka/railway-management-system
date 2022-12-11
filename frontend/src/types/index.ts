@@ -1,7 +1,22 @@
 export type Reservation = {
     id: number
-    idPrzejazdu: number
+    idprzejazdu: number
     imie: string
     nazwisko: string
-    znizka: number
+    znizka: string
+}
+
+export type Discount = {
+    nazwaznizki: string,
+    procentznizki: number,
+    dokumentpotwierdzajacy: string,
+}
+
+export type TrainStop = {
+
+}
+
+
+export type Station = {
+
 }
