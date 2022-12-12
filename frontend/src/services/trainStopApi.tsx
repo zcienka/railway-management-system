@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {TrainStop} from "../types"
+import {TrainStop, Station} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const trainStopApi = createApi({
     reducerPath: "trainStopApi",
     baseQuery: BaseQuery,
-    tagTypes: ["TrainStop", "SingleTrainStop"],
+    tagTypes: ["TrainStop", "SingleTrainStop", "TrainStopInLine"],
     endpoints: (builder) => ({
         getTrainStops: builder.query<TrainStop[], null>({
             query: () => ({
@@ -21,6 +21,7 @@ export const trainStopApi = createApi({
             }),
             providesTags: ["SingleTrainStop"]
         }),
+
         deleteTrainStop: builder.mutation({
             query: (id) => ({
                 url: `/train-stop/${id}`,
@@ -51,5 +52,5 @@ export const {
     useGetTrainStopsQuery,
     useGetSingleTrainStopQuery,
     useDeleteTrainStopMutation,
-    useUpdateTrainStopMutation
+    useUpdateTrainStopMutation,
 } = trainStopApi

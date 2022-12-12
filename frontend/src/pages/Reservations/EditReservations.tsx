@@ -5,22 +5,23 @@ import {
     useDeleteReservationMutation,
     useUpdateReservationMutation
 } from "../../services/reservationsApi"
-import {Discount, Reservation} from "../../types"
+import {Discount, Reservation, Station, TrainStop} from "../../types"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
 import {useGetDiscountsQuery} from "../../services/discountsApi"
 import {v4 as uuidv4} from 'uuid'
 import Loading from "../../components/Loading";
+import {useGetTrainStopByLineQuery} from "../../services/trainPassageApi";
 
 
 const EditReservations = () => {
     const [reservation, setReservation] = useState<Reservation | undefined>(undefined)
     const [name, setName] = useState<string>("")
     const [lastName, setLastName] = useState<string>("")
-    const [trainRideId, setTrainRideId] = useState<string>("")
+    const [trainPassageId, setTrainPassageId] = useState<string>("")
     const [discountName, setDiscountName] = useState<string>("")
 
-    const [isTrainRideIdNumber, setIsTrainRideIdNumber] = useState<boolean>(true)
+    const [isTrainPassageIdNumber, setIsTrainRideIdNumber] = useState<boolean>(true)
     const [isLastNameValidLength, setIsLastNameValidLength] = useState<boolean>(true)
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
 
@@ -34,21 +35,25 @@ const EditReservations = () => {
         skip: id === undefined
     })
 
+    const {data: getTrainStopByLineData} = useGetTrainStopByLineQuery(trainPassageId, {
+            skip: trainPassageId === ""
+        })
+
     const {data: getDiscountData} = useGetDiscountsQuery(null)
 
     const [deleteReservation] = useDeleteReservationMutation()
     const [updateReservation] = useUpdateReservationMutation()
 
     const updateSingleReservation = async () => {
-        if (isTrainRideIdNumber && name !== "" && lastName !== ""
+        if (isTrainPassageIdNumber && name !== "" && lastName !== ""
             && isNameValidLength && isLastNameValidLength) {
-            const trainRideIdNumber = parseInt(trainRideId)
+            const trainPassageIdNumber = parseInt(trainPassageId)
 
             if (typeof id === "string") {
                 const idNumber = parseInt(id)
                 await updateReservation({
                     "id": idNumber,
-                    "idprzejazdu": trainRideIdNumber,
+                    "idprzejazdu": trainPassageIdNumber,
                     "imie": name,
                     "nazwisko": lastName,
                     "znizka": discountName
@@ -91,10 +96,6 @@ const EditReservations = () => {
         }
     }
 
-    const handleSubmit = (e: FormEvent<HTMLDivElement>) => {
-        e.preventDefault()
-    }
-
     useEffect(() => {
         if (isGetSingleReservationSuccess) {
             setReservation(getSingleReservation[0])
@@ -103,17 +104,23 @@ const EditReservations = () => {
 
     useEffect(() => {
         if (reservation !== undefined) {
-            setTrainRideId(reservation.idprzejazdu.toString())
+            setTrainPassageId(reservation.idprzejazdu.toString())
             setName(reservation.imie)
             setLastName(reservation.nazwisko)
             setDiscountName(reservation.znizka)
         }
     }, [reservation])
 
-    if (reservation !== undefined && getDiscountData !== undefined) {
+    if (reservation !== undefined && getDiscountData !== undefined && getTrainStopByLineData !== undefined) {
         const discounts = getDiscountData.map((discount: Discount) => {
             return <option key={uuidv4()} value={discount.nazwaznizki}>
                 {discount.nazwaznizki} ({discount.procentznizki} %)
+            </option>
+        })
+
+        const trainStops = getTrainStopByLineData.map((trainStop: TrainStop) => {
+            return <option key={uuidv4()} value={trainStop.nazwastacji}>
+                {trainStop.nazwastacji}
             </option>
         })
 
@@ -176,7 +183,7 @@ const EditReservations = () => {
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                        <div className={`flex items-center ${lastName === "" && isLastNameValidLength ? 
+                        <div className={`flex items-center ${lastName === "" && isLastNameValidLength ?
                             "visible w-full" : "invisible absolute"}`}>
                             <ExclamationMark className={"h-5 mr-2"}/>
                             <p className={"w-full"}>
@@ -184,7 +191,8 @@ const EditReservations = () => {
                             </p>
                         </div>
 
-                        <div className={`flex items-center ${!isLastNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                        <div
+                            className={`flex items-center ${!isLastNameValidLength ? "visible w-full" : "invisible absolute"}`}>
                             <ExclamationMark className={"h-5 mr-2"}/>
                             <p className={"w-full"}>
                                 Nazwisko musi mieć długość do 32 znaków
@@ -197,11 +205,11 @@ const EditReservations = () => {
                             <label className={"w-2/6"}>Id przejazdu</label>
                             <div className={"w-4/6 flex"}>
                                 <input
-                                    className={`w-1/2 ${!isTrainRideIdNumber ? "border-red-900" : "border-slate-200"}`}
+                                    className={`w-1/2 ${!isTrainPassageIdNumber ? "border-red-900" : "border-slate-200"}`}
                                     type="text"
-                                    value={trainRideId}
+                                    value={trainPassageId}
                                     onChange={(e) => {
-                                        setTrainRideId(e.target.value)
+                                        setTrainPassageId(e.target.value)
                                     }}
                                     onBlur={(e) => checkTrainRideIdNumber(e.target.value)}
                                 />
@@ -210,7 +218,7 @@ const EditReservations = () => {
 
                         <div className={"h-6 flex w-full text-red-900 text-xs"}>
                             <div
-                                className={`flex w-full items-center ${!isTrainRideIdNumber ? "visible" : "invisible"}`}>
+                                className={`flex w-full items-center ${!isTrainPassageIdNumber ? "visible" : "invisible"}`}>
                                 <ExclamationMark className={"h-5 mr-2"}/>
                                 <p className={"w-full"}>
                                     Id przejazdu musi być liczbą
@@ -243,6 +251,7 @@ const EditReservations = () => {
                             </button>
                         </div>
                     </div>
+                    {trainStops}
                 </div>
             </div>
         </div>

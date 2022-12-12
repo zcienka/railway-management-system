@@ -36,7 +36,7 @@ const Reservations = () => {
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/reservations/${reservation.id}`)}>
-                    <div className={"px-3 py-1 border-2 rounded-md cursor-pointer"}>Edytuj</div>
+                    <div className={"px-3 py-1 border-2 rounded-md cursor-pointer mr-2"}>Edytuj</div>
                 </th>
             </tr>
         })

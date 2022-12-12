@@ -6,18 +6,17 @@ import {useNavigate} from "react-router-dom"
 
 const ReservationsTable = (props: any[]) => {
     const [searchValue, setSearchValue] = useState<string>("")
-    const [createReservation] = useCreateReservationMutation()
     const navigate = useNavigate()
 
-    return <div className={"flex"}>
+    return <div className={"flex "}>
         <Menu/>
         <div className={"px-16 py-6 w-full"}>
             <div className={"h-24 w-full flex items-center"}>
                 <p className={"text-4xl"}>Rezerwacja</p>
             </div>
 
-            <div
-                className={"bg-white h-[calc(100%-6rem)] max-h-[calc(100%-6rem)] w-full rounded-xl p-8 border border-stone-200"}>
+            <div className={"bg-white h-[calc(100vh-6rem)] max-h-[calc(100vh-9rem)] " +
+                "w-full rounded-xl p-8 border border-stone-200 overflow-auto"}>
 
                 <div className={"flex mb-4"}>
                     <div className={"flex items-center relative"}>

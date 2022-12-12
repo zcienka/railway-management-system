@@ -23,7 +23,8 @@ export type Station = {
     adres: string,
 }
 
-export type TrainRoute = {
+
+export type TrainPassage = {
     id: number,
     dataodjazdu: Date,
     dataprzyjazdu: Date,

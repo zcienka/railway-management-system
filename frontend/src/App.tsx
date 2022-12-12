@@ -12,6 +12,8 @@ function App() {
                 <Route path={"/reservations/:id"} element={<EditReservations/>}/>
                 <Route path={"/create-reservation"} element={<CreateReservation/>}/>
                 <Route path={"/"} element={<Loading/>}/>
+                {/*<Route path={"/create-train-passage"} element={<Loading/>}/>*/}
+
             </Routes>
         </BrowserRouter>
     )

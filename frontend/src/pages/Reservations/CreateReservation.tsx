@@ -2,11 +2,12 @@ import React, {ChangeEvent, useState} from "react"
 import Menu from "../../components/Menu"
 import {useCreateReservationMutation} from "../../services/reservationsApi"
 import {useNavigate} from "react-router-dom"
-import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
-import {Discount, Reservation} from "../../types";
-import {v4 as uuidv4} from "uuid";
-import {useGetDiscountsQuery} from "../../services/discountsApi";
-import Loading from "../../components/Loading";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
+import {Discount, Reservation, Station} from "../../types"
+import {v4 as uuidv4} from "uuid"
+import {useGetDiscountsQuery} from "../../services/discountsApi"
+import Loading from "../../components/Loading"
+
 
 const CreateReservation = () => {
     const [searchValue, setSearchValue] = useState<string>("")
@@ -71,6 +72,8 @@ const CreateReservation = () => {
                 {discount.nazwaznizki} ({discount.procentznizki} %)
             </option>
         })
+
+
 
         return <div className={"flex"}>
             <Menu/>
