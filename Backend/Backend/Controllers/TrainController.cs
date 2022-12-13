@@ -8,11 +8,11 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DiscountController : ControllerBase
+    public class TrainController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public DiscountController(IConfiguration configuration)
+        public TrainController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -22,8 +22,8 @@ namespace Backend.Controllers
         {
             string query = @"
                             select  *  from
-                            znizka
-                            order by nazwaznizki
+                            pociag
+                            order by id
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -46,12 +46,12 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
-        [HttpGet("{nazwaznizki}")]
-        public IActionResult Get(string nazwaznizki)
+        [HttpGet("{id}")]
+        public IActionResult Get(string id)
         {
             string query = @"
                             select  *  from
-                            znizka where nazwaznizki = @nazwaznizki 
+                            pociag where id = @id 
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -61,7 +61,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@nazwaznizki", nazwaznizki);
+                    myCommand.Parameters.AddWithValue("@id", id);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -77,11 +77,11 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(Discount discount)
+        public IActionResult Post(Train train)
         {
             string query = @"
-                            insert into znizka(nazwaznizki, procentznizki, dokumentpotwierdzajacy) 
-                            values(@nazwaznizki, @procentznizki, @dokumentpotwierdzajacy)
+                            insert into pociag(id, nazwa, idlokomotywy) 
+                            values(@id, @nazwa, @idlokomotywy)
                             ";
 
             DataTable table = new DataTable();
@@ -92,9 +92,9 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@nazwaznizki", discount.nazwaznizki);
-                    myCommand.Parameters.AddWithValue("@procentznizki", discount.procentznizki);
-                    myCommand.Parameters.AddWithValue("@dokumentpotwierdzajacy", discount.dokumentpotwierdzajacy);
+                    myCommand.Parameters.AddWithValue("@id", train.Id);
+                    myCommand.Parameters.AddWithValue("@nazwa", train.Nazwa);
+                    myCommand.Parameters.AddWithValue("@idlokomotywy", train.IdLokomotywy);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -103,17 +103,17 @@ namespace Backend.Controllers
                 }
             }
 
-            return CreatedAtAction(nameof(Get), discount);
+            return CreatedAtAction(nameof(Get), train);
         }
 
         [HttpPatch]
-        public IActionResult Patch(Discount discount)
+        public IActionResult Patch(Train train)
         {
             string query = @"
-                           update znizka
-                           set procentznizki = @procentznizki,
-                           dokumentpotwierdzajacy = @dokumentpotwierdzajacy
-                           where nazwaznizki = @nazwaznizki
+                           update pociag
+                           set nazwa = @nazwa,
+                           idlokomotywy = @idlokomotywy
+                           where id = @id
                             ";
 
             DataTable table = new DataTable();
@@ -124,9 +124,9 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@nazwaznizki", discount.nazwaznizki);
-                    myCommand.Parameters.AddWithValue("@procentznizki", discount.procentznizki);
-                    myCommand.Parameters.AddWithValue("@dokumentpotwierdzajacy", discount.dokumentpotwierdzajacy);
+                    myCommand.Parameters.AddWithValue("@id", train.Id);
+                    myCommand.Parameters.AddWithValue("@nazwa", train.Nazwa);
+                    myCommand.Parameters.AddWithValue("@idlokomotywy", train.IdLokomotywy);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -135,15 +135,15 @@ namespace Backend.Controllers
                 }
             }
 
-            return Ok(discount);
+            return Ok(train);
         }
 
-        [HttpDelete("{nazwaznizki}")]
-        public IActionResult Delete(string nazwaznizki)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
         {
             string query = @"
-                           delete from znizka
-                           where nazwaznizki=@nazwaznizki
+                           delete from pociag
+                           where id=@id
                            ";
 
             DataTable table = new DataTable();
@@ -154,7 +154,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@nazwaznizki", nazwaznizki);
+                    myCommand.Parameters.AddWithValue("@id", id);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);

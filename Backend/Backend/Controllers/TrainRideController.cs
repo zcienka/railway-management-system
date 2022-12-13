@@ -6,13 +6,13 @@ using System.Data;
 
 namespace Backend.Controllers
 {
-    [Route("api/train-passage")]
+    [Route("api/train-ride")]
     [ApiController]
-    public class TrainPassageController : ControllerBase
+    public class TrainRideController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public TrainPassageController(IConfiguration configuration)
+        public TrainRideController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -45,7 +45,7 @@ namespace Backend.Controllers
 
             return Ok(json);
         }
-
+        
         [HttpGet("{id}/station-by-line")]
         public IActionResult GetStationsByLine(string id)
         {
@@ -93,7 +93,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@id", Int64.Parse(id));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -109,7 +109,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(TrainPassage trainPassage)
+        public IActionResult Post(TrainRide trainPassage)
         {
             string query = @"
                             insert into przejazd(id, idkonduktora, idmaszynisty, idliniiprzejazdu, idpociagu) 
@@ -142,7 +142,7 @@ namespace Backend.Controllers
         }
 
         [HttpPatch]
-        public IActionResult Patch(TrainPassage trainPassage)
+        public IActionResult Patch(TrainRide trainPassage)
         {
             string query = @"
                            update przejazd

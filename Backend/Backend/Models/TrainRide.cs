@@ -1,6 +1,6 @@
 ﻿namespace Backend.Models
 {
-    public class TrainPassage
+    public class TrainRide
     {
         public int Id { get; set; }
         public int IdKonduktora { get; set; }
