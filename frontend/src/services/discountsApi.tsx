@@ -31,7 +31,7 @@ export const discountsApi = createApi({
             query: (body) => ({
                 url: "/discount",
                 method: "PATCH",
-                body: body.reservation
+                body: body
             }),
             invalidatesTags: ["Discount"]
         }),

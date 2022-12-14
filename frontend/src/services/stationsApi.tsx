@@ -2,8 +2,8 @@ import {createApi} from "@reduxjs/toolkit/query/react"
 import {Station} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
-export const stationApi = createApi({
-    reducerPath: "stationApi",
+export const stationsApi = createApi({
+    reducerPath: "stationsApi",
     baseQuery: BaseQuery,
     tagTypes: ["Station", "SingleStation"],
     endpoints: (builder) => ({
@@ -54,4 +54,4 @@ export const {
     useGetSingleStationQuery,
     useDeleteStationMutation,
     useUpdateStationMutation
-} = stationApi
+} = stationsApi

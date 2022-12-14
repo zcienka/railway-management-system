@@ -23,8 +23,7 @@ export type Station = {
     adres: string,
 }
 
-
-export type TrainPassage = {
+export type TrainRide = {
     id: number,
     dataodjazdu: Date,
     dataprzyjazdu: Date,
@@ -34,6 +33,38 @@ export type TrainPassage = {
     idpociagu: number,
 }
 
-export type TrainRouteLine = {
+export type RailConnection = {
     id: number,
+}
+
+export type Locomotive = {
+    id: number,
+    databadaniatechnicznego: Date,
+    nazwa: string
+}
+
+export type Train = {
+    id: number,
+    nazwa: string,
+    idlokomotywy: number
+}
+
+export type Worker = {
+    id: number,
+    imie: string,
+    nazwisko: string,
+    placa: number,
+    zawod: string,
+}
+
+export type Carriage = {
+    id: number,
+    databadaniatechnicznego: Date,
+    nazwa: string
+}
+
+export type RailroadCarriage = {
+    numerwagonu: number,
+    idwagonu: number,
+    idpociagu: number,
 }

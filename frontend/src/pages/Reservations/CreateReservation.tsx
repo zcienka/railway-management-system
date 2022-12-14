@@ -73,8 +73,6 @@ const CreateReservation = () => {
             </option>
         })
 
-
-
         return <div className={"flex"}>
             <Menu/>
             <div className={"px-16 py-6 w-full"}>

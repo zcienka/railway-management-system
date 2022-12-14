@@ -1,17 +1,17 @@
-import React, {ChangeEvent, FormEvent, useEffect, useState} from "react"
+import React, {ChangeEvent, useEffect, useState} from "react"
 import {useNavigate, useParams} from 'react-router-dom'
 import {
     useGetSingleReservationQuery,
     useDeleteReservationMutation,
     useUpdateReservationMutation
 } from "../../services/reservationsApi"
-import {Discount, Reservation, Station, TrainStop} from "../../types"
+import {Discount, Reservation, TrainStop} from "../../types"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
 import {useGetDiscountsQuery} from "../../services/discountsApi"
 import {v4 as uuidv4} from 'uuid'
-import Loading from "../../components/Loading";
-import {useGetTrainStopByLineQuery} from "../../services/trainPassageApi";
+import Loading from "../../components/Loading"
+import {useGetTrainStopByLineQuery} from "../../services/trainRideApi"
 
 
 const EditReservations = () => {
@@ -20,8 +20,9 @@ const EditReservations = () => {
     const [lastName, setLastName] = useState<string>("")
     const [trainPassageId, setTrainPassageId] = useState<string>("")
     const [discountName, setDiscountName] = useState<string>("")
+    const [initialStation, setInitialStation] = useState<string>("")
+    const [finalStation, setFinalStation] = useState<string>("")
 
-    const [isTrainPassageIdNumber, setIsTrainRideIdNumber] = useState<boolean>(true)
     const [isLastNameValidLength, setIsLastNameValidLength] = useState<boolean>(true)
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
 
@@ -35,9 +36,12 @@ const EditReservations = () => {
         skip: id === undefined
     })
 
-    const {data: getTrainStopByLineData} = useGetTrainStopByLineQuery(trainPassageId, {
-            skip: trainPassageId === ""
-        })
+    const {
+        data: getTrainStopByLineData,
+        isSuccess: isGetTrainStopByLineSuccess
+    } = useGetTrainStopByLineQuery(trainPassageId, {
+        skip: trainPassageId === ""
+    })
 
     const {data: getDiscountData} = useGetDiscountsQuery(null)
 
@@ -45,7 +49,7 @@ const EditReservations = () => {
     const [updateReservation] = useUpdateReservationMutation()
 
     const updateSingleReservation = async () => {
-        if (isTrainPassageIdNumber && name !== "" && lastName !== ""
+        if (name !== "" && lastName !== ""
             && isNameValidLength && isLastNameValidLength) {
             const trainPassageIdNumber = parseInt(trainPassageId)
 
@@ -70,14 +74,6 @@ const EditReservations = () => {
 
     const handleDiscountChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setDiscountName(event.target.value)
-    }
-
-    const checkTrainRideIdNumber = (userInput: string) => {
-        if (isNaN(Number(userInput))) {
-            setIsTrainRideIdNumber(false)
-        } else {
-            setIsTrainRideIdNumber(true)
-        }
     }
 
     const checkNameValidLength = (userInput: string) => {
@@ -111,6 +107,13 @@ const EditReservations = () => {
         }
     }, [reservation])
 
+    useEffect(() => {
+        if (isGetTrainStopByLineSuccess) {
+            setFinalStation(getTrainStopByLineData[getTrainStopByLineData.length - 1].nazwastacji)
+            setInitialStation(getTrainStopByLineData[0].nazwastacji)
+        }
+    }, [isGetTrainStopByLineSuccess, getTrainStopByLineData])
+
     if (reservation !== undefined && getDiscountData !== undefined && getTrainStopByLineData !== undefined) {
         const discounts = getDiscountData.map((discount: Discount) => {
             return <option key={uuidv4()} value={discount.nazwaznizki}>
@@ -120,7 +123,7 @@ const EditReservations = () => {
 
         const trainStops = getTrainStopByLineData.map((trainStop: TrainStop) => {
             return <option key={uuidv4()} value={trainStop.nazwastacji}>
-                {trainStop.nazwastacji}
+                {getTrainStopByLineData[0].nazwastacji[0]}
             </option>
         })
 
@@ -200,33 +203,6 @@ const EditReservations = () => {
                         </div>
                     </div>
 
-                    <div className={"w-160 flex flex-col items-center"}>
-                        <div className={"flex flex-row w-full"}>
-                            <label className={"w-2/6"}>Id przejazdu</label>
-                            <div className={"w-4/6 flex"}>
-                                <input
-                                    className={`w-1/2 ${!isTrainPassageIdNumber ? "border-red-900" : "border-slate-200"}`}
-                                    type="text"
-                                    value={trainPassageId}
-                                    onChange={(e) => {
-                                        setTrainPassageId(e.target.value)
-                                    }}
-                                    onBlur={(e) => checkTrainRideIdNumber(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                            <div
-                                className={`flex w-full items-center ${!isTrainPassageIdNumber ? "visible" : "invisible"}`}>
-                                <ExclamationMark className={"h-5 mr-2"}/>
-                                <p className={"w-full"}>
-                                    Id przejazdu musi być liczbą
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className={"w-160 flex items-center mb-6"}>
                         <label className={"w-2/6"}>Zniżka</label>
                         <div className={"flex w-4/6"}>
@@ -236,7 +212,33 @@ const EditReservations = () => {
                         </div>
                     </div>
 
-                    <div className={"flex mt-8"}>
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Stacja początkowa</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   value={initialStation}
+                                   onChange={(e) => setInitialStation(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Stacja końcowa</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   value={finalStation}
+                                   onChange={(e) => setFinalStation(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"flex"}>
                         <button onClick={() => navigate("/reservations")}>Anuluj</button>
                         <div className={"flex justify-end w-full"}>
                             <button className={"mr-2 bg-red-600 border-red-700 text-white"}
@@ -244,14 +246,15 @@ const EditReservations = () => {
                                 Usuń
                             </button>
                             <button
-                                className={`${(discountName === "" || lastName === "" || name === "" || !isNameValidLength || !isLastNameValidLength)
+                                className={`${(discountName === "" || lastName === "" || name === "" ||
+                                    !isNameValidLength || !isLastNameValidLength ||
+                                    initialStation === "" || finalStation === "")
                                     ? "cursor-not-allowed bg-slate-200 border-stone-100" : "cursor-pointer"}`}
                                 onClick={() => updateSingleReservation()}>
                                 Zapisz zmiany
                             </button>
                         </div>
                     </div>
-                    {trainStops}
                 </div>
             </div>
         </div>
