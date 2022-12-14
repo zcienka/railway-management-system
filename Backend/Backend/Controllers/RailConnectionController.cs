@@ -6,13 +6,13 @@ using Newtonsoft.Json;
 
 namespace Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/rail-connection")]
     [ApiController]
-    public class TrainController : ControllerBase
+    public class RailConnectionController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public TrainController(IConfiguration configuration)
+        public RailConnectionController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -22,7 +22,7 @@ namespace Backend.Controllers
         {
             string query = @"
                             select * from
-                            pociag
+                            liniaprzejazdu
                             order by id
                             ";
             DataTable table = new DataTable();
@@ -51,7 +51,7 @@ namespace Backend.Controllers
         {
             string query = @"
                             select * from
-                            pociag where id = @id 
+                            liniaprzejazdu where id = @id 
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -77,11 +77,11 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(Train train)
+        public IActionResult Post(RailConnection railConnection)
         {
             string query = @"
-                            insert into pociag(id, nazwa, idlokomotywy) 
-                            values(@id, @nazwa, @idlokomotywy)
+                            insert into liniaprzejazdu(id) 
+                            values(@id)
                             ";
 
             DataTable table = new DataTable();
@@ -92,9 +92,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", train.Id);
-                    myCommand.Parameters.AddWithValue("@nazwa", train.Nazwa);
-                    myCommand.Parameters.AddWithValue("@idlokomotywy", train.IdLokomotywy);
+                    myCommand.Parameters.AddWithValue("@id", railConnection.Id);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -103,46 +101,14 @@ namespace Backend.Controllers
                 }
             }
 
-            return CreatedAtAction(nameof(Get), train);
-        }
-
-        [HttpPatch]
-        public IActionResult Patch(Train train)
-        {
-            string query = @"
-                           update pociag
-                           set nazwa = @nazwa,
-                           idlokomotywy = @idlokomotywy
-                           where id = @id
-                            ";
-
-            DataTable table = new DataTable();
-            string sqlDataSource = _configuration.GetConnectionString("railway_database");
-            NpgsqlDataReader myReader;
-            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
-            {
-                myCon.Open();
-                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
-                {
-                    myCommand.Parameters.AddWithValue("@id", train.Id);
-                    myCommand.Parameters.AddWithValue("@nazwa", train.Nazwa);
-                    myCommand.Parameters.AddWithValue("@idlokomotywy", train.IdLokomotywy);
-
-                    myReader = myCommand.ExecuteReader();
-                    table.Load(myReader);
-                    myReader.Close();
-                    myCon.Close();
-                }
-            }
-
-            return Ok(train);
+            return CreatedAtAction(nameof(Get), railConnection);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
             string query = @"
-                           delete from pociag
+                           delete from liniaprzejazdu
                            where id=@id
                            ";
 

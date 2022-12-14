@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/railroad-carriage")]
     [ApiController]
     public class RailroadCarriageController : ControllerBase
     {
@@ -63,8 +63,8 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@idwagonu", idwagonu);
-                    myCommand.Parameters.AddWithValue("@idpociagu", idpociagu);
+                    myCommand.Parameters.AddWithValue("@idwagonu", Int64.Parse(idwagonu));
+                    myCommand.Parameters.AddWithValue("@idpociagu", Int64.Parse(idpociagu));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);

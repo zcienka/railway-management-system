@@ -8,11 +8,11 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TrainController : ControllerBase
+    public class LocomotiveController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public TrainController(IConfiguration configuration)
+        public LocomotiveController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -21,8 +21,8 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select * from
-                            pociag
+                            select  *  from
+                            lokomotywa
                             order by id
                             ";
             DataTable table = new DataTable();
@@ -50,8 +50,8 @@ namespace Backend.Controllers
         public IActionResult Get(string id)
         {
             string query = @"
-                            select * from
-                            pociag where id = @id 
+                            select  *  from
+                            lokomotywa where id = @id 
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -77,11 +77,11 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(Train train)
+        public IActionResult Post(Locomotive locomotive)
         {
             string query = @"
-                            insert into pociag(id, nazwa, idlokomotywy) 
-                            values(@id, @nazwa, @idlokomotywy)
+                            insert into lokomotywa(id, databadaniatechnicznego, nazwa) 
+                            values(@id, @databadaniatechnicznego, @nazwa)
                             ";
 
             DataTable table = new DataTable();
@@ -92,9 +92,9 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", train.Id);
-                    myCommand.Parameters.AddWithValue("@nazwa", train.Nazwa);
-                    myCommand.Parameters.AddWithValue("@idlokomotywy", train.IdLokomotywy);
+                    myCommand.Parameters.AddWithValue("@id", locomotive.Id);
+                    myCommand.Parameters.AddWithValue("@databadaniatechnicznego", locomotive.Databadaniatechnicznego);
+                    myCommand.Parameters.AddWithValue("@nazwa", locomotive.Nazwa);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -103,16 +103,16 @@ namespace Backend.Controllers
                 }
             }
 
-            return CreatedAtAction(nameof(Get), train);
+            return CreatedAtAction(nameof(Get), locomotive);
         }
 
         [HttpPatch]
-        public IActionResult Patch(Train train)
+        public IActionResult Patch(Locomotive locomotive)
         {
             string query = @"
-                           update pociag
-                           set nazwa = @nazwa,
-                           idlokomotywy = @idlokomotywy
+                           update lokomotywa
+                           set databadaniatechnicznego = @databadaniatechnicznego,
+                           nazwa = @nazwa
                            where id = @id
                             ";
 
@@ -124,9 +124,9 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", train.Id);
-                    myCommand.Parameters.AddWithValue("@nazwa", train.Nazwa);
-                    myCommand.Parameters.AddWithValue("@idlokomotywy", train.IdLokomotywy);
+                    myCommand.Parameters.AddWithValue("@id", locomotive.Id);
+                    myCommand.Parameters.AddWithValue("@databadaniatechnicznego", locomotive.Databadaniatechnicznego);
+                    myCommand.Parameters.AddWithValue("@nazwa", locomotive.Nazwa);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -135,14 +135,14 @@ namespace Backend.Controllers
                 }
             }
 
-            return Ok(train);
+            return Ok(locomotive);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
             string query = @"
-                           delete from pociag
+                           delete from lokomotywa
                            where id=@id
                            ";
 

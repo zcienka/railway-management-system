@@ -61,7 +61,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@id", Int64.Parse(id));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
