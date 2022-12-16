@@ -6,13 +6,13 @@ using Newtonsoft.Json;
 
 namespace Backend.Controllers
 {
-    [Route("api/railroad-carriage")]
+    [Route("api/railroad-car")]
     [ApiController]
-    public class RailroadCarriageController : ControllerBase
+    public class RailroadCarController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public RailroadCarriageController(IConfiguration configuration)
+        public RailroadCarController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -80,7 +80,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(RailroadCarriage railroadCarriage)
+        public IActionResult Post(RailroadCar railroadCarriage)
         {
             string query = @"
                             insert into wagonwpociagu(idwagonu, procentznizki, dokumentpotwierdzajacy) 

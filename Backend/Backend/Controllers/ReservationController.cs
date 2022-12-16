@@ -96,7 +96,7 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@imie", reservation.Imie);
                     myCommand.Parameters.AddWithValue("@nazwisko", reservation.Nazwisko);
                     myCommand.Parameters.AddWithValue("@idprzejazdu", reservation.Idprzejazdu);
-                    myCommand.Parameters.AddWithValue("@znizka", reservation.Znizka);
+                    myCommand.Parameters.AddWithValue("@znizka", Int64.Parse(reservation.Znizka));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
