@@ -59,5 +59,6 @@ export const {
     useGetSingleTrainRideQuery,
     useDeleteTrainRideMutation,
     useUpdateTrainRideMutation,
-    useGetTrainStopByLineQuery
+    useGetTrainStopByLineQuery,
+    useCreateTrainRideMutation
 } = trainRideApi

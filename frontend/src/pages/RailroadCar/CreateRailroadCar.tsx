@@ -1,54 +1,49 @@
 import React, {useState} from "react"
 import Loading from "../../components/Loading"
 import Menu from "../../components/Menu"
-import {useNavigate} from "react-router-dom";
-import {useCreateWorkerMutation} from "../../services/workersApi";
-import {Worker} from "../../types";
+import {RailroadCar} from "../../types"
+import {useNavigate} from "react-router-dom"
+import {useCreateRailroadCarMutation} from "../../services/railroadCarsApi";
 
-const CreateWorker = () => {
+const CreateRailroadCar = () => {
     const navigate = useNavigate()
 
-    const [name, setName] = useState<string>("")
-    const [nameInput, setNameInput] = useState<boolean>(true)
+    const [carriageNumber, setCarNumber] = useState<string>("")
+    const [carriaInput, setCarNumberInput] = useState<boolean>(true)
 
-    const [lastName, setLastName] = useState<string>("")
-    const [lastNameInput, setLastNameInput] = useState<boolean>(true)
+    const [carriageId, setCarId] = useState<string>("")
+    const [carriageIdInput, setCarIdInput] = useState<boolean>(true)
 
-    const [wage, setWage] = useState<string>("")
-    const [wageInput, setWageInput] = useState<boolean>(true)
+    const [trainId, setTrainId] = useState<string>("")
+    const [trainIdInput, setTrainIdInput] = useState<boolean>(true)
 
-    const [occupation, setOccupation] = useState<string>("")
-    const [occupationInput, setOccupationInput] = useState<boolean>(true)
+    const [createRailroadCar] = useCreateRailroadCarMutation()
 
-    const [createWorker] = useCreateWorkerMutation()
-
-    const createSingleWorker = async () => {
-        const singleWorker: Worker = {
-            imie: name,
-            nazwisko: lastName,
-            placa: parseInt(wage),
-            zawod: occupation
+    const createSingleRailroadCar = async () => {
+        const singleRailroadCar: RailroadCar = {
+            numerwagonu: parseInt(carriageNumber),
+            idwagonu: parseInt(carriageId),
+            idpociagu: parseInt(trainId),
         }
-        await createWorker(singleWorker)
-        navigate("/workers")
+        await createRailroadCar(singleRailroadCar)
+        navigate("/railroad-cars")
     }
-
 
     return <div className={"flex"}>
         <Menu/>
         <div className={"px-16 py-6 w-full"}>
             <div className={"h-24 w-full flex items-center"}>
-                <p className={"text-4xl"}>Dodawanie pracownika</p>
+                <p className={"text-4xl"}>Dodawanie wagonu w pociągu</p>
             </div>
             <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
                 <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Imię</label>
+                    <label className={"w-2/6"}>Numer wagonu</label>
                     <div className={"flex w-4/6"}>
                         <input className={"w-1/2"}
-                               value={name}
+                               value={carriageNumber}
                                onChange={(e) => {
-                                   setName(e.target.value)
-                                   setNameInput(false)
+                                   setCarNumber(e.target.value)
+                                   setCarNumberInput(false)
                                }}
                         />
                     </div>
@@ -58,13 +53,13 @@ const CreateWorker = () => {
                 </div>
 
                 <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Nazwisko</label>
+                    <label className={"w-2/6"}>Id wagonu</label>
                     <div className={"flex w-4/6"}>
                         <input className={"w-1/2"}
-                               value={lastName}
+                               value={carriageId}
                                onChange={(e) => {
-                                   setLastName(e.target.value)
-                                   setLastNameInput(false)
+                                   setCarId(e.target.value)
+                                   setCarIdInput(false)
                                }}
                         />
                     </div>
@@ -74,24 +69,24 @@ const CreateWorker = () => {
                 </div>
 
                 <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Płaca</label>
+                    <label className={"w-2/6"}>Id pociągu</label>
                     <div className={"flex w-4/6"}>
                         <input className={"w-1/2"}
-                               value={wage}
+                               value={trainId}
                                onChange={(e) => {
-                                   setWage(e.target.value)
-                                   setWageInput(false)
+                                   setTrainId(e.target.value)
+                                   setTrainIdInput(false)
                                }}
                         />
                     </div>
                 </div>
 
                 <div className={"flex mt-8"}>
-                    <button onClick={() => navigate('/workers')}>Anuluj</button>
+                    <button onClick={() => navigate('/railroad-cars')}>Anuluj</button>
                     <div className={"flex justify-end w-full"}>
                         <button
                             className={"cursor-pointer"}
-                            onClick={() => createSingleWorker()}>
+                            onClick={() => createSingleRailroadCar()}>
                             Dodaj
                         </button>
                     </div>
@@ -101,4 +96,4 @@ const CreateWorker = () => {
     </div>
 }
 
-export default CreateWorker
+export default CreateRailroadCar

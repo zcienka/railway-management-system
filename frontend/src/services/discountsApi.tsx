@@ -50,5 +50,6 @@ export const {
     useGetDiscountsQuery,
     useGetSingleDiscountQuery,
     useDeleteDiscountMutation,
+    useCreateDiscountMutation,
     useUpdateDiscountMutation
 } = discountsApi

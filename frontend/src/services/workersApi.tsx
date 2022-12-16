@@ -50,5 +50,6 @@ export const {
     useGetWorkersQuery,
     useGetSingleWorkerQuery,
     useDeleteWorkerMutation,
-    useUpdateWorkerMutation
+    useUpdateWorkerMutation,
+    useCreateWorkerMutation
 } = workersApi

@@ -53,4 +53,5 @@ export const {
     useGetSingleTrainStopQuery,
     useDeleteTrainStopMutation,
     useUpdateTrainStopMutation,
+    useCreateTrainStopMutation
 } = trainStopApi

@@ -7,7 +7,11 @@ import {useDeleteCarriageMutation, useUpdateCarriageMutation} from "../../servic
 import Menu from "../../components/Menu"
 
 const EditCarriages = () => {
-    const [carriage, setCarriage] = useState<Carriage | undefined>(undefined)
+    const [carriageName, setCarriageName] = useState<string>("")
+    const [carriageInput, setCarriageInput] = useState<boolean>(true)
+
+    const [technicalResearch, setTechnicalResearch] = useState<string>("")
+    const [technicalResearchInput, setTechnicalResearchInput] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -23,12 +27,17 @@ const EditCarriages = () => {
         navigate("/carriages")
     }
 
+    const updateSingleCarriage = async () => {
+        // updateCarriage()
+        // navigate("/carriages")
+    }
     const [deleteCarriage] = useDeleteCarriageMutation()
     const [updateCarriage] = useUpdateCarriageMutation()
 
     useEffect(() => {
         if (isGetSingleCarriageSuccess) {
-            setCarriage(getSingleCarriageData[0])
+            setCarriageName(getSingleCarriageData[0].nazwa)
+            setTechnicalResearch(getSingleCarriageData[0].databadaniatechnicznego.toString().split('T')[0])
         }
     }, [getSingleCarriageData, isGetSingleCarriageSuccess])
 
@@ -40,7 +49,52 @@ const EditCarriages = () => {
                     <p className={"text-4xl"}>Edytuj wagon</p>
                 </div>
                 <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Nazwa wagonu</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   value={carriageName}
+                                   onChange={(e) => {
+                                       setCarriageName(e.target.value)
+                                       setCarriageInput(false)
+                                   }}
+                            />
+                        </div>
+                    </div>
 
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Data badania technicznego</label>
+                        <div className={"flex w-4/6"}>
+                            <input type="date" className={"w-1/2"}
+                                   value={technicalResearch}
+                                   onChange={(e) => {
+                                       setTechnicalResearch(e.target.value)
+                                       setTechnicalResearchInput(false)
+                                   }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"flex"}>
+                        <button onClick={() => navigate("/carriages")}>Anuluj</button>
+                        <div className={"flex justify-end w-full"}>
+                            <button className={"mr-2 bg-red-600 border-red-700 text-white"}
+                                    onClick={() => deleteSingleCarriage()}>
+                                Usuń
+                            </button>
+                            <button
+                                className={`${"cursor-pointer"}`}
+                                onClick={() => updateSingleCarriage()}>
+                                Zapisz zmiany
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

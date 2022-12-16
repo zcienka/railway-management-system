@@ -21,9 +21,9 @@ import Carriages from "./pages/Carriage/Carriages"
 import Workers from "./pages/Worker/Workers"
 import EditWorkers from "./pages/Worker/EditWorkers"
 import CreateWorker from "./pages/Worker/CreateWorker"
-import RailroadCarriages from "./pages/RailroadCarriage/RailroadCarriages"
-import EditRailroadCarriages from "./pages/RailroadCarriage/EditRailroadCarriages"
-import CreateRailroadCarriage from "./pages/RailroadCarriage/CreateRailroadCarriage"
+import RailroadCar from "./pages/RailroadCar/RailroadCars"
+import EditRailroadCar from "./pages/RailroadCar/EditRailroadCar"
+import CreateRailroadCar from "./pages/RailroadCar/CreateRailroadCar"
 import Locomotives from "./pages/Locomotive/Locomotives"
 import EditLocomotive from "./pages/Locomotive/EditLocomotive"
 import CreateLocomotive from "./pages/Locomotive/CreateLocomotive"
@@ -65,9 +65,9 @@ function App() {
                 <Route path={"/workers/:id"} element={<EditWorkers/>}/>
                 <Route path={"/add-worker"} element={<CreateWorker/>}/>
 
-                <Route path={"/railroad-carriages"} element={<RailroadCarriages/>}/>
-                <Route path={"/railroad-carriages/:trainId/:carriageId"} element={<EditRailroadCarriages/>}/>
-                <Route path={"/add-railroad-carriage"} element={<CreateRailroadCarriage/>}/>
+                <Route path={"/railroad-cars"} element={<RailroadCar/>}/>
+                <Route path={"/railroad-cars/:trainIdParam/:carIdParam"} element={<EditRailroadCar/>}/>
+                <Route path={"/add-railroad-cars"} element={<CreateRailroadCar/>}/>
 
                 <Route path={"/locomotive"} element={<Locomotives/>}/>
                 <Route path={"/locomotive/:id"} element={<EditLocomotive/>}/>

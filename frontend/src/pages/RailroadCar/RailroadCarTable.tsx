@@ -3,7 +3,7 @@ import Menu from "../../components/Menu"
 import {ReactComponent as MagnifyingGlass} from "../../icons/magnifyingGlass.svg";
 import {useNavigate} from "react-router-dom";
 
-const RailroadCarriagesTable = (props: any[]) => {
+const RailroadCarTable = (props: any[]) => {
     const [searchValue, setSearchValue] = useState<string>("")
     const navigate = useNavigate()
 
@@ -28,7 +28,7 @@ const RailroadCarriagesTable = (props: any[]) => {
                         </div>
                     </div>
                     <div className={"flex justify-end w-full"}>
-                        <button onClick={() => navigate("/add-railroad-carriage")}>
+                        <button onClick={() => navigate("/add-railroad-cars")}>
                             Dodaj wagon w pociągu
                         </button>
                     </div>
@@ -39,6 +39,7 @@ const RailroadCarriagesTable = (props: any[]) => {
                             <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Numer wagonu</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Id wagonu</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Id pociągu</th>
+                            <th className={"rounded-tr-xl bg-slate-100 w-20 border-y  border-r border-stone-200"}></th>
                         </tr>
                         {Object.values(props)}
                     </tbody>
@@ -48,4 +49,4 @@ const RailroadCarriagesTable = (props: any[]) => {
     </div>
 }
 
-export default RailroadCarriagesTable
+export default RailroadCarTable

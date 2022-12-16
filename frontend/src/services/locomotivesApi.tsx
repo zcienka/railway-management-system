@@ -50,5 +50,6 @@ export const {
     useGetLocomotivesQuery,
     useGetSingleLocomotiveQuery,
     useDeleteLocomotiveMutation,
-    useUpdateLocomotiveMutation
+    useUpdateLocomotiveMutation,
+    useCreateLocomotiveMutation
 } = locomotivesApi

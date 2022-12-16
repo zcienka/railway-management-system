@@ -53,5 +53,6 @@ export const {
     useGetTrainsQuery,
     useGetSingleTrainQuery,
     useDeleteTrainMutation,
-    useUpdateTrainMutation
+    useUpdateTrainMutation,
+    useCreateTrainMutation
 } = trainsApi

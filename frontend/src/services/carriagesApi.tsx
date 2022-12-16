@@ -50,5 +50,6 @@ export const {
     useGetCarriagesQuery,
     useGetSingleCarriageQuery,
     useDeleteCarriageMutation,
+    useCreateCarriageMutation,
     useUpdateCarriageMutation
 } = carriagesApi
