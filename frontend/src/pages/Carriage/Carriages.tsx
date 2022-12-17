@@ -16,7 +16,6 @@ const Carriages = () => {
         isSuccess: isGetCarriagesSuccess,
         isError: isGetCarriagesError,
     } = useGetCarriagesQuery(null)
-    console.log({getCarriages})
 
     useEffect(() => {
         if (isGetCarriagesSuccess) {

@@ -33,11 +33,6 @@ export type TrainRide = {
     idpociagu: number,
 }
 
-// export type TrainRideRequest = {
-//     dataodjazdu: Date
-//     dataprzyjazdu: Date
-// }
-
 export type RailConnection = {
     id?: number,
 }

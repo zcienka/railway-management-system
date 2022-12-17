@@ -35,7 +35,7 @@ const TrainRides = () => {
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainRide.idpociagu}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
-                    onClick={() => navigate(`/train-passages/${trainRide.id}`)}>
+                    onClick={() => navigate(`/train-ride/${trainRide.id}`)}>
                     <div className={"px-3 py-1 border-2 rounded-md cursor-pointer mr-2"}>Edytuj</div>
                 </th>
             </tr>

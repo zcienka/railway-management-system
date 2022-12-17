@@ -34,7 +34,7 @@ const TrainStops = () => {
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.idlinii}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
-                    onClick={() => navigate(`/train-stop/${trainStop.nazwastacji}`)}>
+                    onClick={() => navigate(`/train-stops/${trainStop.numerprzystanku}`)}>
                     <div className={"px-3 py-1 border-2 rounded-md cursor-pointer mr-2"}>Edytuj</div>
                 </th>
             </tr>

@@ -54,5 +54,5 @@ export const {
     useGetSingleStationQuery,
     useDeleteStationMutation,
     useUpdateStationMutation,
-    useCreateStationMutation
+    useCreateStationMutation,
 } = stationsApi

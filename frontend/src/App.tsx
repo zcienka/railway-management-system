@@ -50,7 +50,7 @@ function App() {
                 <Route path={"/add-station"} element={<CreateStation/>}/>
 
                 <Route path={"/train-rides"} element={<TrainRides/>}/>
-                <Route path={"/train-rides/:id"} element={<EditTrainRide/>}/>
+                <Route path={"/train-ride/:idParam"} element={<EditTrainRide/>}/>
                 <Route path={"/add-train-ride"} element={<CreateTrainRide/>}/>
 
                 <Route path={"/train-stops"} element={<TrainStops/>}/>
