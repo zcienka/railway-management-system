@@ -6,6 +6,15 @@ export type Reservation = {
     znizka: string
 }
 
+export type ReservationResponse = {
+    id?: number,
+    dataodjazdu: Date,
+    dataprzyjazdu: Date,
+    imie: string,
+    nazwisko: string,
+    znizka: string,
+}
+
 export type Discount = {
     nazwaznizki: string,
     procentznizki: number,
@@ -33,6 +42,18 @@ export type TrainRide = {
     idpociagu: number,
 }
 
+export type TrainRideResponse = {
+    id?: number,
+    dataodjazdu: Date,
+    dataprzyjazdu: Date,
+    imiekonduktora: string,
+    nazwiskokonduktora: string,
+    imiemaszynisty: string,
+    nazwiskomaszynisty: string,
+    idliniiprzejazdu: number,
+    nazwapociagu: string,
+}
+
 export type RailConnection = {
     id?: number,
 }
@@ -46,7 +67,7 @@ export type Locomotive = {
 export type Train = {
     id?: number,
     nazwa: string,
-    idlokomotywy: number
+    nazwalokomotywy: string
 }
 
 export type Worker = {
@@ -60,11 +81,18 @@ export type Worker = {
 export type Carriage = {
     id?: number,
     databadaniatechnicznego: Date,
-    nazwa: string
+    liczbamiejsc: number
 }
 
 export type RailroadCar = {
     numerwagonu: number,
     idwagonu: number,
     idpociagu: number,
+}
+
+export type RailroadCarResponse = {
+    numerwagonu: number,
+    idwagonu: number,
+    idpociagu: number,
+    nazwapociagu: string,
 }

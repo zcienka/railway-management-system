@@ -1,5 +1,5 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Reservation} from "../types"
+import {Reservation, ReservationResponse} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const reservationsApi = createApi({
@@ -7,7 +7,7 @@ export const reservationsApi = createApi({
     baseQuery: BaseQuery,
     tagTypes: ["Reservation", "SingleReservation"],
     endpoints: (builder) => ({
-        getReservations: builder.query<Reservation[], null>({
+        getReservations: builder.query<ReservationResponse[], null>({
             query: () => ({
                 url: "/reservation",
                 method: "GET",

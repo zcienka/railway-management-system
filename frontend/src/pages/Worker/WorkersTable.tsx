@@ -36,8 +36,7 @@ const WorkersTable = (props: any[]) => {
                 <table className={"w-full border-spacing-0 border-separate overflow-y-auto"}>
                     <tbody>
                         <tr className={"rounded-tl-xl text-slate-600"}>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Id</th>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Imię</th>
+                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Imię</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Nazwisko</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Płaca</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Zawód</th>

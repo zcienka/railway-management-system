@@ -16,6 +16,12 @@ const EditWorkers = () => {
     const [lastName, setLastName] = useState<string>("")
     const [lastNameInput, setLastNameInput] = useState<boolean>(true)
 
+    const [wage, setWage] = useState<string>("")
+    const [wageInput, setWageInput] = useState<boolean>(true)
+
+    const [occupation, setOccupation] = useState<string>("")
+    const [occupationInput, setOccupationInput] = useState<boolean>(true)
+
     const navigate = useNavigate()
     const {id} = useParams()
     const {
@@ -42,6 +48,8 @@ const EditWorkers = () => {
         if (isGetSingleWorkerSuccess) {
             setName(getSingleWorkerData[0].imie)
             setLastName(getSingleWorkerData[0].nazwisko)
+            setWage(getSingleWorkerData[0].placa.toString())
+            setOccupation(getSingleWorkerData[0].zawod)
         }
     }, [getSingleWorkerData, isGetSingleWorkerSuccess])
 
@@ -77,6 +85,38 @@ const EditWorkers = () => {
                                    onChange={(e) => {
                                        setLastName(e.target.value)
                                        setLastNameInput(false)
+                                   }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Płaca</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   value={wage}
+                                   onChange={(e) => {
+                                       setWage(e.target.value)
+                                       setWageInput(false)
+                                   }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Zawód</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   value={occupation}
+                                   onChange={(e) => {
+                                       setOccupation(e.target.value)
+                                       setOccupationInput(false)
                                    }}
                             />
                         </div>

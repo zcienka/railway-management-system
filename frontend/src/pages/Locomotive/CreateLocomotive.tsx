@@ -22,7 +22,7 @@ const CreateLocomotive = () => {
             nazwa: locomotiveName,
         }
         await createLocomotive(singleLocomotive)
-        navigate("/locomotives")
+        navigate("/locomotive")
     }
 
     return <div className={"flex"}>
@@ -63,7 +63,7 @@ const CreateLocomotive = () => {
                 </div>
 
                 <div className={"flex mt-8"}>
-                    <button onClick={() => navigate('/locomotives')}>Anuluj</button>
+                    <button onClick={() => navigate('/locomotive')}>Anuluj</button>
                     <div className={"flex justify-end w-full"}>
                         <button
                             className={"cursor-pointer"}

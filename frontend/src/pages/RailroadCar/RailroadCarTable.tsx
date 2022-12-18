@@ -11,7 +11,7 @@ const RailroadCarTable = (props: any[]) => {
         <Menu/>
         <div className={"px-2 py-2 lg:px-10 lg:py-6 w-full"}>
             <div className={"h-24 w-full flex items-center"}>
-                <p className={"text-4xl"}>Wagony w pociągach</p>
+                <p className={"text-4xl"}>Wagony w pociągu</p>
             </div>
 
             <div className={"bg-white h-[calc(100vh-6rem)] max-h-[calc(100vh-9rem)] " +
@@ -37,8 +37,8 @@ const RailroadCarTable = (props: any[]) => {
                     <tbody>
                         <tr className={"rounded-tl-xl text-slate-600"}>
                             <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Numer wagonu</th>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Id wagonu</th>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Id pociągu</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Pociąg</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Wagon</th>
                             <th className={"rounded-tr-xl bg-slate-100 w-20 border-y  border-r border-stone-200"}></th>
                         </tr>
                         {Object.values(props)}

@@ -29,9 +29,10 @@ const TrainStops = () => {
     } else {
         const allTrainStops = Object.values(trainStop).map((trainStop: TrainStop) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{trainStop.numerprzystanku}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200 underline"}>Pokaż linię</th>
+                {/*{trainStop.idlinii}*/}
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.nazwastacji}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.idlinii}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.numerprzystanku}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/train-stops/${trainStop.numerprzystanku}`)}>

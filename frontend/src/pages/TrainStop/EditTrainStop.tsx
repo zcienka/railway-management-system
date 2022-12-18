@@ -6,8 +6,8 @@ import Menu from "../../components/Menu"
 import {useDeleteTrainStopMutation, useGetSingleTrainStopQuery, useUpdateTrainStopMutation} from "../../services/trainStopApi"
 
 const EditTrainStop = () => {
-    const [lineId, setLineId] = useState<string>("")
-    const [lineIdInput, setLineIdInput] = useState<boolean>(true)
+    const [lineNumber, setLineNumber] = useState<string>("")
+    const [lineNumberInput, setLineNumberInput] = useState<boolean>(true)
 
     const [stopName, setStopName] = useState<string>("")
     const [stopNameInput, setStopNameInput] = useState<boolean>(true)
@@ -36,7 +36,7 @@ const EditTrainStop = () => {
 
     useEffect(() => {
         if (isGetSingleTrainStopSuccess) {
-            setLineId(getSingleTrainStopData[0].idlinii.toString())
+            setLineNumber(getSingleTrainStopData[0].numerprzystanku.toString())
             setStopName(getSingleTrainStopData[0].nazwastacji)
         }
     }, [getSingleTrainStopData, isGetSingleTrainStopSuccess])
@@ -50,13 +50,13 @@ const EditTrainStop = () => {
                 </div>
                 <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Id linii</label>
+                        <label className={"w-2/6"}>Numer przystanku</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
-                                   value={lineId}
+                                   value={lineNumber}
                                    onChange={(e) => {
-                                       setLineId(e.target.value)
-                                       setLineIdInput(false)
+                                       setLineNumber(e.target.value)
+                                       setLineNumberInput(false)
                                    }}
                             />
                         </div>

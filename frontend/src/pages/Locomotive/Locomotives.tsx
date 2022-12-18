@@ -29,12 +29,11 @@ const Locomotives = () => {
     } else {
         const allLocomotives = Object.values(locomotives).map((locomotive: Locomotive) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{locomotive.id}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{locomotive.databadaniatechnicznego.toString()}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{locomotive.databadaniatechnicznego.toString().split("T")[0]}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{locomotive.nazwa}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
-                    onClick={() => navigate(`/locomotive/${locomotive.nazwa}`)}>
+                    onClick={() => navigate(`/locomotive/${locomotive.id}`)}>
                     <div className={"px-3 py-1 border-2 rounded-md cursor-pointer mr-2"}>Edytuj</div>
                 </th>
             </tr>

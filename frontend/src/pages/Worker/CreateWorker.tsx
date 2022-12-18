@@ -86,6 +86,22 @@ const CreateWorker = () => {
                     </div>
                 </div>
 
+                <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                </div>
+
+                <div className={"w-160 flex items-center"}>
+                    <label className={"w-2/6"}>Zawód</label>
+                    <div className={"flex w-4/6"}>
+                        <input className={"w-1/2"}
+                               value={occupation}
+                               onChange={(e) => {
+                                   setOccupation(e.target.value)
+                                   setOccupationInput(false)
+                               }}
+                        />
+                    </div>
+                </div>
+
                 <div className={"flex mt-8"}>
                     <button onClick={() => navigate('/workers')}>Anuluj</button>
                     <div className={"flex justify-end w-full"}>

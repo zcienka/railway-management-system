@@ -36,9 +36,8 @@ const TrainsTable = (props: any[]) => {
                 <table className={"w-full border-spacing-0 border-separate overflow-y-auto"}>
                     <tbody>
                         <tr className={"rounded-tl-xl text-slate-600"}>
-                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Id</th>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Nazwa</th>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Id lokomotywy</th>
+                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Nazwa</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Nazwa lokomotywy</th>
                             <th className={"rounded-tr-xl bg-slate-100 w-20 border-y border-r border-stone-200"}></th>
                         </tr>
                         {Object.values(props)}

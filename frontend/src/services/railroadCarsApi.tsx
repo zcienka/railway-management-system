@@ -1,5 +1,5 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {RailroadCar} from "../types"
+import {RailroadCar, RailroadCarResponse} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const railroadCarsApi = createApi({
@@ -7,14 +7,14 @@ export const railroadCarsApi = createApi({
     baseQuery: BaseQuery,
     tagTypes: ["RailroadCar"],
     endpoints: (builder) => ({
-        getRailroadCars: builder.query<RailroadCar[], null>({
+        getRailroadCars: builder.query<RailroadCarResponse[], null>({
             query: () => ({
                 url: "/railroad-car",
                 method: "GET",
             }),
             providesTags: ["RailroadCar"]
         }),
-        getSingleRailroadCar: builder.query<RailroadCar[], { trainId: string | undefined, carId: string | undefined }>({
+        getSingleRailroadCar: builder.query<RailroadCarResponse[], { trainId: string | undefined, carId: string | undefined }>({
             query: (body) => ({
                 url: `/railroad-car/${body.trainId}/${body.carId}`,
                 method: "GET",

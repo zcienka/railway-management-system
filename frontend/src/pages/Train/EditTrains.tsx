@@ -9,8 +9,8 @@ const EditTrains = () => {
     const [name, setName] = useState<string>("")
     const [nameInput, setNameInput] = useState<boolean>(true)
 
-    const [locomotiveId, setLocomotiveId] = useState<string>("")
-    const [locomotiveIdInput, setLocomotiveIdInput] = useState<boolean>(true)
+    const [locomotiveName, setLocomotiveName] = useState<string>("")
+    const [locomotiveNameInput, setLocomotiveNameInput] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -33,10 +33,10 @@ const EditTrains = () => {
         // updateTrain()
         // navigate("/train")
     }
-
+console.log({getSingleTrainData})
     useEffect(() => {
         if (isGetSingleTrainSuccess) {
-            setLocomotiveId(getSingleTrainData[0].idlokomotywy.toString())
+            setLocomotiveName(getSingleTrainData[0].nazwalokomotywy)
             setName(getSingleTrainData[0].nazwa)
         }
     }, [getSingleTrainData, isGetSingleTrainSuccess])
@@ -66,13 +66,13 @@ const EditTrains = () => {
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Id lokomotywy</label>
+                        <label className={"w-2/6"}>Nazwa lokomotywy</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
-                                   value={locomotiveId}
+                                   value={locomotiveName}
                                    onChange={(e) => {
-                                       setLocomotiveId(e.target.value)
-                                       setLocomotiveIdInput(false)
+                                       setLocomotiveName(e.target.value)
+                                       setLocomotiveNameInput(false)
                                    }}
                             />
                         </div>

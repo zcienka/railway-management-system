@@ -7,8 +7,8 @@ import {useDeleteCarriageMutation, useUpdateCarriageMutation} from "../../servic
 import Menu from "../../components/Menu"
 
 const EditCarriages = () => {
-    const [carriageName, setCarriageName] = useState<string>("")
-    const [carriageInput, setCarriageInput] = useState<boolean>(true)
+    const [seatsNumber, setSeatsNumber] = useState<string>("")
+    const [seatsNumberInput, setSeatsNumberInput] = useState<boolean>(true)
 
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
     const [technicalResearchInput, setTechnicalResearchInput] = useState<boolean>(true)
@@ -36,7 +36,7 @@ const EditCarriages = () => {
 
     useEffect(() => {
         if (isGetSingleCarriageSuccess) {
-            setCarriageName(getSingleCarriageData[0].nazwa)
+            setSeatsNumber(getSingleCarriageData[0].liczbamiejsc.toString())
             setTechnicalResearch(getSingleCarriageData[0].databadaniatechnicznego.toString().split('T')[0])
         }
     }, [getSingleCarriageData, isGetSingleCarriageSuccess])
@@ -53,10 +53,10 @@ const EditCarriages = () => {
                         <label className={"w-2/6"}>Nazwa wagonu</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
-                                   value={carriageName}
+                                   value={seatsNumber}
                                    onChange={(e) => {
-                                       setCarriageName(e.target.value)
-                                       setCarriageInput(false)
+                                       setSeatsNumber(e.target.value)
+                                       setSeatsNumberInput(false)
                                    }}
                             />
                         </div>

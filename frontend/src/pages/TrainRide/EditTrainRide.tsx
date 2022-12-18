@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom"
-import {TrainRide} from "../../types"
+import {Discount, TrainRide, Worker} from "../../types"
 import Menu from "../../components/Menu"
 import {
     useDeleteTrainRideMutation,
     useGetSingleTrainRideQuery,
     useUpdateTrainRideMutation
 } from "../../services/trainRideApi"
+import {useGetConductorsQuery, useGetDriversQuery, useGetSingleWorkerQuery} from "../../services/workersApi";
+import {v4 as uuidv4} from "uuid";
 
 const EditTrainRide = () => {
     const [departureDate, setDepartureDate] = useState<string>("")
@@ -37,6 +39,16 @@ const EditTrainRide = () => {
         skip: idParam === undefined
     })
 
+    const {
+        data: getConductorsData,
+        isSuccess: isGetConductorsSuccess
+    } = useGetConductorsQuery(null)
+
+    const {
+        data: getDriversData,
+        isSuccess: isGetDriversSuccess
+    } = useGetDriversQuery(null)
+
     const [deleteTrainRide] = useDeleteTrainRideMutation()
     const [updateTrainRide] = useUpdateTrainRideMutation()
 
@@ -51,17 +63,28 @@ const EditTrainRide = () => {
     }
     useEffect(() => {
         if (isGetSingleTrainRideSuccess) {
-            // console.log(getSingleTrainRideData[0].dataprzyjazdu.toString().split('T')[0])
             setDepartureDate(getSingleTrainRideData[0].dataodjazdu.toString())
             setArrivalDate(getSingleTrainRideData[0].dataprzyjazdu.toString())
-            setConductorId(getSingleTrainRideData[0].idkonduktora.toString())
-            setDriverId(getSingleTrainRideData[0].idmaszynisty.toString())
+            setConductorId(getSingleTrainRideData[0].imiekonduktora)
+            setDriverId(getSingleTrainRideData[0].imiemaszynisty)
             setRailConnectionId(getSingleTrainRideData[0].idliniiprzejazdu.toString())
-            setTrainId(getSingleTrainRideData[0].idpociagu.toString())
+            setTrainId(getSingleTrainRideData[0].nazwapociagu)
         }
     }, [getSingleTrainRideData, isGetSingleTrainRideSuccess])
 
-    if (getSingleTrainRideData !== undefined) {
+    if (getSingleTrainRideData !== undefined && getDriversData !== undefined && getConductorsData !== undefined) {
+        const drivers = getDriversData.map((worker: Worker) => {
+            return <option key={uuidv4()} value={worker.id}>
+                {worker.imie} {worker.nazwisko}
+            </option>
+        })
+
+        const conductors = getConductorsData.map((worker: Worker) => {
+            return <option key={uuidv4()} value={worker.id}>
+                {worker.imie} {worker.nazwisko}
+            </option>
+        })
+
         return <div className={"flex"}>
             <Menu/>
             <div className={"px-16 py-6 w-full"}>
@@ -104,15 +127,17 @@ const EditTrainRide = () => {
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Id konduktora</label>
+                        <label className={"w-2/6"}>Konduktor</label>
                         <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
+                            <select className={"w-1/2"}
                                    value={conductorId}
                                    onChange={(e) => {
                                        setConductorId(e.target.value)
                                        setConductorIdInput(false)
                                    }}
-                            />
+                            >
+                                {conductors}
+                            </select>
                         </div>
                     </div>
 
@@ -120,15 +145,17 @@ const EditTrainRide = () => {
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Id maszynisty</label>
+                        <label className={"w-2/6"}>Maszynista</label>
                         <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
+                            <select className={"w-1/2"}
                                    value={driverId}
                                    onChange={(e) => {
                                        setDriverId(e.target.value)
                                        setDriverIdInput(false)
                                    }}
-                            />
+                            >
+                                {drivers}
+                            </select>
                         </div>
                     </div>
 
@@ -152,7 +179,7 @@ const EditTrainRide = () => {
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Id pociągu</label>
+                        <label className={"w-2/6"}>Pociąg</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
                                    value={trainId}

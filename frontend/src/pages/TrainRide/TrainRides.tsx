@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
-import {TrainRide} from "../../types"
+import {TrainRide, TrainRideResponse} from "../../types"
 import {v4 as uuidv4} from "uuid"
 import {useGetTrainRidesQuery} from "../../services/trainRideApi"
 import TrainRidesTable from "./TrainRidesTable"
 import {useNavigate} from "react-router-dom"
 
 const TrainRides = () => {
-    const [trainRides, setTrainRides] = useState<TrainRide[] | undefined>(undefined)
+    const [trainRides, setTrainRides] = useState<TrainRideResponse[] | undefined>(undefined)
     const navigate = useNavigate()
 
     const {
@@ -26,13 +26,12 @@ const TrainRides = () => {
     if (trainRides === undefined) {
         return <Loading/>
     } else {
-        const allTrainRides = Object.values(trainRides).map((trainRide: TrainRide) => {
+        const allTrainRides = Object.values(trainRides).map((trainRide: TrainRideResponse) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{trainRide.id}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{trainRide.idkonduktora}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{trainRide.idmaszynisty}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{trainRide.imiekonduktora + " " + trainRide.nazwiskokonduktora}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>{trainRide.imiemaszynisty + " " + trainRide.nazwiskomaszynisty}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainRide.idliniiprzejazdu}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{trainRide.idpociagu}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>{trainRide.nazwapociagu}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/train-ride/${trainRide.id}`)}>

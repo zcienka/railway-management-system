@@ -1,5 +1,5 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {TrainRide, TrainStop} from "../types"
+import {TrainRide, TrainRideResponse, TrainStop} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const trainRideApi = createApi({
@@ -7,14 +7,14 @@ export const trainRideApi = createApi({
     baseQuery: BaseQuery,
     tagTypes: ["TrainRide", "SingleTrainRide", "StationByLine"],
     endpoints: (builder) => ({
-        getTrainRides: builder.query<TrainRide[], null>({
+        getTrainRides: builder.query<TrainRideResponse[], null>({
             query: () => ({
                 url: "/train-ride",
                 method: "GET",
             }),
             providesTags: ["TrainRide"]
         }),
-        getSingleTrainRide: builder.query<TrainRide[], string | undefined>({
+        getSingleTrainRide: builder.query<TrainRideResponse[], string | undefined>({
             query: (id) => ({
                 url: `/train-ride/${id}`,
                 method: "GET",

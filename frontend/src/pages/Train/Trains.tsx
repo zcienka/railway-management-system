@@ -16,22 +16,20 @@ const Trains = () => {
         isSuccess: isGetTrainsSuccess,
         isError: isGetTrainsError,
     } = useGetTrainsQuery(null)
-    console.log({getTrains})
 
     useEffect(() => {
         if (isGetTrainsSuccess) {
             setTrains(getTrains)
         }
     }, [getTrains, isGetTrainsFetching, isGetTrainsSuccess])
-
+console.log({trains})
     if (trains === undefined) {
         return <Loading/>
     } else {
         const allTrains = Object.values(trains).map((train: Train) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{train.id}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{train.nazwa}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{train.idlokomotywy}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{train.nazwa}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>{train.nazwalokomotywy}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/train/${train.id}`)}>

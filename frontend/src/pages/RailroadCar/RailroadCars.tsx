@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
-import {RailroadCar} from "../../types"
+import {RailroadCar, RailroadCarResponse} from "../../types"
 import {v4 as uuidv4} from "uuid"
 import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi"
 import RailroadCarTable from "./RailroadCarTable"
-import {useNavigate} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 const RailroadCars = () => {
-    const [railroadCars, setRailroadCars] = useState<RailroadCar[] | undefined>(undefined)
-
+    const [railroadCars, setRailroadCars] = useState<RailroadCarResponse[] | undefined>(undefined)
 
     const navigate = useNavigate()
 
@@ -28,11 +27,15 @@ const RailroadCars = () => {
     if (railroadCars === undefined) {
         return <Loading/>
     } else {
-        const allRailroadCars = Object.values(railroadCars).map((railroadCar: RailroadCar) => {
+        const allRailroadCars = Object.values(railroadCars).map((railroadCar: RailroadCarResponse) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{railroadCar.idpociagu}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{railroadCar.idwagonu}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{railroadCar.numerwagonu}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{railroadCar.numerwagonu}</th>
+                <th className={"py-2 font-semibold  border-b border-stone-200"}>{railroadCar.nazwapociagu} </th>
+                {/*{railroadCar.idwagonu}*/}
+
+                <th className={"py-2 font-semibold border-b  border-stone-200 underline"}><Link to={"/xd"}>Pokaż wagon</Link></th>
+                {/*{railroadCar.idpociagu}*/}
+
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/railroad-cars/${railroadCar.idpociagu}/${railroadCar.idwagonu}`)}>

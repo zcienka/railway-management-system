@@ -28,8 +28,7 @@ const Workers = () => {
     } else {
         const allWorkers = Object.values(workers).map((worker: Worker) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{worker.id}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{worker.imie}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{worker.imie}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{worker.nazwisko}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{worker.placa}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{worker.zawod}</th>

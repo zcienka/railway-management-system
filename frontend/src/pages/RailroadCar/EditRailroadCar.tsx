@@ -2,9 +2,12 @@ import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom"
 import {useGetSingleRailroadCarQuery} from "../../services/railroadCarsApi"
-import {RailroadCar} from "../../types"
+import {Carriage, Discount, RailroadCar, Train} from "../../types"
 import {useDeleteRailroadCarMutation, useUpdateRailroadCarMutation} from "../../services/railroadCarsApi"
 import Menu from "../../components/Menu"
+import {useGetTrainsQuery} from "../../services/trainsApi"
+import {v4 as uuidv4} from "uuid";
+import {useGetCarriagesQuery} from "../../services/carriagesApi";
 
 const EditRailroadCar = () => {
     const [carNumber, setCarNumber] = useState<string>("")
@@ -13,11 +16,28 @@ const EditRailroadCar = () => {
     const [carId, setCarId] = useState<string>("")
     const [carIdInput, setCarIdInput] = useState<boolean>(true)
 
+    const [trainName, setTrainName] = useState<string>("")
+    const [trainNameInput, setTrainNameInput] = useState<boolean>(true)
+
     const [trainId, setTrainId] = useState<string>("")
     const [trainIdInput, setTrainIdInput] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {trainIdParam, carIdParam} = useParams()
+
+    const {
+        data: getTrainsData,
+        isFetching: isGetTrainsFetching,
+        isSuccess: isGetTrainsSuccess,
+        isError: isGetTrainsError,
+    } = useGetTrainsQuery(null)
+
+    const {
+        data: getCarsData,
+        isFetching: isGetCarsFetching,
+        isSuccess: isGetCarsSuccess,
+        isError: isGetCarsError,
+    } = useGetCarriagesQuery(null)
 
     const {
         data: getSingleRailroadCarData,
@@ -41,16 +61,29 @@ const EditRailroadCar = () => {
         // updateCar()
         // navigate("/railroad-cars")
     }
-console.log({getSingleRailroadCarData})
+
     useEffect(() => {
         if (isGetSingleRailroadCarSuccess) {
             setCarNumber(getSingleRailroadCarData[0].numerwagonu.toString())
             setCarId(getSingleRailroadCarData[0].idwagonu.toString())
             setTrainId(getSingleRailroadCarData[0].idpociagu.toString())
+            setTrainName(getSingleRailroadCarData[0].nazwapociagu.toString())
         }
     }, [getSingleRailroadCarData, isGetSingleRailroadCarSuccess])
 
-    if (getSingleRailroadCarData !== undefined) {
+    if (getSingleRailroadCarData !== undefined && getTrainsData !== undefined && getCarsData !== undefined) {
+        const trainNames = getTrainsData.map((train: Train) => {
+            return <option key={uuidv4()} value={train.nazwa}>
+                {train.nazwa}
+            </option>
+        })
+
+        const cars = getCarsData.map((car: Carriage) => {
+            return <option key={uuidv4()} value={car.id}>
+                {car.liczbamiejsc + " miejsc"}
+            </option>
+        })
+
         return <div className={"flex"}>
             <Menu/>
             <div className={"px-16 py-6 w-full"}>
@@ -75,15 +108,16 @@ console.log({getSingleRailroadCarData})
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Id wagonu</label>
-                        <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
-                                   value={carId}
-                                   onChange={(e) => {
-                                       setCarId(e.target.value)
-                                       setCarIdInput(false)
-                                   }}
-                            />
+                        <div className={"w-160 flex items-center"}>
+                            <label className={"w-2/6"}>Pociąg</label>
+                            <div className={"flex w-4/6"}>
+                                <select className={"w-1/2"} value={trainName} onChange={(e) => {
+                                    setTrainName(e.target.value)
+                                    setTrainNameInput(false)
+                                }}>
+                                    {trainNames}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -91,15 +125,17 @@ console.log({getSingleRailroadCarData})
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Id pociągu</label>
+                        <label className={"w-2/6"}>Wagon</label>
                         <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
-                                   value={trainId}
+                            <select className={"w-1/2"}
+                                   value={carId}
                                    onChange={(e) => {
-                                       setTrainId(e.target.value)
-                                       setTrainIdInput(false)
+                                       setCarId(e.target.value)
+                                       setCarIdInput(false)
                                    }}
-                            />
+                            >
+                                {cars}
+                            </select>
                         </div>
                     </div>
 

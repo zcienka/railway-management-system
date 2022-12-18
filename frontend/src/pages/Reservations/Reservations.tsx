@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react"
 import {useGetReservationsQuery} from "../../services/reservationsApi"
 import ReservationsTable from "./ReservationsTable"
-import {Reservation} from "../../types"
+import {Reservation, ReservationResponse} from "../../types"
 import {useNavigate} from "react-router-dom"
 import {v4 as uuidv4} from 'uuid'
 import Loading from "../../components/Loading"
 
 const Reservations = () => {
-    const [reservations, setReservations] = useState<Reservation[] | undefined>(undefined)
+    const [reservations, setReservations] = useState<ReservationResponse[] | undefined>(undefined)
     const navigate = useNavigate()
 
     const {
@@ -26,12 +26,16 @@ const Reservations = () => {
     if (reservations === undefined) {
         return <Loading/>
     } else {
-        const allReservations = Object.values(reservations).map((reservation: Reservation) => {
+        const allReservations = Object.values(reservations).map((reservation: ReservationResponse) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{reservation.id}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.imie}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{reservation.imie}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.nazwisko}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.idprzejazdu}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>
+                    {reservation.dataodjazdu.toString().split("T")[0] + " " + reservation.dataodjazdu.toString().split("T")[1]}
+                </th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>
+                    {reservation.dataprzyjazdu.toString().split("T")[0] + " " + reservation.dataprzyjazdu.toString().split("T")[1]}
+                </th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{reservation.znizka}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}

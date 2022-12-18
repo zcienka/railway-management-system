@@ -11,15 +11,15 @@ const CreateTrain = () => {
     const [name, setName] = useState<string>("")
     const [nameInput, setNameInput] = useState<boolean>(true)
 
-    const [locomotiveId, setLocomotiveId] = useState<string>("")
-    const [locomotiveIdInput, setLocomotiveIdInput] = useState<boolean>(true)
+    const [locomotiveName, setLocomotiveId] = useState<string>("")
+    const [locomotiveNameInput, setLocomotiveIdInput] = useState<boolean>(true)
 
     const [createTrain] = useCreateTrainMutation()
 
     const createSingleTrain = async () => {
         const singleTrain: Train = {
             nazwa: name,
-            idlokomotywy: parseInt(locomotiveId)
+            nazwalokomotywy: locomotiveName
         }
         await createTrain(singleTrain)
         navigate("/train")
@@ -52,7 +52,7 @@ const CreateTrain = () => {
                     <label className={"w-2/6"}>Id lokomotywy</label>
                     <div className={"flex w-4/6"}>
                         <input className={"w-1/2"}
-                               value={locomotiveId}
+                               value={locomotiveName}
                                onChange={(e) => {
                                    setLocomotiveId(e.target.value)
                                    setLocomotiveIdInput(false)

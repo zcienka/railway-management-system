@@ -8,8 +8,8 @@ import {useCreateCarriageMutation} from "../../services/carriagesApi"
 const CreateCarriage = () => {
     const navigate = useNavigate()
 
-    const [carriageName, setCarriageName] = useState<string>("")
-    const [carriageInput, setCarriageInput] = useState<boolean>(true)
+    const [seatsNumber, setSeatsNumber] = useState<string>("")
+    const [seatsInput, setSeatsInput] = useState<boolean>(true)
 
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
     const [technicalResearchInput, setTechnicalResearchInput] = useState<boolean>(true)
@@ -18,7 +18,7 @@ const CreateCarriage = () => {
     const createSingleCarriage = async () => {
         const singleCarriage: Carriage = {
             databadaniatechnicznego: new Date(technicalResearch),
-            nazwa: carriageName
+            liczbamiejsc: parseInt(seatsNumber)
         }
         await createCarriage(singleCarriage)
         navigate("/carriages")
@@ -35,10 +35,10 @@ const CreateCarriage = () => {
                     <label className={"w-2/6"}>Nazwa wagonu</label>
                     <div className={"flex w-4/6"}>
                         <input className={"w-1/2"}
-                               value={carriageName}
+                               value={seatsNumber}
                                onChange={(e) => {
-                                   setCarriageName(e.target.value)
-                                   setCarriageInput(false)
+                                   setSeatsNumber(e.target.value)
+                                   setSeatsInput(false)
                                }}
                         />
                     </div>

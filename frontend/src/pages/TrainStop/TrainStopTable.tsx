@@ -36,9 +36,9 @@ const TrainStopTable = (props: any[]) => {
                 <table className={"w-full border-spacing-0 border-separate overflow-y-auto"}>
                     <tbody>
                         <tr className={"rounded-tl-xl text-slate-600"}>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Numer przystanku</th>
+                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Linia</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Nazwa stacji</th>
-                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Id linii</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Numer przystanku</th>
                             <th className={"rounded-tr-xl bg-slate-100 w-20 border-y border-r border-stone-200"}></th>
                         </tr>
                         {Object.values(props)}

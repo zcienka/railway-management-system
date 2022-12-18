@@ -1,5 +1,4 @@
 import React, {useState} from "react"
-import Loading from "../../components/Loading"
 import {useNavigate} from "react-router-dom";
 import Menu from "../../components/Menu";
 import {ReactComponent as MagnifyingGlass} from "../../icons/magnifyingGlass.svg";

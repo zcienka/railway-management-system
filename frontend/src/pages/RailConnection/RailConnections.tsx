@@ -28,6 +28,7 @@ const RailConnections = () => {
         const allRailConnections = Object.values(railConnections).map((railConnection: RailConnection) => {
             return <tr key={uuidv4()}>
                 <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{railConnection.id}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200 underline"}>Pokaż przystanki</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}>
                     <div className={"px-3 py-1 border-2 rounded-md cursor-pointer mr-2"}>Edytuj</div>

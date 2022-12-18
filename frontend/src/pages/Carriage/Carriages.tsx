@@ -28,9 +28,8 @@ const Carriages = () => {
     } else {
         const allCarriages = Object.values(carriages).map((carriage: Carriage) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{carriage.id}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{carriage.databadaniatechnicznego.toString()}</th>
-                <th className={"py-2 font-semibold border-b border-stone-200"}>{carriage.nazwa}</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{carriage.databadaniatechnicznego.toString().split("T")[0]}</th>
+                <th className={"py-2 font-semibold border-b border-stone-200"}>{carriage.liczbamiejsc.toString()}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/carriages/${carriage.id}`)}>

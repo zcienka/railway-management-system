@@ -20,6 +20,18 @@ export const workersApi = createApi({
                 method: "GET",
             }),
         }),
+        getConductors: builder.query<Worker[], string | null>({
+            query: () => ({
+                url: `/worker/conductors`,
+                method: "GET",
+            }),
+        }),
+        getDrivers: builder.query<Worker[], string | null>({
+            query: () => ({
+                url: `/worker/drivers`,
+                method: "GET",
+            }),
+        }),
         deleteWorker: builder.mutation({
             query: (id) => ({
                 url: `/worker/${id}`,
@@ -51,5 +63,7 @@ export const {
     useGetSingleWorkerQuery,
     useDeleteWorkerMutation,
     useUpdateWorkerMutation,
-    useCreateWorkerMutation
+    useCreateWorkerMutation,
+    useGetConductorsQuery,
+    useGetDriversQuery
 } = workersApi

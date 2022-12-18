@@ -3,7 +3,9 @@ import Loading from "../../components/Loading"
 import Menu from "../../components/Menu"
 import {useNavigate} from "react-router-dom"
 import {useCreateTrainRideMutation} from "../../services/trainRideApi"
-import {TrainRide} from "../../types"
+import {TrainRide, Worker} from "../../types"
+import {v4 as uuidv4} from "uuid";
+import {useGetConductorsQuery, useGetDriversQuery} from "../../services/workersApi";
 
 const CreateTrainRide = () => {
     const navigate = useNavigate()
@@ -41,124 +43,156 @@ const CreateTrainRide = () => {
         navigate("train-rides")
     }
 
-    return <div className={"flex"}>
-        <Menu/>
-        <div className={"px-16 py-6 w-full"}>
-            <div className={"h-24 w-full flex items-center"}>
-                <p className={"text-4xl"}>Dodawanie przejazdu</p>
-            </div>
-            <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
-                <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Data odjazdu</label>
-                    <div className={"flex w-4/6"}>
-                        <input className={"w-1/2"}
-                               type={"datetime-local"}
-                               value={departureDate}
-                               onChange={(e) => {
-                                   setDepartureDate(e.target.value)
-                                   setDepartureDateInput(false)
-                               }}
-                        />
+    const {
+        data: getConductorsData,
+        isSuccess: isGetConductorsSuccess
+    } = useGetConductorsQuery(null)
+
+    const {
+        data: getDriversData,
+        isSuccess: isGetDriversSuccess
+    } = useGetDriversQuery(null)
+
+
+    if (getDriversData !== undefined && getConductorsData !== undefined) {
+
+        const drivers = getDriversData.map((worker: Worker) => {
+            return <option key={uuidv4()} value={worker.id}>
+                {worker.imie} {worker.nazwisko}
+            </option>
+        })
+
+        const conductors = getConductorsData.map((worker: Worker) => {
+            return <option key={uuidv4()} value={worker.id}>
+                {worker.imie} {worker.nazwisko}
+            </option>
+        })
+
+        return <div className={"flex"}>
+            <Menu/>
+            <div className={"px-16 py-6 w-full"}>
+                <div className={"h-24 w-full flex items-center"}>
+                    <p className={"text-4xl"}>Dodawanie przejazdu</p>
+                </div>
+                <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Data odjazdu</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   type={"datetime-local"}
+                                   value={departureDate}
+                                   onChange={(e) => {
+                                       setDepartureDate(e.target.value)
+                                       setDepartureDateInput(false)
+                                   }}
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                </div>
-
-                <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Data przyjazdu</label>
-                    <div className={"flex w-4/6"}>
-                        <input className={"w-1/2"}
-                               type={"datetime-local"}
-                               value={arrivalDate}
-                               onChange={(e) => {
-                                   setArrivalDate(e.target.value)
-                                   setArrivalDateInput(false)
-                               }}
-                        />
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
                     </div>
-                </div>
 
-                <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                </div>
-
-                <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Id konduktora</label>
-                    <div className={"flex w-4/6"}>
-                        <input className={"w-1/2"}
-                               value={conductorId}
-                               onChange={(e) => {
-                                   setConductorId(e.target.value)
-                                   setConductorIdInput(false)
-                               }}
-                        />
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Data przyjazdu</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   type={"datetime-local"}
+                                   value={arrivalDate}
+                                   onChange={(e) => {
+                                       setArrivalDate(e.target.value)
+                                       setArrivalDateInput(false)
+                                   }}
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                </div>
-
-                <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Id maszynisty</label>
-                    <div className={"flex w-4/6"}>
-                        <input className={"w-1/2"}
-                               value={driverId}
-                               onChange={(e) => {
-                                   setDriverId(e.target.value)
-                                   setDriverIdInput(false)
-                               }}
-                        />
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
                     </div>
-                </div>
 
-                <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                </div>
-
-                <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Id linii przejazdu</label>
-                    <div className={"flex w-4/6"}>
-                        <input className={"w-1/2"}
-                               value={railConnectionId}
-                               onChange={(e) => {
-                                   setRailConnectionId(e.target.value)
-                                   setRailConnectionIdInput(false)
-                               }}
-                        />
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Konduktor</label>
+                        <div className={"flex w-4/6"}>
+                            <select className={"w-1/2"}
+                                    value={conductorId}
+                                    onChange={(e) => {
+                                        setConductorId(e.target.value)
+                                        setConductorIdInput(false)
+                                    }}
+                            >
+                                {conductors}
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                </div>
-
-                <div className={"w-160 flex items-center"}>
-                    <label className={"w-2/6"}>Id pociągu</label>
-                    <div className={"flex w-4/6"}>
-                        <input className={"w-1/2"}
-                               value={trainId}
-                               onChange={(e) => {
-                                   setTrainId(e.target.value)
-                                   setTrainIdInput(false)
-                               }}
-                        />
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
                     </div>
-                </div>
 
-                <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                </div>
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Maszynista</label>
+                        <div className={"flex w-4/6"}>
+                            <select className={"w-1/2"}
+                                    value={driverId}
+                                    onChange={(e) => {
+                                        setDriverId(e.target.value)
+                                        setDriverIdInput(false)
+                                    }}
+                            >
+                                {drivers}
+                            </select>
+                        </div>
+                    </div>
 
-                <div className={"flex mt-8"}>
-                    <button onClick={() => navigate('train-rides')}>Anuluj</button>
-                    <div className={"flex justify-end w-full"}>
-                        <button
-                            className={"cursor-pointer"}
-                            onClick={() => createSingleTrainRide()}>
-                            Dodaj
-                        </button>
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Id linii przejazdu</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   value={railConnectionId}
+                                   onChange={(e) => {
+                                       setRailConnectionId(e.target.value)
+                                       setRailConnectionIdInput(false)
+                                   }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>Pociąg</label>
+                        <div className={"flex w-4/6"}>
+                            <input className={"w-1/2"}
+                                   value={trainId}
+                                   onChange={(e) => {
+                                       setTrainId(e.target.value)
+                                       setTrainIdInput(false)
+                                   }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"flex mt-8"}>
+                        <button onClick={() => navigate('/train-rides')}>Anuluj</button>
+                        <div className={"flex justify-end w-full"}>
+                            <button
+                                className={"cursor-pointer"}
+                                onClick={() => createSingleTrainRide()}>
+                                Dodaj
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    } else {
+        return <Loading/>
+    }
 }
 
 export default CreateTrainRide

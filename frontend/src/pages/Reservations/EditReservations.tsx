@@ -134,14 +134,6 @@ const EditReservations = () => {
                     <p className={"text-4xl"}>Rezerwacja</p>
                 </div>
                 <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
-                    <div className={"w-160 flex items-center mb-2"}>
-                        <p className={"w-2/6"}>Id</p>
-
-                        <div className={"flex w-4/6"}>
-                            <p className={"py-2 px-3"}>{id}</p>
-                        </div>
-                    </div>
-
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Imię</label>
                         <div className={"flex w-4/6"}>
