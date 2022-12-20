@@ -11,13 +11,13 @@ select nazwisko
 from pracownik;
 
 insert into pracownik(id, imie, nazwisko, placa, zawod)
-values (1, 'Krzysztof', 'Wójcik', 1, 'Maszynista');
+values (1, 'Krzysztof', 'Wójcik', 1000, 'Maszynista');
 
 insert into pracownik(id, imie, nazwisko, placa, zawod)
-values (2, 'Tomasz', 'Wiśniewski', 2, 'Konduktor');
+values (2, 'Tomasz', 'Wiśniewski', 2000, 'Konduktor');
 
 insert into pracownik(id, imie, nazwisko, placa, zawod)
-values (3, 'Grażyna', 'Żarko', 3, 'Maszynista');
+values (3, 'Grażyna', 'Żarko', 3000, 'Maszynista');
 
 insert into pracownik(id, imie, nazwisko, placa, zawod)
-values (4, 'Julia', 'Nowaczyk', 4, 'Konduktor');
+values (4, 'Julia', 'Nowaczyk', 4000, 'Konduktor');
