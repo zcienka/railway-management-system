@@ -21,7 +21,12 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select  *  from
+                            select 
+                            numerwagonu,
+                            idwagonu,
+                            idpociagu,
+                            (select nazwa as nazwapociagu from pociag where id=idpociagu)
+                            from
                             wagonwpociagu
                             order by idwagonu, idpociagu
                             ";
@@ -50,7 +55,12 @@ namespace Backend.Controllers
         public IActionResult Get(string idwagonu, string idpociagu)
         {
             string query = @"
-                            select  *  from
+                            select 
+                            numerwagonu,
+                            idwagonu,
+                            idpociagu,
+                            (select nazwa as nazwapociagu from pociag where id=idpociagu)
+                            from
                             wagonwpociagu 
                             where idwagonu = @idwagonu
                             and idpociagu = @idpociagu

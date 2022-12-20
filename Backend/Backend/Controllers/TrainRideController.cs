@@ -20,8 +20,17 @@ namespace Backend.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            string query = @"
-                            select  *  from
+            string query = $@"
+                            select id,
+                            dataodjazdu,
+                            dataprzyjazdu,
+                            (select imie as imiekonduktora from pracownik where id=idkonduktora),
+                            (select nazwisko as nazwiskokonduktora from pracownik where id=idkonduktora),
+                            (select imie as imiemaszynisty from pracownik where id=idmaszynisty),
+                            (select nazwisko as nazwiskomaszynisty from pracownik where id=idmaszynisty),
+                            idliniiprzejazdu,
+                            (select nazwa as nazwapociagu from pociag where id=idpociagu)
+                            from
                             przejazd
                             order by id
                             ";
@@ -50,7 +59,8 @@ namespace Backend.Controllers
         public IActionResult GetStationsByLine(string id)
         {
             string query = @"
-                            select * from
+                            select *
+                            from
                             przystanek p join liniaprzejazdu l
                             on l.id = p.idlinii
                             where @id=id
@@ -82,7 +92,16 @@ namespace Backend.Controllers
         public IActionResult Get(string id)
         {
             string query = @"
-                            select  *  from
+                            select id,
+                            dataodjazdu,
+                            dataprzyjazdu,
+                            (select imie as imiekonduktora from pracownik where id=idkonduktora),
+                            (select nazwisko as nazwiskokonduktora from pracownik where id=idkonduktora),
+                            (select imie as imiemaszynisty from pracownik where id=idmaszynisty),
+                            (select nazwisko as nazwiskomaszynisty from pracownik where id=idmaszynisty),
+                            idliniiprzejazdu,
+                            (select nazwa as nazwapociagu from pociag where id=idpociagu)
+                            from
                             przejazd where id = @id
                             ";
             DataTable table = new DataTable();

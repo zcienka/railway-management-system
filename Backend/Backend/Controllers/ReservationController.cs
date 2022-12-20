@@ -21,9 +21,14 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select  *  from
-                            rezerwacja
-                            order by id
+                           select id,
+                           imie,
+                           nazwisko,
+                           (select dataodjazdu from przejazd where id=idprzejazdu),
+                           (select dataprzyjazdu from przejazd where id=idprzejazdu),
+                           znizka
+                           from rezerwacja
+                           order by id;
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -169,7 +174,7 @@ namespace Backend.Controllers
                 }
             }
 
-            return NoContent(); 
+            return NoContent();
         }
     }
 }

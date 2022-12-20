@@ -76,6 +76,62 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
+        [HttpGet("conductors")]
+        public IActionResult GetConductors()
+        {
+            string query = @"
+                            select * from
+                            pracownik where zawod='Konduktor'
+                            ";
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("railway_database");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            string json = JsonConvert.SerializeObject(table, Formatting.Indented);
+
+            return Ok(json);
+        }
+
+        [HttpGet("drivers")]
+        public IActionResult GetDrivers()
+        {
+            string query = @"
+                            select * from
+                            pracownik where zawod='Maszynista'
+                            ";
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("railway_database");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            string json = JsonConvert.SerializeObject(table, Formatting.Indented);
+
+            return Ok(json);
+        }
+
         [HttpPost]
         public IActionResult Post(Worker worker)
         {
@@ -171,5 +227,7 @@ namespace Backend.Controllers
 
             return NoContent();
         }
+
+
     }
 }

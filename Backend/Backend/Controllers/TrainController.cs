@@ -21,7 +21,11 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select * from
+                            select 
+                            id,
+                            nazwa, 
+                            (select nazwa as nazwalokomotywy from lokomotywa where id=idlokomotywy)
+                            from
                             pociag
                             order by id
                             ";
@@ -50,7 +54,11 @@ namespace Backend.Controllers
         public IActionResult Get(string id)
         {
             string query = @"
-                            select * from
+                            select 
+                            id,
+                            nazwa, 
+                            (select nazwa as nazwalokomotywy from lokomotywa where id=idlokomotywy)
+                            from
                             pociag where id = @id 
                             ";
             DataTable table = new DataTable();
