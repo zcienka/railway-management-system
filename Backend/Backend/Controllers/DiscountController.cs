@@ -21,9 +21,7 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select  *  from
-                            znizka
-                            order by nazwaznizki
+                            select * from znizkaReadAll();
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -50,8 +48,7 @@ namespace Backend.Controllers
         public IActionResult Get(string nazwaznizki)
         {
             string query = @"
-                            select  *  from
-                            znizka where nazwaznizki = @nazwaznizki 
+                            select * from znizkaReadByName(@nazwaznizki);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -80,10 +77,10 @@ namespace Backend.Controllers
         public IActionResult Post(Discount discount)
         {
             string query = @"
-                            insert into znizka(nazwaznizki, procentznizki, dokumentpotwierdzajacy) 
-                            values(@nazwaznizki, @procentznizki, @dokumentpotwierdzajacy)
+                            select znizkaCreate(vNazwa => @nazwaznizki, vProcent => @procentznizki, vDokument => @dokumentpotwierdzajacy);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -95,27 +92,36 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@nazwaznizki", discount.nazwaznizki);
                     myCommand.Parameters.AddWithValue("@procentznizki", discount.procentznizki);
                     myCommand.Parameters.AddWithValue("@dokumentpotwierdzajacy", discount.dokumentpotwierdzajacy);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[3].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return CreatedAtAction(nameof(Get), discount);
+            if(val == 1)
+                return CreatedAtAction(nameof(Get), discount);
+            else if(val == 0)
+                return StatusCode(409, "Istnieje już zniżka o danej nazwie");
+            else if (val == -1)
+                return StatusCode(409, "Dokument musi być dlugości między 1 a 32");
+            else if (val == -2)
+                return StatusCode(409, "Nazwa musi być dlugości między 1 a 32");
+            else
+                return StatusCode(409, "Procent zniżki musi być między 0 a 100");
         }
 
         [HttpPatch]
         public IActionResult Patch(Discount discount)
         {
             string query = @"
-                           update znizka
-                           set procentznizki = @procentznizki,
-                           dokumentpotwierdzajacy = @dokumentpotwierdzajacy
-                           where nazwaznizki = @nazwaznizki
+                            select znizkaUpdate(vNazwa => @nazwaznizki, vProcent => @procentznizki, vDokument => @dokumentpotwierdzajacy);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -127,25 +133,35 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@nazwaznizki", discount.nazwaznizki);
                     myCommand.Parameters.AddWithValue("@procentznizki", discount.procentznizki);
                     myCommand.Parameters.AddWithValue("@dokumentpotwierdzajacy", discount.dokumentpotwierdzajacy);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[3].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
+            if(val == 1)
+                return Ok(discount);
+            else if(val == 0)
+                return StatusCode(409, "Nie istnieje zniżka o danej nazwie");
+            else if(val ==-1)
+                return StatusCode(409, "Dokument musi być dlugości między 1 a 32");
+            else
+                return StatusCode(409, "Procent zniżki musi być między 0 a 100");
 
-            return Ok(discount);
         }
 
         [HttpDelete("{nazwaznizki}")]
         public IActionResult Delete(string nazwaznizki)
         {
             string query = @"
-                           delete from znizka
-                           where nazwaznizki=@nazwaznizki
+                           select znizkaDelete(@nazwaznizki);
                            ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -155,15 +171,21 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@nazwaznizki", nazwaznizki);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[1].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
 
-            return NoContent();
+            if (val == 1)
+                return NoContent();
+            else
+                return StatusCode(409, "Nie istnieje zniżka o danej nazwie");
         }
     }
 }

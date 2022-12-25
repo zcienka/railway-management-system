@@ -22,8 +22,7 @@ namespace Backend.Controllers
         {
             string query = @"
                             select * from
-                            pracownik
-                            order by id
+                            pracownikReadAll();
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -49,9 +48,15 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
+            try
+            {
+                int idInt = Int32.Parse(id);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
                             select * from
-                            pracownik where id = @id 
+                            pracownikReadById(@id);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -61,7 +66,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", Int64.Parse(id));
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -80,8 +85,7 @@ namespace Backend.Controllers
         public IActionResult GetConductors()
         {
             string query = @"
-                            select * from
-                            pracownik where zawod='Konduktor'
+                            select * from pracownikFilter(vZawod => 'Konduktor');
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -108,8 +112,7 @@ namespace Backend.Controllers
         public IActionResult GetDrivers()
         {
             string query = @"
-                            select * from
-                            pracownik where zawod='Maszynista'
+                            select * from pracownikFilter(vZawod => 'Maszynista');
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -136,10 +139,13 @@ namespace Backend.Controllers
         public IActionResult Post(Worker worker)
         {
             string query = @"
-                            insert into pracownik(id, imie, nazwisko, placa, zawod) 
-                            values(@id, @imie, @nazwisko, @placa, @zawod)
+                            select pracownikCreate(vImie => @imie,
+                                                   vNazwisko => @nazwisko,
+                                                   vZawod => @zawod,
+                                                   vPlaca => @placa);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -148,34 +154,45 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", worker.Id);
                     myCommand.Parameters.AddWithValue("@imie", worker.Imie);
                     myCommand.Parameters.AddWithValue("@nazwisko", worker.Nazwisko);
                     myCommand.Parameters.AddWithValue("@placa", worker.Placa);
                     myCommand.Parameters.AddWithValue("@zawod", worker.Zawod);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[4].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
+            if(val == 1)
+                return CreatedAtAction(nameof(Get), worker);
+            else if (val == -1)
+                return StatusCode(409, "Dostępne zawody: \"Maszynista\", \"Konduktor\".");
+            else if (val == -2)
+                return StatusCode(409, "Imię musi być dlugości między 1 a 31");
+            else if (val == -3)
+                return StatusCode(409, "Nazwisko musi być dlugości między 1 a 31");
+            else
+                return StatusCode(409, "Płaca nie może być ujemna");
 
-            return CreatedAtAction(nameof(Get), worker);
         }
 
         [HttpPatch]
         public IActionResult Patch(Worker worker)
         {
             string query = @"
-                           update pracownik
-                           set imie = @imie,
-                           nazwisko = @nazwisko,
-                           placa = @placa,
-                           zawod = @zawod
-                           where id = @id
+                           select pracownikUpdate(vId => @id
+                                                  vImie => @imie, 
+                                                  vNazwisko => @nazwisko, 
+                                                  vZawod => @zawod, 
+                                                  vPlaca => @placa);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -189,25 +206,44 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@nazwisko", worker.Nazwisko);
                     myCommand.Parameters.AddWithValue("@placa", worker.Placa);
                     myCommand.Parameters.AddWithValue("@zawod", worker.Zawod);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[5].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return Ok(worker);
+            if (val == 1)
+                return Ok(worker);
+            else if (val == 0)
+                return StatusCode(409, "Nie znaleziono pracownika o danym ID");
+            else if (val == -1)
+                return StatusCode(409, "Dostępne zawody: \"Maszynista\", \"Konduktor\".");
+            else if (val == -2)
+                return StatusCode(409, "Imię musi być dlugości między 1 a 32");
+            else if (val == -3)
+                return StatusCode(409, "Nazwisko musi być dlugości między 1 a 32");
+            else
+                return StatusCode(409, "Płaca nie może być ujemna");
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            try
+            {
+                int idInt = Int32.Parse(id);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                           delete from pracownik
-                           where id=@id
+                           select pracownikDelete(@id);
                            ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -216,16 +252,22 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[1].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
 
-            return NoContent();
+            if (val == 1)
+                return Ok();
+            else
+                return StatusCode(409, "Nie znaleziono pracownika o danym ID");
         }
 
 

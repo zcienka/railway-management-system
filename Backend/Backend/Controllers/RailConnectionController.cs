@@ -21,9 +21,7 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select * from
-                            liniaprzejazdu
-                            order by id
+                            select * from liniaprzejazduReadAll();
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -49,9 +47,14 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
+            try
+            {
+                int idInt = Int32.Parse(id);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                            select * from
-                            liniaprzejazdu where id = @id 
+                            select * from liniaprzejazduReadById(@id);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -61,7 +64,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", Int64.Parse(id));
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -80,10 +83,10 @@ namespace Backend.Controllers
         public IActionResult Post(RailConnection railConnection)
         {
             string query = @"
-                            insert into liniaprzejazdu(id) 
-                            values(@id)
+                            select liniaprzejazduCreate(@id);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -93,25 +96,36 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@id", railConnection.Id);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[1].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return CreatedAtAction(nameof(Get), railConnection);
+            if(val == 1)
+                return CreatedAtAction(nameof(Get), railConnection);
+            else
+                return StatusCode(409, "Linia przejazdu o danym ID już istnieje");
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            try
+            {
+                int idInt = Int32.Parse(id);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                           delete from liniaprzejazdu
-                           where id=@id
+                           select liniaprzejazduDelete(@id);
                            ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -120,16 +134,21 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[1].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return NoContent();
+            if (val == 1)
+                return NoContent();
+            else
+                return StatusCode(409, "Linia o danym ID nie istnieje");
         }
     }
 }

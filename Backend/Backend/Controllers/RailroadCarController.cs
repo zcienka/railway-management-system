@@ -21,14 +21,8 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select 
-                            numerwagonu,
-                            idwagonu,
-                            idpociagu,
-                            (select nazwa as nazwapociagu from pociag where id=idpociagu)
-                            from
-                            wagonwpociagu
-                            order by idwagonu, idpociagu
+                            select numerwagonu, idwagonu, idpociagu, nazwa as nazwapociagu from wagonwpociaguReadAll() 
+                            join pociag on pociag.id=idpociagu order by idwagonu, idpociagu;
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -54,16 +48,17 @@ namespace Backend.Controllers
         [HttpGet("{idwagonu}/{idpociagu}")]
         public IActionResult Get(string idwagonu, string idpociagu)
         {
+            try
+            {
+                int idw = Int32.Parse(idwagonu);
+                int idp = Int32.Parse(idpociagu);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                            select 
-                            numerwagonu,
-                            idwagonu,
-                            idpociagu,
-                            (select nazwa as nazwapociagu from pociag where id=idpociagu)
-                            from
-                            wagonwpociagu 
-                            where idwagonu = @idwagonu
-                            and idpociagu = @idpociagu
+                            select numerwagonu, idwagonu, idpociagu, nazwa as nazwapociagu from wagonwpociaguReadById(vIdWagonu => @idwagonu,
+                                                                                                      vIdPociagu => @idpociagu)
+                            join pociag on pociag.id=idpociagu;
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -73,8 +68,8 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@idwagonu", Int64.Parse(idwagonu));
-                    myCommand.Parameters.AddWithValue("@idpociagu", Int64.Parse(idpociagu));
+                    myCommand.Parameters.AddWithValue("@idwagonu", Int32.Parse(idwagonu));
+                    myCommand.Parameters.AddWithValue("@idpociagu", Int32.Parse(idpociagu));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -90,13 +85,13 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(RailroadCar railroadCarriage)
+        public IActionResult Post(RailroadCar railroadcar)
         {
             string query = @"
-                            insert into wagonwpociagu(idwagonu, procentznizki, dokumentpotwierdzajacy) 
-                            values(@idwagonu, @procentznizki, @dokumentpotwierdzajacy)
+                            select wagonwpociaguCreate(vIdWagonu => @idwagonu, vIdPociagu => @idpociagu, vNrWagonu => @numerwagonu);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -105,30 +100,37 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    // myCommand.Parameters.AddWithValue("@idwagonu", railroadCarriage.idwagonu);
-                    // myCommand.Parameters.AddWithValue("@procentznizki", railroadCarriage.procentznizki);
-                    // myCommand.Parameters.AddWithValue("@dokumentpotwierdzajacy", railroadCarriage.dokumentpotwierdzajacy);
+                    myCommand.Parameters.AddWithValue("@numerwagonu", railroadcar.NumerWagonu);
+                    myCommand.Parameters.AddWithValue("@idwagonu", railroadcar.IdWagonu);
+                    myCommand.Parameters.AddWithValue("@idpociagu", railroadcar.IdPociagu);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[3].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return CreatedAtAction(nameof(Get), railroadCarriage);
+            if(val == 1)
+                return CreatedAtAction(nameof(Get), railroadcar);
+            else if (val == 0)
+                return StatusCode(409, "Dany wagon znajduje się już w tym pociągu");
+            else if (val == -1)
+                return StatusCode(409, "Wszystkie wartości muszą być nieujemne");
+            else
+                return StatusCode(409, "Pociąg ma już przydzielony wagon z danym numerem");
         }
 
         [HttpPatch]
-        public IActionResult Patch(Reservation reservation)
+        public IActionResult Patch(RailroadCar railroadcar)
         {
             string query = @"
-                           update wagonwpociagu
-                           set procentznizki = @procentznizki,
-                           dokumentpotwierdzajacy = @dokumentpotwierdzajacy
-                           where idwagonu = @idwagonu
+                            select wagonwpociaguUpdate(vIdWagonu => @idwagonu, vIdPociagu => @idpociagu, vNrWagonu => @numerwagonu);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -137,24 +139,44 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
+                    myCommand.Parameters.AddWithValue("@numerwagonu", railroadcar.NumerWagonu);
+                    myCommand.Parameters.AddWithValue("@idwagonu", railroadcar.IdWagonu);
+                    myCommand.Parameters.AddWithValue("@idpociagu", railroadcar.IdPociagu);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[3].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return Ok(reservation);
+            if(val == 1)
+                return Ok(railroadcar);
+            else if(val == 0)
+                return StatusCode(409, "Wagon nie jest przydzielony do tego pociągu");
+            else if(val == -1)
+                return StatusCode(409, "Wszystkie wartości muszą być nieujemne");
+            else
+                return StatusCode(409, "Pociąg ma już przydzielony wagon z danym numerem");
         }
 
-        [HttpDelete("{idwagonu}")]
-        public IActionResult Delete(string idwagonu)
+        [HttpDelete("{idpociagu}/{idwagonu}")]
+        public IActionResult Delete(string idwagonu, string idpociagu)
         {
+            try
+            {
+                int idw = Int32.Parse(idwagonu);
+                int idp = Int32.Parse(idpociagu);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                           delete from wagonwpociagu
-                           where idwagonu=@idwagonu
+                            select wagonwpociaguDelete(vIdWagonu => @idwagonu, vIdPociagu => @idpociagu);
                            ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -163,16 +185,23 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@idwagonu", idwagonu);
+                    myCommand.Parameters.AddWithValue("@idwagonu", Int32.Parse(idwagonu));
+                    myCommand.Parameters.AddWithValue("@idpociagu", Int32.Parse(idpociagu));
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[2].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
 
-            return NoContent();
+            if(val == 1)
+                return NoContent();
+            else
+                return StatusCode(409, "Nie znaleziono danego wagonu w danym pociągu");
         }
     }
 }

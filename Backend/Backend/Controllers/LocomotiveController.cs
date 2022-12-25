@@ -21,9 +21,7 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select  *  from
-                            lokomotywa
-                            order by id
+                            select * from lokomotywaReadAll();
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -49,9 +47,14 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
+            try
+            {
+                int idInt = Int32.Parse(id);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                            select  *  from
-                            lokomotywa where id = @id 
+                            select * from lokomotywaReadById(@id);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -61,7 +64,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", Int64.Parse(id));
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -80,10 +83,10 @@ namespace Backend.Controllers
         public IActionResult Post(Locomotive locomotive)
         {
             string query = @"
-                            insert into lokomotywa(id, databadaniatechnicznego, nazwa) 
-                            values(@id, @databadaniatechnicznego, @nazwa)
+                            select lokomotywaCreate(vData => @databadaniatechnicznego, vNazwa => @nazwa);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -92,30 +95,34 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", locomotive.Id);
-                    myCommand.Parameters.AddWithValue("@databadaniatechnicznego", locomotive.Databadaniatechnicznego);
+                    myCommand.Parameters.AddWithValue("@databadaniatechnicznego", DateOnly.FromDateTime(locomotive.Databadaniatechnicznego));
                     myCommand.Parameters.AddWithValue("@nazwa", locomotive.Nazwa);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[2].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return CreatedAtAction(nameof(Get), locomotive);
+            if(val == 1)
+                return CreatedAtAction(nameof(Get), locomotive);
+            else if(val == -1)
+                return StatusCode(409, "Data nie może być przeszła");
+            else
+                return StatusCode(409, "Nazwa musi być dlugości maksymalnie 32");
         }
 
         [HttpPatch]
         public IActionResult Patch(Locomotive locomotive)
         {
             string query = @"
-                           update lokomotywa
-                           set databadaniatechnicznego = @databadaniatechnicznego,
-                           nazwa = @nazwa
-                           where id = @id
+                            select lokomotywaUpdate(vId => @id, vData => @databadaniatechnicznego, vNazwa => @nazwa);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -125,27 +132,42 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@id", locomotive.Id);
-                    myCommand.Parameters.AddWithValue("@databadaniatechnicznego", locomotive.Databadaniatechnicznego);
+                    myCommand.Parameters.AddWithValue("@databadaniatechnicznego", DateOnly.FromDateTime(locomotive.Databadaniatechnicznego));
                     myCommand.Parameters.AddWithValue("@nazwa", locomotive.Nazwa);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[3].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return Ok(locomotive);
+            if(val == 1)
+                return Ok(locomotive);
+            if(val == 0)
+                return StatusCode(409, "Nie znaleziono lokomotywy o danym ID");
+            if(val == -1)
+                return StatusCode(409, "Data nie może być przeszła");
+            else
+                return StatusCode(409, "Nazwa musi być dlugości maksymalnie 32");
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            try
+            {
+                int idInt = Int32.Parse(id);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                           delete from lokomotywa
-                           where id=@id
+                           select lokomotywaDelete(@id);
                            ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -154,16 +176,22 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[1].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
+            if(val == 1)
+                return Ok();
+            else
+                return StatusCode(409, "Nie znaleziono lokomotywy o danym ID");
 
-            return NoContent();
         }
     }
 }

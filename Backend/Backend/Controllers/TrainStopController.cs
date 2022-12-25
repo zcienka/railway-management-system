@@ -21,9 +21,7 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select  *  from
-                            przystanek
-                            order by numerprzystanku
+                            select * from przystanekFilter();
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -47,11 +45,17 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{numerprzystanku}")]
-        public IActionResult Get(int numerprzystanku)
+        public IActionResult Get(string numerprzystanku)
         {
+            try
+            {
+                int nrInt = Int32.Parse(numerprzystanku);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                            select  *  from
-                            przystanek where numerprzystanku = @numerprzystanku 
+                            select * from przystanekFilter(vNrPrzystankuMin => @numerprzystanku, 
+                                                           vNrPrzystankuMax => @numerprzystanku);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -61,7 +65,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@numerprzystanku", numerprzystanku);
+                    myCommand.Parameters.AddWithValue("@numerprzystanku", Int32.Parse(numerprzystanku));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -77,11 +81,17 @@ namespace Backend.Controllers
         }
 
         [HttpGet("line/{idLinii}")]
-        public IActionResult GetTrainStopByLine(int idLinii)
+        public IActionResult GetTrainStopByLine(string idLinii)
         {
+            try
+            {
+                int idInt = Int32.Parse(idLinii);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                            select  *  from
-                            przystanek where idlinii = @idlinii 
+                            select * from przystanekFilter(vNrLiniiMin => @idlinii,
+                                                           vNrLiniiMax => @idlinii);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -91,7 +101,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@idlinii", idLinii);
+                    myCommand.Parameters.AddWithValue("@idlinii", Int32.Parse(idLinii));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -110,10 +120,12 @@ namespace Backend.Controllers
         public IActionResult Post(TrainStop trainStop)
         {
             string query = @"
-                            insert into przystanek(numerprzystanku, nazwastacji, idlinii)
-                            values(@numerprzystanku, @nazwastacji, @idlinii)
+                            select przystanekCreate(vNrPrzystanku => @numerprzystanku, 
+                                                    vNazwaStacji => @nazwastacji, 
+                                                    vNrLinii => @idlinii);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -125,27 +137,38 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@numerprzystanku", trainStop.NumerPrzystanku);
                     myCommand.Parameters.AddWithValue("@nazwastacji", trainStop.NazwaStacji);
                     myCommand.Parameters.AddWithValue("@idlinii", trainStop.IdLinii);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[3].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return CreatedAtAction(nameof(Get), new { numerprzystanku = trainStop.NumerPrzystanku }, trainStop);
+            if(val == 1)
+                return CreatedAtAction(nameof(Get), new { numerprzystanku = trainStop.NumerPrzystanku }, trainStop);
+            else if(val == 0)
+                return StatusCode(409, "Na tej linii znajduje się już ten przystanek");
+            else if(val == -1)
+                return StatusCode(409, "Id linii oraz numer przystanku muszą być liczbami nieujemnymi");
+            else if (val == -2)
+                return StatusCode(409, "Nazwa stacji musi być długości od 1 do 64 znaków");
+            else
+                return StatusCode(409, "Na tej linii podany numer przystanku jest już zajęty");
         }
 
         [HttpPatch]
         public IActionResult Patch(TrainStop trainStop)
         {
             string query = @"
-                           update przystanek
-                           set nazwastacji = @nazwastacji,
-                           idlinii = @idlinii
-                           where numerprzystanku = @numerprzystanku
+                            select przystanekUpdate(vNrPrzystanku => @numerprzystanku,
+                                                    vNazwaStacji => @nazwastacji,
+                                                    vNrLinii => @idlinii);
                             ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -157,25 +180,40 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@numerprzystanku", trainStop.NumerPrzystanku);
                     myCommand.Parameters.AddWithValue("@nazwastacji", trainStop.NazwaStacji);
                     myCommand.Parameters.AddWithValue("@idlinii", trainStop.IdLinii);
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[3].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return Ok(trainStop);
+            if(val == 1)
+                return Ok(trainStop);
+            else if (val == 0)
+                return StatusCode(409, "Na tej linii nie ma takiego przystanku");
+            else if (val == -1)
+                return StatusCode(409, "Numer przystanku oraz ID linii musi być nieujemne");
+            else
+                return StatusCode(409, "Na tej linii podany numer przystanku jest już zajęty");
         }
 
-        [HttpDelete("{numerprzystanku}")]
-        public IActionResult Delete(int numerprzystanku)
+        [HttpDelete("{nazwastacji}/{idLinii}")]
+        public IActionResult Delete(string nazwastacji, string idLinii)
         {
+            try
+            {
+                int idInt = Int32.Parse(idLinii);
+            }
+            catch { return StatusCode(409, "Id musi być liczbą"); }
+
             string query = @"
-                           delete from przystanek
-                           where numerprzystanku=@numerprzystanku
+                           select przystanekDelete(vNazwaStacji => @nazwastacji, vNrLinii => @idlinii);
                            ";
 
+            int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
             NpgsqlDataReader myReader;
@@ -184,16 +222,22 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@numerprzystanku", numerprzystanku);
+                    myCommand.Parameters.AddWithValue("@nazwastacji", nazwastacji);
+                    myCommand.Parameters.AddWithValue("@idlinii", Int32.Parse(idLinii));
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[2].Value));
+
                     myReader.Close();
                     myCon.Close();
                 }
             }
-
-            return NoContent();
+            if(val == 1)
+                return NoContent();
+            else
+                return StatusCode(409, "Na tej linii nie ma takiego przystanku");
         }
     }
 }
