@@ -30,21 +30,28 @@ export const stationsApi = createApi({
         }),
         updateStation: builder.mutation({
             query: (body) => ({
-                url: "/station",
+                url: "/station/update",
                 method: "PATCH",
-                body: body
+                params: {nazwa: body.nazwa, adres: body.adres}
             }),
             invalidatesTags: ["Station"]
         }),
         createStation: builder.mutation({
             query: (body) => ({
-                url: "/station",
+                url: "/station/create",
                 method: "POST",
-                body: body
+                params: {nazwa: body.nazwa, adres: body.adres}
             }),
             invalidatesTags: ["Station"]
         }),
-
+        filterStation: builder.mutation({
+            query: (body) => ({
+                url: "/station/search",
+                method: "GET",
+                params: {nazwa: body.nazwa, adres: body.adres}
+            }),
+            invalidatesTags: ["Station"]
+        }),
 
     }),
 })

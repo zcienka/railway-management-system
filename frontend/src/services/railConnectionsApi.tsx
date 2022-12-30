@@ -23,9 +23,9 @@ export const railConnectionsApi = createApi({
         }),
         createRailConnection: builder.mutation({
             query: (body) => ({
-                url: "/rail-connection",
+                url: "/rail-connection/create",
                 method: "POST",
-                body: body
+                params: {id: body.id}
             }),
             invalidatesTags: ["RailConnection"]
         }),

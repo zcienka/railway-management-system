@@ -28,8 +28,16 @@ const EditCarriages = () => {
     }
 
     const updateSingleCarriage = async () => {
-        // updateCarriage()
-        // navigate("/carriages")
+        if(id){
+            
+        }
+        const singleCarriage: Carriage = {
+            databadaniatechnicznego: new Date(technicalResearch),
+            liczbamiejsc: parseInt(seatsNumber),
+            id: parseInt(id?.toString() || "undefined")
+        }
+        await updateCarriage(singleCarriage)
+        navigate("/carriages")
     }
     const [deleteCarriage] = useDeleteCarriageMutation()
     const [updateCarriage] = useUpdateCarriageMutation()

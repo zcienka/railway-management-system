@@ -40,8 +40,15 @@ const EditWorkers = () => {
     }
 
     const updateSingleWorker = async () => {
-        // updateWorker()
-        // navigate("/workers")
+        const singleWorker: Worker = {
+            imie: name,
+            nazwisko: lastName,
+            placa: parseInt(wage),
+            zawod: occupation,
+            id: parseInt(id?.toString() || "undefined")
+        }
+        await updateWorker(singleWorker)
+        navigate("/workers")
     }
 
     useEffect(() => {

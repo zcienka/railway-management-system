@@ -37,17 +37,18 @@ export const trainRideApi = createApi({
         }),
         updateTrainRide: builder.mutation({
             query: (body) => ({
-                url: "/train-ride",
+                url: "/train-ride/update",
                 method: "PATCH",
-                body: body
+                params: {id: body.id, dataodjazdu: body.dataodjazdu.toISOString(), dataprzyjazdu: body.dataprzyjazdu.toISOString(),
+                    idkonduktora: body.idkonduktora, idmaszynisty: body.idmaszynisty, idliniiprzejazdu: body.idliniiprzejazdu, idpociagu: body.idpociagu}
             }),
             invalidatesTags: ["TrainRide"]
         }),
         createTrainRide: builder.mutation({
             query: (body) => ({
-                url: "/train-ride",
+                url: "/train-ride/create",
                 method: "POST",
-                body: body
+                params: {dataodjazdu: body.dataodjazdu.toISOString(), dataprzyjazdu: body.dataprzyjazdu.toISOString(), idkonduktora: body.idkonduktora, idmaszynisty: body.idmaszynisty, idliniiprzejazdu: body.idliniiprzejazdu, idpociagu: body.idpociagu}
             }),
             invalidatesTags: ["TrainRide"]
         }),

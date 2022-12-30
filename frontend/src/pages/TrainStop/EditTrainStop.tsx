@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom"
-import {TrainStop} from "../../types"
+import {TrainStop, TrainStopNumberless} from "../../types"
 import Menu from "../../components/Menu"
 import {useDeleteTrainStopMutation, useGetSingleTrainStopQuery, useUpdateTrainStopMutation} from "../../services/trainStopApi"
 
@@ -11,6 +11,9 @@ const EditTrainStop = () => {
 
     const [stopName, setStopName] = useState<string>("")
     const [stopNameInput, setStopNameInput] = useState<boolean>(true)
+
+    const [lineId, setLineId] = useState<string>("")
+    const [lineIdInput, setLineIdInput] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -25,19 +28,29 @@ const EditTrainStop = () => {
     const [updateTrainStop] = useUpdateTrainStopMutation()
 
     const deleteSingleTrainStop = async () => {
-        await deleteTrainStop(id)
+        const singleTrainStop: TrainStopNumberless = {
+            nazwastacji: stopName,
+            idlinii: parseInt(lineId)
+        }
+        await deleteTrainStop(singleTrainStop)
         navigate("/train-stops")
     }
 
     const updateSingleTrainStop = async () => {
-        // updateTrainStop()
-        // navigate("/train-stops")
+        const singleTrainStop: TrainStop = {
+            numerprzystanku: parseInt(lineNumber),
+            nazwastacji: stopName,
+            idlinii: parseInt(lineId),
+        }
+        await updateTrainStop(singleTrainStop)
+        navigate("/train-stops")
     }
 
     useEffect(() => {
         if (isGetSingleTrainStopSuccess) {
             setLineNumber(getSingleTrainStopData[0].numerprzystanku.toString())
             setStopName(getSingleTrainStopData[0].nazwastacji)
+            setLineId(getSingleTrainStopData[0].idlinii.toString())
         }
     }, [getSingleTrainStopData, isGetSingleTrainStopSuccess])
 
@@ -68,13 +81,17 @@ const EditTrainStop = () => {
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Nazwa stacji</label>
                         <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
-                                   value={stopName}
-                                   onChange={(e) => {
-                                       setStopName(e.target.value)
-                                       setStopNameInput(false)
-                                   }}
-                            />
+                            <label className={"w-2/6"}>{stopName}</label>
+                        </div>
+                    </div>
+
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
+                    <div className={"w-160 flex items-center"}>
+                        <label className={"w-2/6"}>ID linii</label>
+                        <div className={"flex w-4/6"}>
+                            <label className={"w-2/6"}>{lineId}</label>
                         </div>
                     </div>
 

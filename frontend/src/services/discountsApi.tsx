@@ -29,17 +29,25 @@ export const discountsApi = createApi({
         }),
         updateDiscount: builder.mutation({
             query: (body) => ({
-                url: "/discount",
+                url: "/discount/update",
                 method: "PATCH",
-                body: body
+                params: {nazwa : body.nazwaznizki, procent : body.procentznizki, dokument : body.dokumentpotwierdzajacy}
             }),
             invalidatesTags: ["Discount"]
         }),
         createDiscount: builder.mutation({
             query: (body) => ({
-                url: "/discount",
+                url: `/discount/create`,
                 method: "POST",
-                body: body
+                params: {nazwa : body.nazwaznizki, procent : body.procentznizki, dokument : body.dokumentpotwierdzajacy}
+            }),
+            invalidatesTags: ["Discount"]
+        }),
+        filterDiscount: builder.mutation({
+            query: (body) => ({
+                url: `/discount/search`,
+                method: "GET",
+                params: {nazwa : body.nazwaznizki, procentmin : body.procentznizkimin, procentmax : body.procentznizkimax, dokument : body.dokumentpotwierdzajacy}
             }),
             invalidatesTags: ["Discount"]
         }),

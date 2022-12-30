@@ -19,7 +19,7 @@ const CreateTrain = () => {
     const createSingleTrain = async () => {
         const singleTrain: Train = {
             nazwa: name,
-            nazwalokomotywy: locomotiveName
+            idlokomotywy: parseInt(locomotiveName)
         }
         await createTrain(singleTrain)
         navigate("/train")

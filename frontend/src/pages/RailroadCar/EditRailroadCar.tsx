@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom"
 import {useGetSingleRailroadCarQuery} from "../../services/railroadCarsApi"
-import {Carriage, Discount, RailroadCar, Train} from "../../types"
+import {Carriage, Discount, RailroadCar, RailroadCarNumberless, Train} from "../../types"
 import {useDeleteRailroadCarMutation, useUpdateRailroadCarMutation} from "../../services/railroadCarsApi"
 import Menu from "../../components/Menu"
 import {useGetTrainsQuery} from "../../services/trainsApi"
@@ -53,13 +53,22 @@ const EditRailroadCar = () => {
     const [updateCar] = useUpdateRailroadCarMutation()
 
     const deleteSingleCar = async () => {
-        await deleteCar(trainIdParam)
+        const railroadcarNumberless: RailroadCarNumberless = {
+            idwagonu: parseInt(carId),
+            idpociagu: parseInt(trainId),
+        }
+        await deleteCar(railroadcarNumberless)
         navigate("/railroad-cars")
     }
 
     const updateSingleCar = async () => {
-        // updateCar()
-        // navigate("/railroad-cars")
+        const singleRailroadCar: RailroadCar = {
+            numerwagonu: parseInt(carNumber),
+            idwagonu: parseInt(carId),
+            idpociagu: parseInt(trainId),
+        }
+        await updateCar(singleRailroadCar)
+        navigate("/railroad-cars")
     }
 
     useEffect(() => {
@@ -111,12 +120,7 @@ const EditRailroadCar = () => {
                         <div className={"w-160 flex items-center"}>
                             <label className={"w-2/6"}>Pociąg</label>
                             <div className={"flex w-4/6"}>
-                                <select className={"w-1/2"} value={trainName} onChange={(e) => {
-                                    setTrainName(e.target.value)
-                                    setTrainNameInput(false)
-                                }}>
-                                    {trainNames}
-                                </select>
+                                <label className={"w-2/6"}>{trainName}</label>
                             </div>
                         </div>
                     </div>
@@ -127,15 +131,7 @@ const EditRailroadCar = () => {
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Wagon</label>
                         <div className={"flex w-4/6"}>
-                            <select className={"w-1/2"}
-                                   value={carId}
-                                   onChange={(e) => {
-                                       setCarId(e.target.value)
-                                       setCarIdInput(false)
-                                   }}
-                            >
-                                {cars}
-                            </select>
+                            <label className={"w-2/6"}>{carId}</label>
                         </div>
                     </div>
 

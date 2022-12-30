@@ -29,17 +29,28 @@ export const locomotivesApi = createApi({
         }),
         updateLocomotive: builder.mutation({
             query: (body) => ({
-                url: "/locomotive",
+                url: "/locomotive/update",
                 method: "PATCH",
-                body: body
+                params: {id : body.id, databadania : body.databadaniatechnicznego.toISOString().substring(0,10), nazwa : body.nazwa}
+
             }),
             invalidatesTags: ["Locomotive"]
         }),
         createLocomotive: builder.mutation({
             query: (body) => ({
-                url: "/locomotive",
+                url: "/locomotive/create",
                 method: "POST",
-                body: body
+                params: {databadania : body.databadaniatechnicznego.toISOString().substring(0,10), nazwa : body.nazwa}
+            }),
+            invalidatesTags: ["Locomotive"]
+        }),
+        filterLocomotive: builder.mutation({
+            query: (body) => ({
+                url: "/locomotive/search",
+                method: "GET",
+                params: {databadaniamin : body.databadaniatechnicznegomin.toISOString().substring(0,10),
+                        databadaniamax : body.databadaniatechnicznegomax.toISOString().substring(0,10), 
+                        nazwa : body.nazwa}
             }),
             invalidatesTags: ["Locomotive"]
         }),

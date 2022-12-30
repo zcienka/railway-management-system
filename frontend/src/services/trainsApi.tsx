@@ -30,21 +30,28 @@ export const trainsApi = createApi({
         }),
         updateTrain: builder.mutation({
             query: (body) => ({
-                url: "/train",
+                url: "/train/update",
                 method: "PATCH",
-                body: body
+                params: {id : body.id, nazwa : body.nazwa, idlokomotywy : body.idlokomotywy}
             }),
             invalidatesTags: ["Train"]
         }),
         createTrain: builder.mutation({
             query: (body) => ({
-                url: "/train",
+                url: "/train/create",
                 method: "POST",
-                body: body
+                params: {nazwa : body.nazwa, idlokomotywy : body.idlokomotywy}
             }),
             invalidatesTags: ["Train"]
         }),
-
+        filterTrain: builder.mutation({
+            query: (body) => ({
+                url: "/train/search",
+                method: "GET",
+                params: {nazwa : body.nazwa, idlokomotywymin : body.idlokomotywymin, idlokomotywymax : body.idlokomotywymax}
+            }),
+            invalidatesTags: ["Train"]
+        }),
 
     }),
 })

@@ -40,7 +40,7 @@ const CreateTrainRide = () => {
             idpociagu: parseInt(trainId),
         }
         await createTrainRide(singleTrainRide)
-        navigate("train-rides")
+        navigate("/train-rides")
     }
 
     const {

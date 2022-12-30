@@ -135,9 +135,65 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
-        [HttpPost]
-        public IActionResult Post(Worker worker)
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Worker>>> search(string? imie, string? nazwisko, 
+                                                                    string? placamin, string? placamax, string? zawod)
         {
+            if (imie == null)
+                imie = "";
+            if (nazwisko == null)
+                nazwisko = "";
+            if (placamin == null)
+                placamin = "0";
+            if (placamax == null)
+                placamax = "999999";
+            if (zawod == null)
+                zawod = "";
+            try{
+                Int32.Parse(placamin);
+                Int32.Parse(placamax);
+            } catch { return StatusCode(409, "Pola płac muszą być liczbami"); }
+
+            string query = @"
+                            select * from pracownikFilter(vImie => @imie, vNazwisko => @nazwisko,
+                                                       vMinPlaca => @placamin, vMaxPlaca => @placamax, vZawod => @zawod);
+                            ";
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("railway_database");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@imie", imie);
+                    myCommand.Parameters.AddWithValue("@nazwisko", nazwisko);
+                    myCommand.Parameters.AddWithValue("@placamin", Int32.Parse(placamin));
+                    myCommand.Parameters.AddWithValue("@placamax", Int32.Parse(placamax));
+                    myCommand.Parameters.AddWithValue("@zawod", zawod);
+
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            string json = JsonConvert.SerializeObject(table, Formatting.Indented);
+
+            return Ok(json);
+        }
+
+        [HttpPost("create")]
+        public async Task<ActionResult<IEnumerable<Worker>>> create(string? imie, string? nazwisko, string? placa, string? zawod)
+        {
+            if(imie == null || nazwisko == null || placa == null || zawod == null)
+                return StatusCode(409, "Wszystkie pola muszą byc wypełnione");
+            try{
+                Int32.Parse(placa);
+            } catch { return StatusCode(409, "Pole płacy musi być liczbą"); }
+
             string query = @"
                             select pracownikCreate(vImie => @imie,
                                                    vNazwisko => @nazwisko,
@@ -154,10 +210,10 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@imie", worker.Imie);
-                    myCommand.Parameters.AddWithValue("@nazwisko", worker.Nazwisko);
-                    myCommand.Parameters.AddWithValue("@placa", worker.Placa);
-                    myCommand.Parameters.AddWithValue("@zawod", worker.Zawod);
+                    myCommand.Parameters.AddWithValue("@imie", imie);
+                    myCommand.Parameters.AddWithValue("@nazwisko", nazwisko);
+                    myCommand.Parameters.AddWithValue("@placa", Int32.Parse(placa));
+                    myCommand.Parameters.AddWithValue("@zawod", zawod);
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
@@ -168,8 +224,8 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
-                return CreatedAtAction(nameof(Get), worker);
+            if (val == 1)
+                return Ok();
             else if (val == -1)
                 return StatusCode(409, "Dostępne zawody: \"Maszynista\", \"Konduktor\".");
             else if (val == -2)
@@ -178,14 +234,23 @@ namespace Backend.Controllers
                 return StatusCode(409, "Nazwisko musi być dlugości między 1 a 31");
             else
                 return StatusCode(409, "Płaca nie może być ujemna");
-
         }
 
-        [HttpPatch]
-        public IActionResult Patch(Worker worker)
+        [HttpPatch("update")]
+        public async Task<ActionResult<IEnumerable<Worker>>> update(string? id,string? imie, string? nazwisko, 
+                                                                    string? placa, string? zawod)
         {
+            if (id == null || imie == null || nazwisko == null || placa == null || zawod == null)
+                return StatusCode(409, "Wszystkie pola muszą byc wypełnione");
+            try
+            {
+                Int32.Parse(id);
+                Int32.Parse(placa);
+            }
+            catch { return StatusCode(409, "Pola płacy i id muszą być liczbami"); }
+
             string query = @"
-                           select pracownikUpdate(vId => @id
+                           select pracownikUpdate(vId => @id,
                                                   vImie => @imie, 
                                                   vNazwisko => @nazwisko, 
                                                   vZawod => @zawod, 
@@ -201,11 +266,11 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", worker.Id);
-                    myCommand.Parameters.AddWithValue("@imie", worker.Imie);
-                    myCommand.Parameters.AddWithValue("@nazwisko", worker.Nazwisko);
-                    myCommand.Parameters.AddWithValue("@placa", worker.Placa);
-                    myCommand.Parameters.AddWithValue("@zawod", worker.Zawod);
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
+                    myCommand.Parameters.AddWithValue("@imie", imie);
+                    myCommand.Parameters.AddWithValue("@nazwisko", nazwisko);
+                    myCommand.Parameters.AddWithValue("@placa", Int32.Parse(placa));
+                    myCommand.Parameters.AddWithValue("@zawod", zawod);
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
@@ -217,7 +282,7 @@ namespace Backend.Controllers
                 }
             }
             if (val == 1)
-                return Ok(worker);
+                return Ok();
             else if (val == 0)
                 return StatusCode(409, "Nie znaleziono pracownika o danym ID");
             else if (val == -1)
@@ -229,7 +294,6 @@ namespace Backend.Controllers
             else
                 return StatusCode(409, "Płaca nie może być ujemna");
         }
-
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {

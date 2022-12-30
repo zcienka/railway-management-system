@@ -379,6 +379,8 @@ BEGIN
 	if(vIdWagonu < 0 or vIdPociagu < 0 or vNrWagonu < 0) then return -1; end if;
 	if((select count(*) from wagonwpociagu where idpociagu = vIdPociagu 
 										   and numerwagonu = vNrWagonu)!= 0) then return -2; end if;
+	if((select count(*) from wagon where vIdWagonu=wagon.id) != 1) then return -3; end if;
+	if((select count(*) from pociag where vIdPociagu=pociag.id) != 1) then return -4; end if;
 	update wagonwpociagu
 	SET numerwagonu = vNrWagonu
 		where idpociagu = vIdPociagu and idwagonu = vIdWagonu;
@@ -396,6 +398,8 @@ BEGIN
 	if(vIdWagonu < 0 or vIdPociagu < 0 or vNrWagonu < 0) then return -1; end if;
 	if((select count(*) from wagonwpociagu where idpociagu = vIdPociagu 
 										   and numerwagonu = vNrWagonu)!= 0) then return -2; end if;
+	if((select count(*) from wagon where vIdWagonu=wagon.id) != 1) then return -3; end if;
+	if((select count(*) from pociag where vIdPociagu=pociag.id) != 1) then return -4; end if;
 	insert into wagonwpociagu(numerwagonu, idWagonu, idpociagu)
 	values(vNrWagonu, vIdWagonu, vIdPociagu);
 	return 1;
@@ -553,17 +557,17 @@ CREATE OR REPLACE FUNCTION przystanekCreate(IN vNrPrzystanku INTEGER,
 RETURNS INTEGER AS $$
 BEGIN
 	if((select count(*) from przystanek where nazwastacji = vNazwaStacji 
-										   and idlinii = vNrLinii) != 1) then return 0; end if; -- na linii jest już ten przystanek
+										   and idlinii = vNrLinii) != 0) then return 0; end if; -- na linii jest już ten przystanek
 	if(vNrPrzystanku < 0 or vNrLinii < 0) then return -1; end if;
 	if(length(vNazwaStacji) < 1 or length(vNazwaStacji) > 64) then return -2; end if;
 	if((select count(*) from przystanek where idlinii = vNrLinii 
 										   and numerprzystanku = vNrPrzystanku)!= 0) then return -3; end if; -- na linii jest już ten numer zajęty
+
 	insert into przystanek(numerprzystanku, nazwastacji, idlinii)
 	values(vNrPrzystanku, vNazwaStacji, vNrLinii);
 	return 1;
 END
 $$ LANGUAGE plpgsql;
-
 --##########################################################################################
 
 CREATE OR REPLACE FUNCTION przejazdReadAll()

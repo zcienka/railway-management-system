@@ -27,6 +27,11 @@ export type TrainStop = {
     idlinii: number,
 }
 
+export type TrainStopNumberless = {
+    nazwastacji: string,
+    idlinii: number,
+}
+
 export type Station = {
     nazwa: string,
     adres: string,
@@ -46,6 +51,8 @@ export type TrainRideResponse = {
     id?: number,
     dataodjazdu: Date,
     dataprzyjazdu: Date,
+    idkonduktora: number,
+    idmaszynisty: number,
     imiekonduktora: string,
     nazwiskokonduktora: string,
     imiemaszynisty: string,
@@ -61,13 +68,15 @@ export type RailConnection = {
 export type Locomotive = {
     id?: number,
     databadaniatechnicznego: Date,
+    databadaniatechnicznegomin?: Date,
+    databadaniatechnicznegomax?: Date,
     nazwa: string
 }
 
 export type Train = {
     id?: number,
     nazwa: string,
-    nazwalokomotywy: string
+    idlokomotywy: number
 }
 
 export type Worker = {
@@ -86,6 +95,11 @@ export type Carriage = {
 
 export type RailroadCar = {
     numerwagonu: number,
+    idwagonu: number,
+    idpociagu: number,
+}
+
+export type RailroadCarNumberless = {
     idwagonu: number,
     idpociagu: number,
 }

@@ -1,8 +1,12 @@
 import React, {useState} from "react"
 import Loading from "../../components/Loading"
 import Menu from "../../components/Menu"
+import {RailConnection} from "../../types"
+import {useNavigate} from "react-router-dom"
 
 const CreateRailConnection = () => {
+    const navigate = useNavigate()
+
     const [lastName, setLastName] = useState<string>("")
     const [firstLastNameInput, setFirstLastNameInput] = useState<boolean>(true)
 

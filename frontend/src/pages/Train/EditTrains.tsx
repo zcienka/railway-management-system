@@ -30,13 +30,18 @@ const EditTrains = () => {
     }
 
     const updateSingleTrain = async () => {
-        // updateTrain()
-        // navigate("/train")
+        const singleTrain: Train = {
+            nazwa: name,
+            idlokomotywy: parseInt(locomotiveName),
+            id: parseInt(id?.toString() || "undefined")
+        }
+        await updateTrain(singleTrain)
+        navigate("/train")
     }
 console.log({getSingleTrainData})
     useEffect(() => {
         if (isGetSingleTrainSuccess) {
-            setLocomotiveName(getSingleTrainData[0].nazwalokomotywy)
+            setLocomotiveName(String(getSingleTrainData[0].idlokomotywy))
             setName(getSingleTrainData[0].nazwa)
         }
     }, [getSingleTrainData, isGetSingleTrainSuccess])

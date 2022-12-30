@@ -31,17 +31,26 @@ export const trainStopApi = createApi({
         }),
         updateTrainStop: builder.mutation({
             query: (body) => ({
-                url: "/train-stop",
+                url: "/train-stop/update",
                 method: "PATCH",
-                body: body
+                params: {numerprzystanku: body.numerprzystanku, nazwastacji: body.nazwastacji, idlinii: body.idlinii}
             }),
             invalidatesTags: ["TrainStop"]
         }),
         createTrainStop: builder.mutation({
             query: (body) => ({
-                url: "/train-stop",
+                url: "/train-stop/create",
                 method: "POST",
-                body: body
+                params: {numerprzystanku: body.numerprzystanku, nazwastacji: body.nazwastacji, idlinii: body.idlinii}
+            }),
+            invalidatesTags: ["TrainStop"]
+        }),
+        filterTrainStop: builder.mutation({
+            query: (body) => ({
+                url: "/train-stop/filter",
+                method: "GET",
+                params: {numerprzystankumin: body.numerprzystankumin, numerprzystankumax: body.numerprzystankumax, 
+                        nazwastacji: body.nazwastacji, idliniimin: body.idliniimin, idliniimax: body.idliniimax}
             }),
             invalidatesTags: ["TrainStop"]
         }),

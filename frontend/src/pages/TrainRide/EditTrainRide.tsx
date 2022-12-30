@@ -58,8 +58,17 @@ const EditTrainRide = () => {
     }
 
     const updateSingleTrainRide = async () => {
-        // updateTrainRide()
-        // navigate("/train")
+        const singleTrainRide: TrainRide = {
+            id: parseInt(idParam?.toString() || "undefined"),
+            dataodjazdu: new Date(departureDate),
+            dataprzyjazdu: new Date(arrivalDate),
+            idkonduktora: parseInt(conductorId),
+            idmaszynisty: parseInt(driverId),
+            idliniiprzejazdu: parseInt(railConnectionId),
+            idpociagu: parseInt(trainId),
+        }
+        await updateTrainRide(singleTrainRide)
+        navigate("/train-rides")
     }
     useEffect(() => {
         if (isGetSingleTrainRideSuccess) {

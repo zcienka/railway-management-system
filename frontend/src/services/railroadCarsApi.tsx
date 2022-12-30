@@ -21,25 +21,33 @@ export const railroadCarsApi = createApi({
             }),
         }),
         deleteRailroadCar: builder.mutation({
-            query: (id) => ({
-                url: `/railroad-car/${id}`,
+            query: (body) => ({
+                url: `/railroad-car/${body.idpociagu}/${body.idwagonu}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["RailroadCar"]
         }),
         updateRailroadCar: builder.mutation({
             query: (body) => ({
-                url: "/railroad-car",
+                url: "/railroad-car/update",
                 method: "PATCH",
-                body: body
+                params: {nrwagonu : body.numerwagonu, idwagonu : body.idwagonu, idpociagu : body.idpociagu}
             }),
             invalidatesTags: ["RailroadCar"]
         }),
         createRailroadCar: builder.mutation({
             query: (body) => ({
-                url: "/railroad-car",
+                url: "/railroad-car/create",
                 method: "POST",
-                body: body
+                params: {nrwagonu : body.numerwagonu, idwagonu : body.idwagonu, idpociagu : body.idpociagu}
+            }),
+            invalidatesTags: ["RailroadCar"]
+        }),
+        filterRailroadCar: builder.mutation({
+            query: (body) => ({
+                url: "/railroad-car/search",
+                method: "GET",
+                params: {idwagonumin : body.idwagonumin, idwagonumax : body.idwagonumax, idpociagumin : body.idpociagumin, idpociagumax : body.idpociagumax}
             }),
             invalidatesTags: ["RailroadCar"]
         }),

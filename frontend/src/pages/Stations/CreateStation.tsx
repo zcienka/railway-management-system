@@ -22,7 +22,7 @@ const CreateStation = () => {
             adres: address
         }
         await createStation(singleStation)
-        navigate("/railroad-carriages")
+        navigate("/stations")
     }
 
     return <div className={"flex"}>

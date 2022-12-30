@@ -41,17 +41,25 @@ export const workersApi = createApi({
         }),
         updateWorker: builder.mutation({
             query: (body) => ({
-                url: "/worker",
+                url: "/worker/update",
                 method: "PATCH",
-                body: body.reservation
+                params: {id: body.id, imie: body.imie, nazwisko: body.nazwisko, placa: body.placa, zawod: body.zawod}
             }),
             invalidatesTags: ["Worker"]
         }),
         createWorker: builder.mutation({
             query: (body) => ({
-                url: "/worker",
+                url: "/worker/create",
                 method: "POST",
-                body: body
+                params: {imie: body.imie, nazwisko: body.nazwisko, placa: body.placa, zawod: body.zawod}
+            }),
+            invalidatesTags: ["Worker"]
+        }),
+        filterWorker: builder.mutation({
+            query: (body) => ({
+                url: "/worker/search",
+                method: "GET",
+                params: {imie: body.imie, nazwisko: body.nazwisko, placamin: body.placamin, placamax: body.placamax, zawod: body.zawod}
             }),
             invalidatesTags: ["Worker"]
         }),

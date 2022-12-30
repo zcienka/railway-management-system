@@ -79,9 +79,16 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
-        [HttpPost]
-        public IActionResult Post(RailConnection railConnection)
+        [HttpPost("create")]
+        public async Task<ActionResult<IEnumerable<Station>>> create(string? id)
         {
+            if(id == null)
+                return StatusCode(409, "Wszystkie pola muszą byc wypełnione");
+            try
+            {
+                Int32.Parse(id);
+            } catch { return StatusCode(409, "Pole id musi być liczbą"); }
+
             string query = @"
                             select liniaprzejazduCreate(@id);
                             ";
@@ -95,7 +102,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", railConnection.Id);
+                    myCommand.Parameters.AddWithValue("@id", id);
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
@@ -106,8 +113,8 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
-                return CreatedAtAction(nameof(Get), railConnection);
+            if (val == 1)
+                return Ok();
             else
                 return StatusCode(409, "Linia przejazdu o danym ID już istnieje");
         }

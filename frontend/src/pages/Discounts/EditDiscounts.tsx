@@ -31,8 +31,13 @@ const EditDiscounts = () => {
     }
 
     const updateSingleDiscount = async () => {
-        // updateDiscount()
-        // navigate("/discounts")
+        const singleDiscount: Discount = {
+            nazwaznizki: discountName,
+            procentznizki: parseInt(discountPercentage),
+            dokumentpotwierdzajacy: identityDocument
+        }
+        await updateDiscount(singleDiscount)
+        navigate("/discounts")
     }
 
     const [deleteDiscount] = useDeleteDiscountMutation()

@@ -46,7 +46,7 @@ const CreateDiscount = () => {
                     <label className={"w-2/6"}>Nazwa zniżki</label>
                     <div className={"flex w-4/6"}>
                         <input className={"w-1/2"}
-                               value={discountPercentage}
+                               value={discountName}
                                onChange={(e) => {
                                    setDiscountName(e.target.value)
                                    setDiscountNameInput(false)
@@ -62,7 +62,7 @@ const CreateDiscount = () => {
                     <label className={"w-2/6"}>Procent zniżki</label>
                     <div className={"flex w-4/6"}>
                         <input className={"w-1/2"}
-                               value={identityDocument}
+                               value={discountPercentage}
                                onChange={(e) => {
                                    setDiscountPercentage(e.target.value)
                                    setDiscountPercentageInput(false)

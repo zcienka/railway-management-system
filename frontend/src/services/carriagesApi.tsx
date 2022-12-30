@@ -29,17 +29,28 @@ export const carriagesApi = createApi({
         }),
         updateCarriage: builder.mutation({
             query: (body) => ({
-                url: "/carriage",
+                url: "/carriage/update",
                 method: "PATCH",
-                body: body
+                params: {id : body.id, databadania : body.databadaniatechnicznego.toISOString().substring(0,10), liczbamiejsc : body.liczbamiejsc}
             }),
             invalidatesTags: ["Carriage"]
         }),
         createCarriage: builder.mutation({
             query: (body) => ({
-                url: "/carriage",
+                url: `/carriage/create`,
                 method: "POST",
-                body: body
+                params: {databadania : body.databadaniatechnicznego.toISOString().substring(0,10), liczbamiejsc : body.liczbamiejsc}
+            }),
+            invalidatesTags: ["Carriage"]
+        }),
+        filterCarriage: builder.mutation({
+            query: (body) => ({
+                url: `/carriage/search`,
+                method: "GET",
+                params: {databadaniamin : body.databadaniatechnicznegomin.toISOString().substring(0,10), 
+                    databadaniamax : body.databadaniatechnicznegomax.toISOString().substring(0,10), 
+                    liczbamiejscmin : body.liczbamiejscmin, 
+                    liczbamiejscmax : body.liczbamiejscmax}
             }),
             invalidatesTags: ["Carriage"]
         }),

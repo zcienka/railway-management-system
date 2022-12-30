@@ -84,9 +84,73 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
-        [HttpPost]
-        public IActionResult Post(RailroadCar railroadcar)
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<RailroadCar>>> search(string? idwagonumin, string? idwagonumax,
+                                                                        string? idpociagumin, string? idpociagumax)
         {
+            if (idwagonumin == null)
+                idwagonumin = "0";
+            if (idwagonumax == null)
+                idwagonumax = "99999";
+            if (idpociagumin == null)
+                idpociagumin = "0";
+            if (idpociagumax == null)
+                idpociagumax = "99999";
+
+            try
+            {
+                Int32.Parse(idwagonumin);
+                Int32.Parse(idpociagumin);
+                Int32.Parse(idwagonumax);
+                Int32.Parse(idpociagumax);
+            }
+            catch { return StatusCode(409, "Wszystkie pola muszą być liczbami"); }
+
+            string query = @"
+                            select * from wagonwpociaguFilter(vIdWagonuMin => @idwagonumin, vIdWagonuMax => @idwagonumax
+                                                       vIdPociaguMin => @idpociagumin, vIdPociaguMax => @idpociagumax);
+                            ";
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("railway_database");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@idwagonumin", idwagonumin);
+                    myCommand.Parameters.AddWithValue("@idwagonumax", idwagonumax);
+                    myCommand.Parameters.AddWithValue("@idpociagumin", Int32.Parse(idpociagumin));
+                    myCommand.Parameters.AddWithValue("@idpociagumax", Int32.Parse(idpociagumax));
+
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            string json = JsonConvert.SerializeObject(table, Formatting.Indented);
+
+            return Ok(json);
+        }
+        [HttpPost("create")]
+        public async Task<ActionResult<IEnumerable<RailroadCar>>> create(string? nrwagonu, string? idwagonu, string? idpociagu)
+        {
+            if(nrwagonu == null)
+                return StatusCode(409, "Numer wagonu nie może być pusty");
+            if(idwagonu == null)
+                return StatusCode(409, "Id wagonu nie może być puste");
+            if(idpociagu == null)
+                return StatusCode(409, "Id pociągu nie może być puste");
+            try
+            {
+                Int32.Parse(nrwagonu);
+                Int32.Parse(idwagonu);
+                Int32.Parse(idpociagu);
+            } catch { return StatusCode(409, "Wszystkie pola muszą być liczbami"); }
+
             string query = @"
                             select wagonwpociaguCreate(vIdWagonu => @idwagonu, vIdPociagu => @idpociagu, vNrWagonu => @numerwagonu);
                             ";
@@ -100,9 +164,9 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@numerwagonu", railroadcar.NumerWagonu);
-                    myCommand.Parameters.AddWithValue("@idwagonu", railroadcar.IdWagonu);
-                    myCommand.Parameters.AddWithValue("@idpociagu", railroadcar.IdPociagu);
+                    myCommand.Parameters.AddWithValue("@numerwagonu", Int32.Parse(nrwagonu));
+                    myCommand.Parameters.AddWithValue("@idwagonu", Int32.Parse(idwagonu));
+                    myCommand.Parameters.AddWithValue("@idpociagu", Int32.Parse(idpociagu));
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
@@ -113,19 +177,37 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
-                return CreatedAtAction(nameof(Get), railroadcar);
+            if (val == 1)
+                return Ok();
             else if (val == 0)
                 return StatusCode(409, "Dany wagon znajduje się już w tym pociągu");
             else if (val == -1)
                 return StatusCode(409, "Wszystkie wartości muszą być nieujemne");
-            else
+            else if (val == -2)
                 return StatusCode(409, "Pociąg ma już przydzielony wagon z danym numerem");
+            else if (val == -3)
+                return StatusCode(409, "Nie znaleziono wagonu o danym id");
+            else
+                return StatusCode(409, "Nie znaleziono pociągu o danym id");
         }
 
-        [HttpPatch]
-        public IActionResult Patch(RailroadCar railroadcar)
+        [HttpPatch("update")]
+        public async Task<ActionResult<IEnumerable<RailroadCar>>> update(string? nrwagonu, string? idwagonu, string? idpociagu)
         {
+            if (nrwagonu == null)
+                return StatusCode(409, "Numer wagonu nie może być pusty");
+            if (idwagonu == null)
+                return StatusCode(409, "Id wagonu nie może być puste");
+            if (idpociagu == null)
+                return StatusCode(409, "Id pociągu nie może być puste");
+            try
+            {
+                Int32.Parse(nrwagonu);
+                Int32.Parse(idwagonu);
+                Int32.Parse(idpociagu);
+            }
+            catch { return StatusCode(409, "Wszystkie pola muszą być liczbami"); }
+
             string query = @"
                             select wagonwpociaguUpdate(vIdWagonu => @idwagonu, vIdPociagu => @idpociagu, vNrWagonu => @numerwagonu);
                             ";
@@ -139,9 +221,9 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@numerwagonu", railroadcar.NumerWagonu);
-                    myCommand.Parameters.AddWithValue("@idwagonu", railroadcar.IdWagonu);
-                    myCommand.Parameters.AddWithValue("@idpociagu", railroadcar.IdPociagu);
+                    myCommand.Parameters.AddWithValue("@numerwagonu", Int32.Parse(nrwagonu));
+                    myCommand.Parameters.AddWithValue("@idwagonu", Int32.Parse(idwagonu));
+                    myCommand.Parameters.AddWithValue("@idpociagu", Int32.Parse(idpociagu));
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
@@ -152,14 +234,18 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
-                return Ok(railroadcar);
-            else if(val == 0)
+            if (val == 1)
+                return Ok();
+            else if (val == 0)
                 return StatusCode(409, "Wagon nie jest przydzielony do tego pociągu");
-            else if(val == -1)
+            else if (val == -1)
                 return StatusCode(409, "Wszystkie wartości muszą być nieujemne");
-            else
+            else if (val == -2)
                 return StatusCode(409, "Pociąg ma już przydzielony wagon z danym numerem");
+            else if (val == -3)
+                return StatusCode(409, "Nie znaleziono wagonu o danym id");
+            else
+                return StatusCode(409, "Nie znaleziono pociągu o danym id");
         }
 
         [HttpDelete("{idpociagu}/{idwagonu}")]

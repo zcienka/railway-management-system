@@ -80,16 +80,74 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
-        [HttpPost]
-        public IActionResult Post(Reservation reservation)
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Reservation>>> search(string? imie, string? nazwisko, string? znizka, string? idprzejazdumin,
+                                                                                                                         string? idprzejazdumax)
         {
+            if (imie == null)
+                imie = "";
+            if (nazwisko == null)
+                nazwisko = "";
+            if (znizka == null)
+                znizka = "";
+            if (idprzejazdumin == null)
+                idprzejazdumin = "0";
+            if (idprzejazdumax == null)
+                idprzejazdumax = "99999";
+            try
+            {
+                Int32.Parse(idprzejazdumin);
+                Int32.Parse(idprzejazdumax);
+            } catch { return StatusCode(409, "Id muszą byc liczbami"); }
+
+            string query = @"
+                            select * from rezerwacjaFilter(vImie => @imie, vNazwisko => @nazwisko,
+                                                         vIdPrzejazduMin => @idprzejazdumin, vIdPrzejazduMax => @idprzejazdumax,
+                                                         vZnizka => @znizka);
+                            ";
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("railway_database");
+            NpgsqlDataReader myReader;
+            using (NpgsqlConnection myCon = new NpgsqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@imie", imie);
+                    myCommand.Parameters.AddWithValue("@nazwisko", nazwisko);
+                    myCommand.Parameters.AddWithValue("@idprzejazdumin", Int32.Parse(idprzejazdumin));
+                    myCommand.Parameters.AddWithValue("@idprzejazdumax", Int32.Parse(idprzejazdumax));
+                    myCommand.Parameters.AddWithValue("@znizka", znizka);
+
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+
+                    myReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            string json = JsonConvert.SerializeObject(table, Formatting.Indented);
+
+            return Ok(json);
+        }
+
+        [HttpPost("create")]
+        public async Task<ActionResult<IEnumerable<Reservation>>> create(string? imie, string? nazwisko, string? znizka, string? idprzejazdu)
+        {
+            if(imie == null || nazwisko == null || znizka == null || idprzejazdu == null)
+                return StatusCode(409, "Wszystkie pola muszą byc wypełnione");
+            try
+            {
+                Int32.Parse(idprzejazdu);
+            } catch { StatusCode(409, "id musi być liczbą"); }
+
             string query = @"
                             select rezerwacjaCreate(vImie => @imie,
 						                            vNazwisko => @nazwisko,
 						                            vIdPrzejazdu => @idprzejazdu,
 						                            vZnizka => @znizka);
                             ";
-
             int val = 0;
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -99,36 +157,44 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", reservation.Id);
-                    myCommand.Parameters.AddWithValue("@imie", reservation.Imie);
-                    myCommand.Parameters.AddWithValue("@nazwisko", reservation.Nazwisko);
-                    myCommand.Parameters.AddWithValue("@idprzejazdu", reservation.Idprzejazdu);
-                    myCommand.Parameters.AddWithValue("@znizka", Int64.Parse(reservation.Znizka));
+                    myCommand.Parameters.AddWithValue("@imie", imie);
+                    myCommand.Parameters.AddWithValue("@nazwisko", nazwisko);
+                    myCommand.Parameters.AddWithValue("@idprzejazdu", Int32.Parse(idprzejazdu));
+                    myCommand.Parameters.AddWithValue("@znizka", znizka);
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
-                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[5].Value));
+                    val = Int32.Parse(JsonConvert.SerializeObject(myCommand.Parameters[4].Value));
 
                     myReader.Close();
                     myCon.Close();
                 }
             }
-            if(val == 1)
-                return CreatedAtAction(nameof(Get), new { id = reservation.Id }, reservation);
-            else if(val == 0)
+            if (val == 1)
+                return Ok();
+            else if (val == 0)
                 return StatusCode(409, "Nie znaleziono przejazdu o danym ID");
             else if (val == -1)
                 return StatusCode(409, "Nie znaleziono zniżki o danej nazwie");
             else if (val == -2)
                 return StatusCode(409, "Imię musi być o długości między 1 a 16 znaków");
             else
-                return StatusCode(409, "Imię musi być o długości między 1 a 32 znaków");
+                return StatusCode(409, "Nazwisko musi być o długości między 1 a 32 znaków");
         }
 
-        [HttpPatch]
-        public IActionResult Patch(Reservation reservation)
+        [HttpPatch("update")]
+        public async Task<ActionResult<IEnumerable<Reservation>>> update(string? id, string? imie, string? nazwisko, string? znizka, string? idprzejazdu)
         {
+            if (id == null || imie == null || nazwisko == null || znizka == null || idprzejazdu == null)
+                return StatusCode(409, "Wszystkie pola muszą byc wypełnione");
+            try
+            {
+                Int32.Parse(id);
+                Int32.Parse(idprzejazdu);
+            }
+            catch { StatusCode(409, "id muszą być liczbami"); }
+
             string query = @"
                            select rezerwacjaUpdate(vId => @id,
 						                           vImie => @imie,
@@ -146,11 +212,11 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", reservation.Id);
-                    myCommand.Parameters.AddWithValue("@imie", reservation.Imie);
-                    myCommand.Parameters.AddWithValue("@nazwisko", reservation.Nazwisko);
-                    myCommand.Parameters.AddWithValue("@idprzejazdu", reservation.Idprzejazdu);
-                    myCommand.Parameters.AddWithValue("@znizka", reservation.Znizka);
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
+                    myCommand.Parameters.AddWithValue("@imie", imie);
+                    myCommand.Parameters.AddWithValue("@nazwisko", nazwisko);
+                    myCommand.Parameters.AddWithValue("@idprzejazdu", Int32.Parse(idprzejazdu));
+                    myCommand.Parameters.AddWithValue("@znizka", znizka);
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
@@ -162,7 +228,7 @@ namespace Backend.Controllers
                 }
             }
             if (val == 1)
-                return Ok(reservation);
+                return Ok();
             else if (val == 0)
                 return StatusCode(409, "Nie znaleziono przejazdu o danym ID");
             else if (val == -1)

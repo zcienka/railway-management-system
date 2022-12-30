@@ -28,8 +28,13 @@ const EditLocomotive = () => {
     }
 
     const updateSingleLocomotive = async () => {
-        // updateLocomotive()
-        // navigate("/locomotive")
+        const singleLocomotive: Locomotive = {
+            databadaniatechnicznego: new Date(technicalResearch),
+            nazwa: locomotiveName,
+            id: parseInt(id?.toString() || "undefined")
+        }
+        await updateLocomotive(singleLocomotive)
+        navigate("/locomotive")
     }
 
     const [deleteLocomotive] = useDeleteLocomotiveMutation()

@@ -30,26 +30,27 @@ export const reservationsApi = createApi({
         }),
         updateReservation: builder.mutation({
             query: (body) => ({
-                url: "/reservation",
+                url: "/reservation/update",
                 method: "PATCH",
-                body: body
+                params: {id: body.id, imie: body.imie, nazwisko: body.nazwisko, znizka: body.znizka, idprzejazdu: body.idprzejazdu}
             }),
             invalidatesTags: ["Reservation", "SingleReservation"]
         }),
-        createReservation: builder.mutation<Reservation, Reservation>({
+        createReservation: builder.mutation({
             query: (body) => ({
-                url: "/reservation",
+                url: "/reservation/create",
                 method: "POST",
-                body: body
+                params: {imie: body.imie, nazwisko: body.nazwisko, znizka: body.znizka, idprzejazdu: body.idprzejazdu}
             }),
             invalidatesTags: ["Reservation"]
         }),
-        searchReservations: builder.query<Reservation[], string | undefined>({
-            query: (searchValue) => ({
-                url: `/reservation/search/${searchValue}`,
+        filterReservations: builder.mutation({
+            query: (body) => ({
+                url: `/reservation/search`,
                 method: "GET",
+                params: {imie: body.imie, nazwisko: body.nazwisko, znizka: body.znizka, idprzejazdumin: body.idprzejazdumin, idprzejazdumax: body.idprzejazdumax}
             }),
-            providesTags: ["SingleReservation"]
+            invalidatesTags: ["SingleReservation"]
         }),
     }),
 })

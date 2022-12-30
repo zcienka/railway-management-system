@@ -32,7 +32,6 @@ const CreateReservation = () => {
             setFirstNameInput(false)
         } else {
             const reservation : Reservation = {
-                id: 6,
                 idprzejazdu: 7,
                 imie: name,
                 nazwisko: lastName,

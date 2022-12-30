@@ -34,8 +34,12 @@ const EditStations = () => {
     }
 
     const updateSingleStation = async () => {
-        // updateStation()
-        // navigate("/stations")
+        const singleStation: Station = {
+            nazwa: name,
+            adres: address
+        }
+        await updateStation(singleStation)
+        navigate("/stations")
     }
 
 
@@ -57,13 +61,7 @@ const EditStations = () => {
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Nazwa</label>
                         <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
-                                   value={name}
-                                   onChange={(e) => {
-                                       setName(e.target.value)
-                                       setNameInput(false)
-                                   }}
-                            />
+                        <label className={"w-2/6"}>{name}</label>
                         </div>
                     </div>
 
