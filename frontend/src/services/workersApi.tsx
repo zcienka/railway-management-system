@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Worker} from "../types"
+import {SearchWorker, Worker} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const workersApi = createApi({
     reducerPath: "workersApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Worker"],
+    tagTypes: ["Worker", "SearchWorker"],
     endpoints: (builder) => ({
         getWorkers: builder.query<Worker[], null>({
             query: () => ({
@@ -55,13 +55,13 @@ export const workersApi = createApi({
             }),
             invalidatesTags: ["Worker"]
         }),
-        filterWorker: builder.mutation({
+        filterWorker: builder.query<Worker[], SearchWorker>({
             query: (body) => ({
                 url: "/worker/search",
                 method: "GET",
-                params: {imie: body.imie, nazwisko: body.nazwisko, placamin: body.placamin, placamax: body.placamax, zawod: body.zawod}
+                params: body
             }),
-            invalidatesTags: ["Worker"]
+            providesTags: ["SearchWorker"]
         }),
     }),
 })
@@ -73,5 +73,6 @@ export const {
     useUpdateWorkerMutation,
     useCreateWorkerMutation,
     useGetConductorsQuery,
-    useGetDriversQuery
+    useGetDriversQuery,
+    useFilterWorkerQuery
 } = workersApi

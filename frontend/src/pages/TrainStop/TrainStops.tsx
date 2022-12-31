@@ -1,14 +1,36 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
-import {TrainStop} from "../../types"
+import {SearchTrainStop, TrainStop} from "../../types"
 import {v4 as uuidv4} from "uuid"
-import {useGetTrainStopsQuery} from "../../services/trainStopApi"
-import TrainStopsTable from "./TrainStopTable"
-import {useNavigate} from "react-router-dom";
+import {useGetTrainStopsQuery, useFilterTrainStopQuery} from "../../services/trainStopApi"
+import {useNavigate} from "react-router-dom"
+import Menu from "../../components/Menu"
+
+const initialState: SearchTrainStop = {
+    numerprzystankumin: "",
+    numerprzystankumax: "",
+    nazwastacji: "",
+    idliniimin: "",
+    idliniimax: "",
+}
 
 const TrainStops = () => {
+    const [searchTrainStop, setSearchTrainStop] = useState<SearchTrainStop>(initialState)
+    const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
+    const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+
     const [trainStop, setTrainStops] = useState<TrainStop[] | undefined>(undefined)
     const navigate = useNavigate()
+
+    const {
+        data: getFilterTrainStops,
+        isFetching: isGetFilterTrainStopFetching,
+        isSuccess: isGetFilterTrainStopSuccess,
+        isError: isGetFilterTrainStopError,
+    } = useFilterTrainStopQuery(
+        searchTrainStop,
+        {skip: !showSearchResponse}
+    )
 
     const {
         data: getTrainStops,
@@ -16,13 +38,17 @@ const TrainStops = () => {
         isSuccess: isGetTrainStopsSuccess,
         isError: isGetTrainStopsError,
     } = useGetTrainStopsQuery(null)
-    console.log({getTrainStops})
 
     useEffect(() => {
-        if (isGetTrainStopsSuccess) {
+        if (isGetFilterTrainStopSuccess) {
+            setTrainStops(getFilterTrainStops)
+            setShowSearchResponse(() => false)
+        } else if (isGetTrainStopsSuccess && isFirstRender) {
             setTrainStops(getTrainStops)
+            setIsFirstRender(() => false)
         }
-    }, [getTrainStops, isGetTrainStopsFetching, isGetTrainStopsSuccess])
+    }, [getFilterTrainStops, getTrainStops, isFirstRender, isGetFilterTrainStopSuccess,
+        isGetTrainStopsFetching, isGetTrainStopsSuccess])
 
     if (trainStop === undefined) {
         return <Loading/>
@@ -30,7 +56,6 @@ const TrainStops = () => {
         const allTrainStops = Object.values(trainStop).map((trainStop: TrainStop) => {
             return <tr key={uuidv4()}>
                 <th className={"py-2 font-semibold border-b border-l border-stone-200 underline"}>Pokaż linię</th>
-                {/*{trainStop.idlinii}*/}
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.nazwastacji}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.numerprzystanku}</th>
 
@@ -40,7 +65,78 @@ const TrainStops = () => {
                 </th>
             </tr>
         })
-        return <TrainStopsTable {...allTrainStops}/>
+        return <div className={"flex"}>
+            <Menu/>
+            <div className={"px-2 py-2 lg:px-10 lg:py-6 w-full"}>
+                <div className={"h-24 w-full flex items-center"}>
+                    <p className={"text-4xl"}>Przystanki</p>
+                </div>
+
+                <div className={"bg-white h-[calc(100vh-6rem)] max-h-[calc(100vh-9rem)] " +
+                    "w-full rounded-xl lg:p-8 p-4 border border-stone-200 overflow-auto"}>
+                    <div className={"flex mb-4 w-full"}>
+
+                        <div className={"w-2/3 mr-2"}>
+                            <input type="text"
+                                   placeholder="Minimalny numer przystanku"
+                                   className={"border mb-4 inline-block w-full"}
+                                   onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
+                                       return {...prevState, numerprzystankumin: e.target.value}
+                                   })}/>
+                        </div>
+
+                        <div className={"w-2/3 mr-2"}>
+                            <input type="text"
+                                   placeholder="Maksymalny numer przystanku"
+                                   className={"border mb-4 inline-block w-full"}
+                                   onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
+                                       return {...prevState, numerprzystankumax: e.target.value}
+                                   })}/>
+                        </div>
+                        <input type="text"
+                               placeholder="Nazwa stacji"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
+                                   return {...prevState, nazwastacji: e.target.value}
+                               })}/>
+
+                        <input type="text"
+                               placeholder="Minimalne id linii"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
+                                   return {...prevState, idliniimin: e.target.value}
+                               })}/>
+
+                        <input type="text"
+                               placeholder="Maksymalne id linii"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
+                                   return {...prevState, idliniimax: e.target.value}
+                               })}/>
+
+                        <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
+                            Szukaj
+                        </button>
+                        <div className={"flex justify-end w-full mb-4"}>
+                            <button onClick={() => navigate("/add-train-stop")}>
+                                Dodaj przystanek
+                            </button>
+                        </div>
+                    </div>
+                    <table className={"w-full border-spacing-0 border-separate overflow-y-auto"}>
+                        <tbody>
+                        <tr className={"rounded-tl-xl text-slate-600"}>
+                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Linia</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Nazwa stacji</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Numer przystanku</th>
+                            <th className={"rounded-tr-xl bg-slate-100 w-20 border-y border-r border-stone-200"}></th>
+                        </tr>
+                        {allTrainStops}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     }
 }
 

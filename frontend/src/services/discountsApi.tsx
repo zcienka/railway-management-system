@@ -48,8 +48,8 @@ export const discountsApi = createApi({
                 url: "/discount/search",
                 method: "GET",
                 params: body,
-                providesTags: ["SearchDiscount"]
-            })
+            }),
+            providesTags: ["SearchDiscount"]
         }),
     }),
 })

@@ -5,7 +5,7 @@ import BaseQuery from "../utils/baseQuery"
 export const trainRideApi = createApi({
     reducerPath: "trainRideApi",
     baseQuery: BaseQuery,
-    tagTypes: ["TrainRide", "SingleTrainRide", "StationByLine"],
+    tagTypes: ["TrainRide", "SingleTrainRide", "StationByLine", "SearchTrainRide"],
     endpoints: (builder) => ({
         getTrainRides: builder.query<TrainRideResponse[], null>({
             query: () => ({
@@ -44,14 +44,22 @@ export const trainRideApi = createApi({
             }),
             invalidatesTags: ["TrainRide"]
         }),
-        // createTrainRide: builder.query<TrainRide[], SearchTrainRide>({
-        //     query: (body) => ({
-        //         url: "/train-ride/create",
-        //         method: "GET",
-        //         params: body
-        //     }),
-        //     invalidatesTags: ["TrainRide"]
-        // }),
+        createTrainRide: builder.mutation({
+            query: (body) => ({
+                url: "/train-ride/create",
+                method: "GET",
+                params: body
+            }),
+            invalidatesTags: ["TrainRide"]
+        }),
+        filterTrainRide: builder.query<TrainRideResponse[], SearchTrainRide>({
+            query: (body) => ({
+                url: "/train-ride/search",
+                method: "GET",
+                params: body
+            }),
+            providesTags: ["SearchTrainRide"]
+        })
     }),
 })
 
@@ -61,6 +69,6 @@ export const {
     useDeleteTrainRideMutation,
     useUpdateTrainRideMutation,
     useGetTrainStopByLineQuery,
-    // useCreateTrainRideMutation,
-    // useFilterTrainRideQuery
+    useCreateTrainRideMutation,
+    useFilterTrainRideQuery
 } = trainRideApi

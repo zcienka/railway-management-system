@@ -11,8 +11,9 @@
 
     input {
         @apply p-2;
-        @apply pl-3;
-        @apply pr-5;
+        @apply px-3;
+        /*@apply min-w-144;*/
+        /*@apply pr-5;*/
         @apply border-2;
         @apply border-slate-200;
         @apply rounded-xl;

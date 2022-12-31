@@ -1,14 +1,36 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
-import {Worker} from "../../types"
+import {SearchWorker, Worker} from "../../types"
 import {v4 as uuidv4} from "uuid"
-import {useGetWorkersQuery} from "../../services/workersApi"
-import WorkersTable from "./WorkersTable"
+import {useGetWorkersQuery, useFilterWorkerQuery} from "../../services/workersApi"
 import {useNavigate} from "react-router-dom"
+import Menu from "../../components/Menu";
+
+const initialState: SearchWorker = {
+    imie: "",
+    nazwisko: "",
+    placamin: "",
+    placamax: "",
+    zawod: ""
+}
 
 const Workers = () => {
+    const [searchWorker, setSearchWorker] = useState<SearchWorker>(initialState)
+    const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
+    const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+
     const [workers, setWorkers] = useState<Worker[] | undefined>(undefined)
     const navigate = useNavigate()
+
+    const {
+        data: getFilterWorkers,
+        isFetching: isGetFilterWorkerFetching,
+        isSuccess: isGetFilterWorkerSuccess,
+        isError: isGetFilterWorkerError,
+    } = useFilterWorkerQuery(
+        searchWorker,
+        {skip: !showSearchResponse}
+    )
 
     const {
         data: getWorkers,
@@ -18,10 +40,14 @@ const Workers = () => {
     } = useGetWorkersQuery(null)
 
     useEffect(() => {
-        if (isGetWorkersSuccess) {
+        if (isGetFilterWorkerSuccess) {
+            setWorkers(getFilterWorkers)
+            setShowSearchResponse(() => false)
+        } else if (isGetWorkersSuccess && isFirstRender) {
             setWorkers(getWorkers)
+            setIsFirstRender(() => false)
         }
-    }, [getWorkers, isGetWorkersFetching, isGetWorkersSuccess])
+    }, [getFilterWorkers, getWorkers, isFirstRender, isGetFilterWorkerSuccess, isGetWorkersFetching, isGetWorkersSuccess])
 
     if (workers === undefined) {
         return <Loading/>
@@ -39,7 +65,82 @@ const Workers = () => {
                 </th>
             </tr>
         })
-        return <WorkersTable {...allWorkers}/>
+        return <div className={"flex"}>
+            <Menu/>
+            <div className={"px-2 py-2 lg:px-10 lg:py-6 w-full"}>
+                <div className={"h-24 w-full flex items-center"}>
+                    <p className={"text-4xl"}>Pracownicy</p>
+                </div>
+
+                <div className={"bg-white h-[calc(100vh-6rem)] max-h-[calc(100vh-9rem)] " +
+                    "w-full rounded-xl lg:p-8 p-4 border border-stone-200 overflow-auto"}>
+                    <div className={"flex mb-4 w-full"}>
+
+                        <input type="text"
+                               placeholder="Imię"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchWorker((prevState: SearchWorker) => {
+                                   return {...prevState, imie: e.target.value}
+                               })}/>
+                        <div/>
+
+                        <input type="text"
+                               placeholder="Nazwisko"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchWorker((prevState: SearchWorker) => {
+                                   return {...prevState, nazwisko: e.target.value}
+                               })}/>
+                        <div/>
+
+                        <input type="text"
+                               placeholder="Minimalna płaca"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchWorker((prevState: SearchWorker) => {
+                                   return {...prevState, placamin: e.target.value}
+                               })}/>
+                        <div/>
+
+                        <input type="text"
+                               placeholder="Maksymalna płaca"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchWorker((prevState: SearchWorker) => {
+                                   return {...prevState, placamax: e.target.value}
+                               })}/>
+                        <div/>
+
+                        <input type="text"
+                               placeholder="Zawód"
+                               className={"border mb-4 mr-2"}
+                               onChange={(e) => setSearchWorker((prevState: SearchWorker) => {
+                                   return {...prevState, zawod: e.target.value}
+                               })}/>
+                        <div/>
+
+                        <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
+                            Szukaj
+                        </button>
+
+                        <div className={"flex justify-end w-full mb-4"}>
+                            <button onClick={() => navigate("/add-worker")}>
+                                Dodaj pracownika
+                            </button>
+                        </div>
+                    </div>
+                    <table className={"w-full border-spacing-0 border-separate overflow-y-auto"}>
+                        <tbody>
+                        <tr className={"rounded-tl-xl text-slate-600"}>
+                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Imię</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Nazwisko</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Płaca</th>
+                            <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Zawód</th>
+                            <th className={"rounded-tr-xl bg-slate-100 w-20 border-y border-r border-stone-200"}></th>
+                        </tr>
+                        {allWorkers}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     }
 }
 
