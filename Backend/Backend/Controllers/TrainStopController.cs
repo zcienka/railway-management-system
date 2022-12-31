@@ -141,8 +141,8 @@ namespace Backend.Controllers
             } catch { return StatusCode(409, "Pola id linii i numery przystanków muszą być liczbami"); }
 
             string query = @"
-                            select * from przystanekFilter(vNrPrzystankuMin => @numerprzystankumin, vNrPrzystankuMax => @numerprzystankumax
-                                                            vNrLiniiMin => @idliniimin , vNrLiniiMax => @idliniimax
+                            select * from przystanekFilter(vNrPrzystankuMin => @numerprzystankumin, vNrPrzystankuMax => @numerprzystankumax,
+                                                            vNrLiniiMin => @idliniimin, vNrLiniiMax => @idliniimax,
                                                             vNazwaStacji => @nazwastacji);
                             ";
             DataTable table = new DataTable();

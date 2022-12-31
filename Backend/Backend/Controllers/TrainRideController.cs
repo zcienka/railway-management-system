@@ -133,18 +133,10 @@ namespace Backend.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<TrainRide>>> search(string? idmin, string? idmax,
-                                                                       string? dataodjazdumin, string? dataodjazdumax,
+        public async Task<ActionResult<IEnumerable<TrainRide>>> search(string? dataodjazdumin, string? dataodjazdumax,
                                                                        string? dataprzyjazdumin, string? dataprzyjazdumax,
-                                                                       string? idkonduktoramin, string? idkonduktoramax,
-                                                                       string? idmaszynistymin, string? idmaszynistymax,
-                                                                       string? idliniiprzejazdumin, string? idliniiprzejazdumax,
-                                                                       string? idpociagumin, string? idpociagumax)
+                                                                       string? idliniiprzejazdumin, string? idliniiprzejazdumax)
         {
-            if (idmin == null)
-                idmin = "0";
-            if (idmax == null)
-                idmax = "999999";
             if (dataodjazdumin == null)
                 dataodjazdumin = "2022-12-23";
             if (dataodjazdumax == null)
@@ -153,36 +145,20 @@ namespace Backend.Controllers
                 dataprzyjazdumin = "2022-12-23";
             if (dataprzyjazdumax == null)
                 dataprzyjazdumax = "2122-12-23";
-            if (idkonduktoramin == null)
-                idkonduktoramin = "0";
-            if (idkonduktoramax == null)
-                idkonduktoramax = "9999";
-            if (idmaszynistymin == null)
-                idmaszynistymin = "0";
-            if (idmaszynistymax == null)
-                idmaszynistymax = "9999";
             if (idliniiprzejazdumin == null)
                 idliniiprzejazdumin = "0";
             if (idliniiprzejazdumax == null)
                 idliniiprzejazdumax = "9999";
-            if (idpociagumin == null)
-                idpociagumin = "0";
-            if (idpociagumax == null)
-                idpociagumax = "9999";
-            try {
-                Int32.Parse(idmin);
-                Int32.Parse(idmax);
-                Int32.Parse(idkonduktoramin);
-                Int32.Parse(idkonduktoramax);
-                Int32.Parse(idmaszynistymin);
-                Int32.Parse(idmaszynistymax);
+
+            try
+            {
                 Int32.Parse(idliniiprzejazdumin);
                 Int32.Parse(idliniiprzejazdumax);
-                Int32.Parse(idpociagumin);
-                Int32.Parse(idpociagumax);
-            } catch { return StatusCode(409, "Pola wszelkich id muszą być liczbami"); }
+            }
+            catch { return StatusCode(409, "Pola wszelkich id muszą być liczbami"); }
 
-            try{
+            try
+            {
                 DateOnly.Parse(dataodjazdumin);
                 DateOnly.Parse(dataodjazdumax);
                 DateOnly.Parse(dataprzyjazdumin);
@@ -190,13 +166,9 @@ namespace Backend.Controllers
             } catch { return StatusCode(409, "Niepoprawny zapis dat"); }
 
             string query = @"
-                            select * from przejazdFilter(vIdMin => @idmin, vIdMax => @idmax,
-                                                         vOdjazdOd => @dataodjazdumin, vOdjazdDo => @dataodjazdumax,
+                            select * from przejazdFilter(vOdjazdOd => @dataodjazdumin, vOdjazdDo => @dataodjazdumax,
                                                          vPrzyjazdOd => @dataprzyjazdumin, vPrzyjazdDo => @dataprzyjazdumax,
-                                                         vIdKonduktoraOd => @idkonduktoramin, vIdKonduktoraDo => @idkonduktoramax,
-                                                         vIdMaszynistyOd => @idmaszynistymin, vIdMaszynistyDo => @idmaszynistymax,
-                                                         vIdLiniiPrzejazduOd => @idliniiprzejazdumin, vIdLiniiPrzejazduDo => @idliniiprzejazdumax,
-                                                         vIdPociaguOd => @idpociagumin, vIdPociaguDo => @idpociagumax);
+                                                         vIdLiniiPrzejazduOd => @idliniiprzejazdumin, vIdLiniiPrzejazduDo => @idliniiprzejazdumax);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -206,20 +178,12 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@idmin", Int32.Parse(idmin));
-                    myCommand.Parameters.AddWithValue("@idmax", Int32.Parse(idmax));
                     myCommand.Parameters.AddWithValue("@dataodjazdumin", DateOnly.Parse(dataodjazdumin));
                     myCommand.Parameters.AddWithValue("@dataodjazdumax", DateOnly.Parse(dataodjazdumax));
                     myCommand.Parameters.AddWithValue("@dataprzyjazdumin", DateOnly.Parse(dataprzyjazdumin));
                     myCommand.Parameters.AddWithValue("@dataprzyjazdumax", DateOnly.Parse(dataprzyjazdumax));
-                    myCommand.Parameters.AddWithValue("@idkonduktoramin", Int32.Parse(idkonduktoramin));
-                    myCommand.Parameters.AddWithValue("@idkonduktoramax", Int32.Parse(idkonduktoramax));
-                    myCommand.Parameters.AddWithValue("@idmaszynistymin", Int32.Parse(idmaszynistymin));
-                    myCommand.Parameters.AddWithValue("@idmaszynistymax", Int32.Parse(idmaszynistymax));
                     myCommand.Parameters.AddWithValue("@idliniiprzejazdumin", Int32.Parse(idliniiprzejazdumin));
                     myCommand.Parameters.AddWithValue("@idliniiprzejazdumax", Int32.Parse(idliniiprzejazdumax));
-                    myCommand.Parameters.AddWithValue("@idpociagumin", Int32.Parse(idpociagumin));
-                    myCommand.Parameters.AddWithValue("@idpociagumax", Int32.Parse(idpociagumax));
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
