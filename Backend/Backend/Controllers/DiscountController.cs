@@ -74,6 +74,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("search")]
+        //string? nazwa, 
         public async Task<ActionResult<IEnumerable<Discount>>> search(string? nazwa, string? procentmin, string? procentmax, string? dokument)
         {
             if (nazwa == null)
@@ -84,7 +85,8 @@ namespace Backend.Controllers
                 procentmax = "100";
             if (dokument == null)
                 dokument = "";
-            try{
+            try
+            {
                 Int32.Parse(procentmin);
                 Int32.Parse(procentmax);
             }

@@ -100,14 +100,14 @@ namespace Backend.Controllers
             try
             {
                 Int32.Parse(idwagonumin);
-                Int32.Parse(idpociagumin);
                 Int32.Parse(idwagonumax);
+                Int32.Parse(idpociagumin);
                 Int32.Parse(idpociagumax);
             }
             catch { return StatusCode(409, "Wszystkie pola muszą być liczbami"); }
 
             string query = @"
-                            select * from wagonwpociaguFilter(vIdWagonuMin => @idwagonumin, vIdWagonuMax => @idwagonumax
+                            select * from wagonwpociagufilter(vIdWagonuMin => @idwagonumin, vIdWagonuMax => @idwagonumax,
                                                        vIdPociaguMin => @idpociagumin, vIdPociaguMax => @idpociagumax);
                             ";
             DataTable table = new DataTable();
@@ -118,8 +118,8 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@idwagonumin", idwagonumin);
-                    myCommand.Parameters.AddWithValue("@idwagonumax", idwagonumax);
+                    myCommand.Parameters.AddWithValue("@idwagonumin", Int32.Parse(idwagonumin));
+                    myCommand.Parameters.AddWithValue("@idwagonumax", Int32.Parse(idwagonumax));
                     myCommand.Parameters.AddWithValue("@idpociagumin", Int32.Parse(idpociagumin));
                     myCommand.Parameters.AddWithValue("@idpociagumax", Int32.Parse(idpociagumax));
 

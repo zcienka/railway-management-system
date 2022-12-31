@@ -51,7 +51,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                             select * from wagonReadById(@id);
@@ -78,12 +81,11 @@ namespace Backend.Controllers
 
             return Ok(json);
         }
-
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Carriage>>> search(string? databadaniamin,
-                                                                      string? databadaniamax,
-                                                                      string? liczbamiejscmin,
-                                                                      string? liczbamiejscmax)
+                                                                             string? databadaniamax,
+                                                                             string? liczbamiejscmin,
+                                                                             string? liczbamiejscmax)
         {
             if (databadaniamin == null)
                 databadaniamin = "2022-12-31";
@@ -94,10 +96,12 @@ namespace Backend.Controllers
             if (liczbamiejscmax == null)
                 liczbamiejscmax = "100000";
 
-            try{
+            try
+            {
                 Int32.Parse(liczbamiejscmin);
                 Int32.Parse(liczbamiejscmax);
-            } catch { return StatusCode(409, "Pola liczby miejsc muszą być liczbami"); }
+            }
+            catch { return StatusCode(409, "Pola liczby miejsc muszą być liczbami"); }
 
             string query = @"
                             select * from wagonFilter(vMiejscMin => @liczbamiejscmin, vMiejscMax => @liczbamiejscmax, 
@@ -129,21 +133,31 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
-       [HttpPost("create")]
+
+        [HttpPost("create")]
         public async Task<ActionResult<IEnumerable<Carriage>>> create(string? databadania, string? liczbamiejsc)
         {
             if (databadania == null)
                 return StatusCode(409, "Pole daty następnego badania nie może być puste");
             if (liczbamiejsc == null)
                 return StatusCode(409, "Pole liczby miejsc nie może być puste");
-            try{
+            try
+            {
                 Int32.Parse(liczbamiejsc);
             }
-            catch { return StatusCode(409, "Pole Liczby miejsc musi być liczbą"); }
-            try{
+            catch
+            {
+                return StatusCode(409, "Pole Liczby miejsc musi być liczbą");
+            }
+
+            try
+            {
                 DateOnly.Parse(databadania);
             }
-            catch { return StatusCode(409, "Pole daty badania nie jest datą"); }
+            catch
+            {
+                return StatusCode(409, "Pole daty badania nie jest datą");
+            }
 
             string query = @"
                             select wagonCreate(vData => @databadaniatechnicznego, vMiejsc => @liczbamiejsc);
@@ -159,7 +173,8 @@ namespace Backend.Controllers
                 {
                     myCommand.Parameters.AddWithValue("@databadaniatechnicznego", DateOnly.Parse(databadania));
                     myCommand.Parameters.AddWithValue("@liczbamiejsc", Int32.Parse(liczbamiejsc));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -179,7 +194,8 @@ namespace Backend.Controllers
         }
 
         [HttpPatch("update")]
-        public async Task<ActionResult<IEnumerable<Carriage>>> update(string? id, string? databadania, string? liczbamiejsc)
+        public async Task<ActionResult<IEnumerable<Carriage>>> update(string? id, string? databadania,
+            string? liczbamiejsc)
         {
             if (id == null)
                 return StatusCode(409, "Pole id nie może być puste");
@@ -187,19 +203,32 @@ namespace Backend.Controllers
                 return StatusCode(409, "Pole daty następnego badania nie może być puste");
             if (liczbamiejsc == null)
                 return StatusCode(409, "Pole liczby miejsc nie może być puste");
-            try{
+            try
+            {
                 Int32.Parse(liczbamiejsc);
             }
-            catch { return StatusCode(409, "Pole Liczby miejsc musi być liczbą"); }
-            try{
+            catch
+            {
+                return StatusCode(409, "Pole Liczby miejsc musi być liczbą");
+            }
+
+            try
+            {
                 DateOnly.Parse(databadania);
             }
-            catch { return StatusCode(409, "Pole daty badania nie jest datą"); }
+            catch
+            {
+                return StatusCode(409, "Pole daty badania nie jest datą");
+            }
+
             try
             {
                 Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Pole id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Pole id musi być liczbą");
+            }
 
             string query = @"
                             select wagonUpdate(vId => @id, vData => @databadaniatechnicznego, vMiejsc => @liczbamiejsc);
@@ -217,7 +246,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
                     myCommand.Parameters.AddWithValue("@databadaniatechnicznego", DateOnly.Parse(databadania));
                     myCommand.Parameters.AddWithValue("@liczbamiejsc", Int32.Parse(liczbamiejsc));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -245,7 +275,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                            select wagonDelete(@id);
@@ -261,7 +294,8 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -271,7 +305,8 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
+
+            if (val == 1)
                 return NoContent();
             else
                 return StatusCode(409, "Nie znaleziono wagonu o danym ID");
