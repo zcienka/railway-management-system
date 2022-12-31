@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Train} from "../types"
+import {SearchTrain, Train} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const trainsApi = createApi({
     reducerPath: "trainsApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Train", "SingleTrain"],
+    tagTypes: ["Train", "SingleTrain", "TrainSearch"],
     endpoints: (builder) => ({
         getTrains: builder.query<Train[], null>({
             query: () => ({
@@ -44,13 +44,13 @@ export const trainsApi = createApi({
             }),
             invalidatesTags: ["Train"]
         }),
-        filterTrain: builder.mutation({
+        filterTrain: builder.query<Train[], SearchTrain>({
             query: (body) => ({
                 url: "/train/search",
                 method: "GET",
-                params: {nazwa : body.nazwa, idlokomotywymin : body.idlokomotywymin, idlokomotywymax : body.idlokomotywymax}
+                params: body
             }),
-            invalidatesTags: ["Train"]
+            providesTags: ["TrainSearch"]
         }),
 
     }),
@@ -61,5 +61,6 @@ export const {
     useGetSingleTrainQuery,
     useDeleteTrainMutation,
     useUpdateTrainMutation,
-    useCreateTrainMutation
+    useCreateTrainMutation,
+    useFilterTrainQuery
 } = trainsApi

@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Reservation, ReservationResponse} from "../types"
+import {Reservation, ReservationResponse, SearchReservation} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const reservationsApi = createApi({
     reducerPath: "reservationsApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Reservation", "SingleReservation"],
+    tagTypes: ["Reservation", "SingleReservation", "SearchReservations"],
     endpoints: (builder) => ({
         getReservations: builder.query<ReservationResponse[], null>({
             query: () => ({
@@ -44,13 +44,13 @@ export const reservationsApi = createApi({
             }),
             invalidatesTags: ["Reservation"]
         }),
-        filterReservations: builder.mutation({
+        filterReservation: builder.query<ReservationResponse[], SearchReservation>({
             query: (body) => ({
-                url: `/reservation/search`,
+                url: "/reservation/search",
                 method: "GET",
-                params: {imie: body.imie, nazwisko: body.nazwisko, znizka: body.znizka, idprzejazdumin: body.idprzejazdumin, idprzejazdumax: body.idprzejazdumax}
+                params: body
             }),
-            invalidatesTags: ["SingleReservation"]
+            providesTags: ["SearchReservations"]
         }),
     }),
 })
@@ -61,4 +61,5 @@ export const {
     useDeleteReservationMutation,
     useUpdateReservationMutation,
     useCreateReservationMutation,
+    useFilterReservationQuery
 } = reservationsApi

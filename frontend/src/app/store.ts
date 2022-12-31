@@ -5,9 +5,9 @@ import {discountsApi} from "../services/discountsApi"
 import {trainStopApi} from "../services/trainStopApi"
 import {trainRideApi} from "../services/trainRideApi"
 import {stationsApi} from "../services/stationsApi"
-import {carriagesApi} from "../services/carriagesApi"
-import {locomotivesApi} from "../services/locomotivesApi"
 import {railroadCarsApi} from "../services/railroadCarsApi"
+import {locomotivesApi} from "../services/locomotivesApi"
+import {railroadCarsInTheTrainApi} from "../services/railroadCarsInTheTrainApi"
 import {trainsApi} from "../services/trainsApi"
 import {workersApi} from "../services/workersApi"
 import {railConnectionsApi} from "../services/railConnectionsApi";
@@ -19,9 +19,9 @@ const store = configureStore({
         [trainStopApi.reducerPath]: trainStopApi.reducer,
         [trainRideApi.reducerPath]: trainRideApi.reducer,
         [stationsApi.reducerPath]: stationsApi.reducer,
-        [carriagesApi.reducerPath]: carriagesApi.reducer,
-        [locomotivesApi.reducerPath]: locomotivesApi.reducer,
         [railroadCarsApi.reducerPath]: railroadCarsApi.reducer,
+        [locomotivesApi.reducerPath]: locomotivesApi.reducer,
+        [railroadCarsInTheTrainApi.reducerPath]: railroadCarsInTheTrainApi.reducer,
         [trainsApi.reducerPath]: trainsApi.reducer,
         [workersApi.reducerPath]: workersApi.reducer,
         [railConnectionsApi.reducerPath]: railConnectionsApi.reducer,
@@ -32,9 +32,9 @@ const store = configureStore({
             trainStopApi.middleware,
             trainRideApi.middleware,
             stationsApi.middleware,
-            carriagesApi.middleware,
-            locomotivesApi.middleware,
             railroadCarsApi.middleware,
+            locomotivesApi.middleware,
+            railroadCarsInTheTrainApi.middleware,
             trainsApi.middleware,
             workersApi.middleware,
             railConnectionsApi.middleware),

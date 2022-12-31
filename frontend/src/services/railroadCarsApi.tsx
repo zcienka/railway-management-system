@@ -1,55 +1,63 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {RailroadCar, RailroadCarResponse} from "../types"
+import {Discount, RailroadCar, RailroadCarSearch, SearchDiscount, SearchRailroadCar} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const railroadCarsApi = createApi({
     reducerPath: "railroadCarsApi",
     baseQuery: BaseQuery,
-    tagTypes: ["RailroadCar"],
+    tagTypes: ["RailroadCar", "SearchRailroadCar"],
     endpoints: (builder) => ({
-        getRailroadCars: builder.query<RailroadCarResponse[], null>({
+        getRailroadCars: builder.query<RailroadCar[], null>({
             query: () => ({
-                url: "/railroad-car",
+                url: "/carriage",
                 method: "GET",
             }),
             providesTags: ["RailroadCar"]
         }),
-        getSingleRailroadCar: builder.query<RailroadCarResponse[], { trainId: string | undefined, carId: string | undefined }>({
-            query: (body) => ({
-                url: `/railroad-car/${body.trainId}/${body.carId}`,
+        getSingleRailroadCar: builder.query<RailroadCar[], string | undefined>({
+            query: (id) => ({
+                url: `/carriage/${id}`,
                 method: "GET",
             }),
         }),
         deleteRailroadCar: builder.mutation({
-            query: (body) => ({
-                url: `/railroad-car/${body.idpociagu}/${body.idwagonu}`,
+            query: (id) => ({
+                url: `/carriage/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["RailroadCar"]
         }),
         updateRailroadCar: builder.mutation({
             query: (body) => ({
-                url: "/railroad-car/update",
+                url: "/carriage/update",
                 method: "PATCH",
-                params: {nrwagonu : body.numerwagonu, idwagonu : body.idwagonu, idpociagu : body.idpociagu}
+                params: {
+                    id: body.id,
+                    databadania: body.databadaniatechnicznego.toISOString().substring(0, 10),
+                    liczbamiejsc: body.liczbamiejsc
+                }
             }),
             invalidatesTags: ["RailroadCar"]
         }),
         createRailroadCar: builder.mutation({
             query: (body) => ({
-                url: "/railroad-car/create",
+                url: `/carriage/create`,
                 method: "POST",
-                params: {nrwagonu : body.numerwagonu, idwagonu : body.idwagonu, idpociagu : body.idpociagu}
+                params: {
+                    databadania: body.databadaniatechnicznego.toISOString().substring(0, 10),
+                    liczbamiejsc: body.liczbamiejsc
+                }
             }),
             invalidatesTags: ["RailroadCar"]
         }),
-        filterRailroadCar: builder.mutation({
+
+        filterRailroadCar: builder.query<RailroadCar[], SearchRailroadCar>({
             query: (body) => ({
-                url: "/railroad-car/search",
+                url: "/carriage/search",
                 method: "GET",
-                params: {idwagonumin : body.idwagonumin, idwagonumax : body.idwagonumax, idpociagumin : body.idpociagumin, idpociagumax : body.idpociagumax}
+                params: body
             }),
-            invalidatesTags: ["RailroadCar"]
+            providesTags: ["SearchRailroadCar"]
         }),
     }),
 })
@@ -58,6 +66,7 @@ export const {
     useGetRailroadCarsQuery,
     useGetSingleRailroadCarQuery,
     useDeleteRailroadCarMutation,
+    useCreateRailroadCarMutation,
     useUpdateRailroadCarMutation,
-    useCreateRailroadCarMutation
+    useFilterRailroadCarQuery
 } = railroadCarsApi

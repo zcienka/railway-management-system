@@ -6,6 +6,14 @@ export type Reservation = {
     znizka: string
 }
 
+export type SearchReservation = {
+    imie: string,
+    nazwisko: string,
+    znizka: string,
+    idprzejazdumin: string,
+    idprzejazdumax: string
+}
+
 export type ReservationResponse = {
     id?: number,
     dataodjazdu: Date,
@@ -19,6 +27,13 @@ export type Discount = {
     nazwaznizki: string,
     procentznizki: number,
     dokumentpotwierdzajacy: string,
+}
+
+export type SearchDiscount = {
+    nazwa: string,
+    procentmin: string,
+    procentmax: string,
+    dokument: string,
 }
 
 export type TrainStop = {
@@ -37,6 +52,11 @@ export type Station = {
     adres: string,
 }
 
+export type SearchStation = {
+    nazwa: string,
+    adres: string,
+}
+
 export type TrainRide = {
     id?: number,
     dataodjazdu: Date,
@@ -45,6 +65,15 @@ export type TrainRide = {
     idmaszynisty: number,
     idliniiprzejazdu: number,
     idpociagu: number,
+}
+
+export type SearchTrainRide = {
+    dataodjazdu: string,
+    dataprzyjazdu:  string,
+    idkonduktora: string,
+    idmaszynisty:  string,
+    idliniiprzejazdu: string,
+    idpociagu: string,
 }
 
 export type TrainRideResponse = {
@@ -73,10 +102,22 @@ export type Locomotive = {
     nazwa: string
 }
 
+export type SearchLocomotive = {
+    databadaniamin: string,
+    databadaniamax: string,
+    nazwa: string
+}
+
 export type Train = {
     id?: number,
     nazwa: string,
     idlokomotywy: number
+}
+
+export type SearchTrain = {
+    nazwa: string,
+    idlokomotywymin: string,
+    idlokomotywymax: string
 }
 
 export type Worker = {
@@ -87,16 +128,30 @@ export type Worker = {
     zawod: string,
 }
 
-export type Carriage = {
+export type RailroadCar = {
     id?: number,
     databadaniatechnicznego: Date,
     liczbamiejsc: number
 }
 
-export type RailroadCar = {
+export type SearchRailroadCar = {
+    databadaniamin: string,
+    databadaniamax: string,
+    liczbamiejscmin: string,
+    liczbamiejscmax: string,
+}
+
+export type RailroadCarInTheTrain = {
     numerwagonu: number,
     idwagonu: number,
     idpociagu: number,
+}
+
+export type SearchRailroadCarInTheTrain = {
+    idwagonumin: string,
+    idwagonumax: string,
+    idpociagumin: string
+    idpociagumax: string
 }
 
 export type RailroadCarNumberless = {
@@ -104,9 +159,16 @@ export type RailroadCarNumberless = {
     idpociagu: number,
 }
 
-export type RailroadCarResponse = {
+export type RailroadCarInTheTrainResponse = {
     numerwagonu: number,
     idwagonu: number,
     idpociagu: number,
     nazwapociagu: string,
+}
+
+export type RailroadCarSearch = {
+    databadaniamin: Date,
+    databadaniamax: Date,
+    liczbamiejscmin: string,
+    liczbamiejscmax: string,
 }

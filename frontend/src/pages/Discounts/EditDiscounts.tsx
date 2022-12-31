@@ -18,6 +18,7 @@ const EditDiscounts = () => {
 
     const navigate = useNavigate()
     const {id} = useParams()
+
     const {
         data: getSingleDiscountData,
         isSuccess: isGetSingleDiscountSuccess

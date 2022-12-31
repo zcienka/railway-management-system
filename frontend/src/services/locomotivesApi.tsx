@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Locomotive} from "../types"
+import {Locomotive, SearchLocomotive} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const locomotivesApi = createApi({
     reducerPath: "locomotivesApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Locomotive"],
+    tagTypes: ["Locomotive", "LocomotiveFilter"],
     endpoints: (builder) => ({
         getLocomotives: builder.query<Locomotive[], null>({
             query: () => ({
@@ -44,15 +44,16 @@ export const locomotivesApi = createApi({
             }),
             invalidatesTags: ["Locomotive"]
         }),
-        filterLocomotive: builder.mutation({
+        filterLocomotive: builder.query<Locomotive[], SearchLocomotive>({
             query: (body) => ({
                 url: "/locomotive/search",
                 method: "GET",
-                params: {databadaniamin : body.databadaniatechnicznegomin.toISOString().substring(0,10),
-                        databadaniamax : body.databadaniatechnicznegomax.toISOString().substring(0,10), 
-                        nazwa : body.nazwa}
+                params: body,
+// {databadaniamin : body.databadaniatechnicznegomin.toISOString().substring(0,10),
+//     databadaniamax : body.databadaniatechnicznegomax.toISOString().substring(0,10),
+//     nazwa : body.nazwa}
             }),
-            invalidatesTags: ["Locomotive"]
+            providesTags: ["LocomotiveFilter"]
         }),
     }),
 })
@@ -62,5 +63,6 @@ export const {
     useGetSingleLocomotiveQuery,
     useDeleteLocomotiveMutation,
     useUpdateLocomotiveMutation,
-    useCreateLocomotiveMutation
+    useCreateLocomotiveMutation,
+    useFilterLocomotiveQuery
 } = locomotivesApi

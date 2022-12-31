@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Station} from "../types"
+import {Discount, SearchDiscount, SearchStation, Station} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const stationsApi = createApi({
     reducerPath: "stationsApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Station", "SingleStation"],
+    tagTypes: ["Station", "SingleStation", "SearchStation"],
     endpoints: (builder) => ({
         getStations: builder.query<Station[], null>({
             query: () => ({
@@ -44,15 +44,14 @@ export const stationsApi = createApi({
             }),
             invalidatesTags: ["Station"]
         }),
-        filterStation: builder.mutation({
+        filterStation: builder.query<Station[], SearchStation>({
             query: (body) => ({
                 url: "/station/search",
                 method: "GET",
-                params: {nazwa: body.nazwa, adres: body.adres}
+                params: body
             }),
-            invalidatesTags: ["Station"]
+            providesTags: ["SearchStation"]
         }),
-
     }),
 })
 
@@ -62,4 +61,5 @@ export const {
     useDeleteStationMutation,
     useUpdateStationMutation,
     useCreateStationMutation,
+    useFilterStationQuery
 } = stationsApi

@@ -1,5 +1,5 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {TrainRide, TrainRideResponse, TrainStop} from "../types"
+import {SearchTrainRide, TrainRide, TrainRideResponse, TrainStop} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const trainRideApi = createApi({
@@ -44,14 +44,14 @@ export const trainRideApi = createApi({
             }),
             invalidatesTags: ["TrainRide"]
         }),
-        createTrainRide: builder.mutation({
-            query: (body) => ({
-                url: "/train-ride/create",
-                method: "POST",
-                params: {dataodjazdu: body.dataodjazdu.toISOString(), dataprzyjazdu: body.dataprzyjazdu.toISOString(), idkonduktora: body.idkonduktora, idmaszynisty: body.idmaszynisty, idliniiprzejazdu: body.idliniiprzejazdu, idpociagu: body.idpociagu}
-            }),
-            invalidatesTags: ["TrainRide"]
-        }),
+        // createTrainRide: builder.query<TrainRide[], SearchTrainRide>({
+        //     query: (body) => ({
+        //         url: "/train-ride/create",
+        //         method: "GET",
+        //         params: body
+        //     }),
+        //     invalidatesTags: ["TrainRide"]
+        // }),
     }),
 })
 
@@ -61,5 +61,6 @@ export const {
     useDeleteTrainRideMutation,
     useUpdateTrainRideMutation,
     useGetTrainStopByLineQuery,
-    useCreateTrainRideMutation
+    // useCreateTrainRideMutation,
+    // useFilterTrainRideQuery
 } = trainRideApi

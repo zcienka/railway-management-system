@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom"
-import {useGetSingleRailroadCarQuery} from "../../services/railroadCarsApi"
-import {Carriage, Discount, RailroadCar, RailroadCarNumberless, Train} from "../../types"
-import {useDeleteRailroadCarMutation, useUpdateRailroadCarMutation} from "../../services/railroadCarsApi"
+import {useGetSingleRailroadCarInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi"
+import {RailroadCar, Discount, RailroadCarInTheTrain, RailroadCarNumberless, Train} from "../../types"
+import {
+    useDeleteRailroadCarInTheTrainMutation,
+    useUpdateRailroadCarInTheTrainMutation
+} from "../../services/railroadCarsInTheTrainApi"
 import Menu from "../../components/Menu"
 import {useGetTrainsQuery} from "../../services/trainsApi"
 import {v4 as uuidv4} from "uuid";
-import {useGetCarriagesQuery} from "../../services/carriagesApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
 
-const EditRailroadCar = () => {
+const EditRailroadCarInTheTrain = () => {
     const [carNumber, setCarNumber] = useState<string>("")
     const [carNumberInput, setCarNumberInput] = useState<boolean>(true)
 
@@ -37,20 +40,20 @@ const EditRailroadCar = () => {
         isFetching: isGetCarsFetching,
         isSuccess: isGetCarsSuccess,
         isError: isGetCarsError,
-    } = useGetCarriagesQuery(null)
+    } = useGetRailroadCarsQuery(null)
 
     const {
         data: getSingleRailroadCarData,
         isSuccess: isGetSingleRailroadCarSuccess
-    } = useGetSingleRailroadCarQuery({
+    } = useGetSingleRailroadCarInTheTrainQuery({
         "trainId": trainIdParam,
         "carId": carIdParam
     }, {
         skip: trainIdParam === undefined || carIdParam === undefined
     })
 
-    const [deleteCar] = useDeleteRailroadCarMutation()
-    const [updateCar] = useUpdateRailroadCarMutation()
+    const [deleteCar] = useDeleteRailroadCarInTheTrainMutation()
+    const [updateCar] = useUpdateRailroadCarInTheTrainMutation()
 
     const deleteSingleCar = async () => {
         const railroadcarNumberless: RailroadCarNumberless = {
@@ -62,7 +65,7 @@ const EditRailroadCar = () => {
     }
 
     const updateSingleCar = async () => {
-        const singleRailroadCar: RailroadCar = {
+        const singleRailroadCar: RailroadCarInTheTrain = {
             numerwagonu: parseInt(carNumber),
             idwagonu: parseInt(carId),
             idpociagu: parseInt(trainId),
@@ -87,7 +90,7 @@ const EditRailroadCar = () => {
             </option>
         })
 
-        const cars = getCarsData.map((car: Carriage) => {
+        const cars = getCarsData.map((car: RailroadCar) => {
             return <option key={uuidv4()} value={car.id}>
                 {car.liczbamiejsc + " miejsc"}
             </option>
@@ -160,4 +163,4 @@ const EditRailroadCar = () => {
     }
 }
 
-export default EditRailroadCar
+export default EditRailroadCarInTheTrain

@@ -15,15 +15,14 @@ import CreateTrainRide from "./pages/TrainRide/CreateTrainRide"
 import TrainStops from "./pages/TrainStop/TrainStops"
 import EditTrainStop from "./pages/TrainStop/EditTrainStop"
 import CreateTrainStop from "./pages/TrainStop/CreateTrainStop"
-import EditCarriages from "./pages/Carriage/EditCarriages"
-import CreateCarriage from "./pages/Carriage/CreateCarriage"
-import Carriages from "./pages/Carriage/Carriages"
+import EditRailroadCars from "./pages/RailroadCar/EditRailroadCars"
+import CreateRailroadCar from "./pages/RailroadCar/CreateRailroadCar"
+import RailroadCars from "./pages/RailroadCar/RailroadCars"
 import Workers from "./pages/Worker/Workers"
 import EditWorkers from "./pages/Worker/EditWorkers"
 import CreateWorker from "./pages/Worker/CreateWorker"
-import RailroadCar from "./pages/RailroadCar/RailroadCars"
-import EditRailroadCar from "./pages/RailroadCar/EditRailroadCar"
-import CreateRailroadCar from "./pages/RailroadCar/CreateRailroadCar"
+import EditRailroadCarInTheTrain from "./pages/RailroadCarInTheTrain/EditRailroadCarInTheTrain"
+import CreateRailroadCarInTheTrain from "./pages/RailroadCarInTheTrain/CreateRailroadCarInTheTrain"
 import Locomotives from "./pages/Locomotive/Locomotives"
 import EditLocomotive from "./pages/Locomotive/EditLocomotive"
 import CreateLocomotive from "./pages/Locomotive/CreateLocomotive"
@@ -32,6 +31,7 @@ import EditTrains from "./pages/Train/EditTrains";
 import CreateTrain from "./pages/Train/CreateTrain";
 import RailConnections from "./pages/RailConnection/RailConnections";
 import CreateRailConnection from "./pages/RailConnection/CreateRailConnection";
+import RailroadCarsInTheTrain from "./pages/RailroadCarInTheTrain/RailroadCarsInTheTrain";
 
 function App() {
     return (
@@ -57,17 +57,17 @@ function App() {
                 <Route path={"/train-stops/:id"} element={<EditTrainStop/>}/>
                 <Route path={"/add-train-stop"} element={<CreateTrainStop/>}/>
 
-                <Route path={"/carriages"} element={<Carriages/>}/>
-                <Route path={"/carriages/:id"} element={<EditCarriages/>}/>
-                <Route path={"/add-carriage"} element={<CreateCarriage/>}/>
+                <Route path={"/railroad-cars"} element={<RailroadCars/>}/>
+                <Route path={"/railroad-cars/:id"} element={<EditRailroadCars/>}/>
+                <Route path={"/add-railroad-car"} element={<CreateRailroadCar/>}/>
 
                 <Route path={"/workers"} element={<Workers/>}/>
                 <Route path={"/workers/:id"} element={<EditWorkers/>}/>
                 <Route path={"/add-worker"} element={<CreateWorker/>}/>
 
-                <Route path={"/railroad-cars"} element={<RailroadCar/>}/>
-                <Route path={"/railroad-cars/:trainIdParam/:carIdParam"} element={<EditRailroadCar/>}/>
-                <Route path={"/add-railroad-cars"} element={<CreateRailroadCar/>}/>
+                <Route path={"/railroad-cars-in-the-train"} element={<RailroadCarsInTheTrain/>}/>
+                <Route path={"/railroad-cars-in-the-train/:trainIdParam/:carIdParam"} element={<EditRailroadCarInTheTrain/>}/>
+                <Route path={"/add-railroad-cars-in-the-train"} element={<CreateRailroadCarInTheTrain/>}/>
 
                 <Route path={"/locomotive"} element={<Locomotives/>}/>
                 <Route path={"/locomotive/:id"} element={<EditLocomotive/>}/>

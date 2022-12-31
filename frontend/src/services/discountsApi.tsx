@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Discount} from "../types"
+import {Discount, SearchDiscount} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const discountsApi = createApi({
     reducerPath: "discountsApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Discount"],
+    tagTypes: ["Discount", "SearchDiscount"],
     endpoints: (builder) => ({
         getDiscounts: builder.query<Discount[], null>({
             query: () => ({
@@ -31,7 +31,7 @@ export const discountsApi = createApi({
             query: (body) => ({
                 url: "/discount/update",
                 method: "PATCH",
-                params: {nazwa : body.nazwaznizki, procent : body.procentznizki, dokument : body.dokumentpotwierdzajacy}
+                params: {nazwa: body.nazwaznizki, procent: body.procentznizki, dokument: body.dokumentpotwierdzajacy}
             }),
             invalidatesTags: ["Discount"]
         }),
@@ -39,17 +39,17 @@ export const discountsApi = createApi({
             query: (body) => ({
                 url: `/discount/create`,
                 method: "POST",
-                params: {nazwa : body.nazwaznizki, procent : body.procentznizki, dokument : body.dokumentpotwierdzajacy}
+                params: {nazwa: body.nazwaznizki, procent: body.procentznizki, dokument: body.dokumentpotwierdzajacy}
             }),
             invalidatesTags: ["Discount"]
         }),
-        filterDiscount: builder.mutation({
+        filterDiscount: builder.query<Discount[], SearchDiscount>({
             query: (body) => ({
-                url: `/discount/search`,
+                url: "/discount/search",
                 method: "GET",
-                params: {nazwa : body.nazwaznizki, procentmin : body.procentznizkimin, procentmax : body.procentznizkimax, dokument : body.dokumentpotwierdzajacy}
-            }),
-            invalidatesTags: ["Discount"]
+                params: body,
+                providesTags: ["SearchDiscount"]
+            })
         }),
     }),
 })
@@ -59,5 +59,6 @@ export const {
     useGetSingleDiscountQuery,
     useDeleteDiscountMutation,
     useCreateDiscountMutation,
-    useUpdateDiscountMutation
+    useUpdateDiscountMutation,
+    useFilterDiscountQuery
 } = discountsApi

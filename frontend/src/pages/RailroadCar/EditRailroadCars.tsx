@@ -1,12 +1,12 @@
-import React, {ChangeEvent, useEffect, useState} from "react"
+import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom"
-import {useGetSingleCarriageQuery} from "../../services/carriagesApi"
-import {Carriage} from "../../types"
-import {useDeleteCarriageMutation, useUpdateCarriageMutation} from "../../services/carriagesApi"
+import {useGetSingleRailroadCarQuery} from "../../services/railroadCarsApi"
+import {RailroadCar} from "../../types"
+import {useDeleteRailroadCarMutation, useUpdateRailroadCarMutation} from "../../services/railroadCarsApi"
 import Menu from "../../components/Menu"
 
-const EditCarriages = () => {
+const EditRailroadCars = () => {
     const [seatsNumber, setSeatsNumber] = useState<string>("")
     const [seatsNumberInput, setSeatsNumberInput] = useState<boolean>(true)
 
@@ -16,40 +16,37 @@ const EditCarriages = () => {
     const navigate = useNavigate()
     const {id} = useParams()
     const {
-        data: getSingleCarriageData,
-        isSuccess: isGetSingleCarriageSuccess
-    } = useGetSingleCarriageQuery(id, {
+        data: getSingleRailroadCarData,
+        isSuccess: isGetSingleRailroadCarSuccess
+    } = useGetSingleRailroadCarQuery(id, {
         skip: id === undefined
     })
 
-    const deleteSingleCarriage = async () => {
-        await deleteCarriage(id)
-        navigate("/carriages")
+    const deleteSingleRailroadCar = async () => {
+        await deleteRailroadCar(id)
+        navigate("/railroad-cars")
     }
 
-    const updateSingleCarriage = async () => {
-        if(id){
-            
-        }
-        const singleCarriage: Carriage = {
+    const updateSingleRailroadCar = async () => {
+        const singleRailroadCar: RailroadCar = {
             databadaniatechnicznego: new Date(technicalResearch),
             liczbamiejsc: parseInt(seatsNumber),
             id: parseInt(id?.toString() || "undefined")
         }
-        await updateCarriage(singleCarriage)
-        navigate("/carriages")
+        await updateRailroadCar(singleRailroadCar)
+        navigate("/railroad-cars")
     }
-    const [deleteCarriage] = useDeleteCarriageMutation()
-    const [updateCarriage] = useUpdateCarriageMutation()
+    const [deleteRailroadCar] = useDeleteRailroadCarMutation()
+    const [updateRailroadCar] = useUpdateRailroadCarMutation()
 
     useEffect(() => {
-        if (isGetSingleCarriageSuccess) {
-            setSeatsNumber(getSingleCarriageData[0].liczbamiejsc.toString())
-            setTechnicalResearch(getSingleCarriageData[0].databadaniatechnicznego.toString().split('T')[0])
+        if (isGetSingleRailroadCarSuccess) {
+            setSeatsNumber(getSingleRailroadCarData[0].liczbamiejsc.toString())
+            setTechnicalResearch(getSingleRailroadCarData[0].databadaniatechnicznego.toString().split('T')[0])
         }
-    }, [getSingleCarriageData, isGetSingleCarriageSuccess])
+    }, [getSingleRailroadCarData, isGetSingleRailroadCarSuccess])
 
-    if (getSingleCarriageData !== undefined) {
+    if (getSingleRailroadCarData !== undefined) {
         return <div className={"flex"}>
             <Menu/>
             <div className={"px-16 py-6 w-full"}>
@@ -90,15 +87,15 @@ const EditCarriages = () => {
                     </div>
 
                     <div className={"flex"}>
-                        <button onClick={() => navigate("/carriages")}>Anuluj</button>
+                        <button onClick={() => navigate("/railroad-cars")}>Anuluj</button>
                         <div className={"flex justify-end w-full"}>
                             <button className={"mr-2 bg-red-600 border-red-700 text-white"}
-                                    onClick={() => deleteSingleCarriage()}>
+                                    onClick={() => deleteSingleRailroadCar()}>
                                 Usuń
                             </button>
                             <button
                                 className={`${"cursor-pointer"}`}
-                                onClick={() => updateSingleCarriage()}>
+                                onClick={() => updateSingleRailroadCar()}>
                                 Zapisz zmiany
                             </button>
                         </div>
@@ -111,4 +108,4 @@ const EditCarriages = () => {
     }
 }
 
-export default EditCarriages
+export default EditRailroadCars
