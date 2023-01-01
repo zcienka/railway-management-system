@@ -10,8 +10,8 @@ export type SearchReservation = {
     imie: string,
     nazwisko: string,
     znizka: string,
-    idprzejazdumin: string,
-    idprzejazdumax: string
+    dataprzejazdumin: string,
+    dataprzejazdumax: string
 }
 
 export type ReservationResponse = {
@@ -165,8 +165,7 @@ export type RailroadCarInTheTrain = {
 export type SearchRailroadCarInTheTrain = {
     idwagonumin: string,
     idwagonumax: string,
-    idpociagumin: string
-    idpociagumax: string
+    nazwapociagu: string,
 }
 
 export type RailroadCarNumberless = {

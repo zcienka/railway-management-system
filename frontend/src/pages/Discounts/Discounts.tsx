@@ -5,6 +5,7 @@ import {v4 as uuidv4} from "uuid"
 import {useFilterDiscountQuery, useGetDiscountsQuery} from "../../services/discountsApi"
 import {useNavigate} from "react-router-dom";
 import Menu from "../../components/Menu";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchDiscount = {
     nazwa: "",
@@ -17,14 +18,15 @@ const Discounts = () => {
     const [searchDiscount, setSearchDiscount] = useState<SearchDiscount>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+    const [errorMessage, setErrorMessage] = useState<string>("")
 
     const [discounts, setDiscounts] = useState<Discount[] | undefined>(undefined)
     const navigate = useNavigate()
     const {
         data: getFilterDiscounts,
-        isFetching: isGetFilterDiscountFetching,
         isSuccess: isGetFilterDiscountSuccess,
         isError: isGetFilterDiscountError,
+        error: getFilterDiscountsError
     } = useFilterDiscountQuery(
         searchDiscount,
         {skip: !showSearchResponse}
@@ -34,7 +36,6 @@ const Discounts = () => {
         data: getDiscounts,
         isFetching: isGetDiscountsFetching,
         isSuccess: isGetDiscountsSuccess,
-        isError: isGetDiscountsError,
     } = useGetDiscountsQuery(null)
 
     useEffect(() => {
@@ -47,7 +48,6 @@ const Discounts = () => {
         }
     }, [isFirstRender, getFilterDiscounts, isGetFilterDiscountSuccess,
         getDiscounts, isGetDiscountsFetching, isGetDiscountsSuccess])
-
 
     if (discounts === undefined) {
         return <Loading/>
@@ -64,6 +64,8 @@ const Discounts = () => {
                 </th>
             </tr>
         })
+
+
         return <div className={"flex"}>
             <Menu/>
             <div className={"px-2 py-2 lg:px-10 lg:py-6 w-full"}>
@@ -73,7 +75,7 @@ const Discounts = () => {
 
                 <div className={"bg-white h-[calc(100vh-6rem)] max-h-[calc(100vh-9rem)] " +
                     "w-full rounded-xl lg:p-8 p-4 border border-stone-200 overflow-auto"}>
-                    <div className={"flex items-center relative mr-4 "}>
+                    <div className={"flex items-center mr-4"}>
                         <input type="text"
                                placeholder="Nazwa zniżki"
                                className={"border mb-4 mr-2"}
@@ -86,7 +88,7 @@ const Discounts = () => {
                                    placeholder="Minimalny procent zniżki"
                                    className={"border mb-4 mr-2"}
                                    onChange={(e) => setSearchDiscount((prevState: SearchDiscount) => {
-                                       return {...prevState, nazwaznizki: e.target.value}
+                                       return {...prevState, procentmin: e.target.value}
                                    })}/>
                             <input type="text"
                                    placeholder="Maksymalny procent zniżki"
@@ -98,11 +100,24 @@ const Discounts = () => {
                                    placeholder="Dokument potwierdzający"
                                    className={"border mb-4 mr-2"}
                                    onChange={(e) => setSearchDiscount((prevState: SearchDiscount) => {
-                                       return {...prevState, procentmin: e.target.value}
+                                       return {...prevState, dokument: e.target.value}
                                    })}/>
                             <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
                                 Szukaj
                             </button>
+
+                            <div className={`${isGetFilterDiscountError ? "visible w-full" : "invisible absolute"} `}>
+                                <div className={"w-96 mb-4 ml-2 text-red-700"}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+
+                                            {// @ts-ignore
+                                                getFilterDiscountsError !== undefined ? getFilterDiscountsError!.data : ""}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className={"flex justify-end w-full mb-4"}>

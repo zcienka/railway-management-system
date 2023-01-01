@@ -121,12 +121,6 @@ const EditReservations = () => {
             </option>
         })
 
-        const trainStops = getTrainStopByLineData.map((trainStop: TrainStop) => {
-            return <option key={uuidv4()} value={trainStop.nazwastacji}>
-                {getTrainStopByLineData[0].nazwastacji[0]}
-            </option>
-        })
-
         return <div className={"flex"}>
             <Menu/>
             <div className={"px-16 py-6 w-full"}>

@@ -8,18 +8,21 @@ import {v4 as uuidv4} from "uuid"
 import {useGetRailroadCarsInTheTrainQuery, useFilterRailroadCarInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi"
 import {Link, useNavigate} from "react-router-dom"
 import Menu from "../../components/Menu"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchRailroadCarInTheTrain = {
     idwagonumin: "",
     idwagonumax: "",
-    idpociagumin: "",
-    idpociagumax: ""
+    // idpociagumin: "",
+    // idpociagumax: "",
+    nazwapociagu: "",
 }
 
 const RailroadCarsInTheTrain = () => {
     const [searchRailroadCarsInTheTrain, setSearchRailroadCarsInTheTrain] = useState<SearchRailroadCarInTheTrain>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+    const [isRailroadCarIdInteger, setIsRailroadCarIdInteger] = useState<boolean>(true)
 
     const [railroadCars, setRailroadCarsInTheTrain] = useState<RailroadCarInTheTrainResponse[] | undefined>(undefined)
 
@@ -41,6 +44,14 @@ const RailroadCarsInTheTrain = () => {
         isError: isGetRailroadCarsError,
     } = useGetRailroadCarsInTheTrainQuery(null)
 
+    const checkIsRailroadCarIdInteger = () => {
+        if (isNaN(Number(searchRailroadCarsInTheTrain.idwagonumin)) || isNaN(Number(searchRailroadCarsInTheTrain.idwagonumax))) {
+            setIsRailroadCarIdInteger(() => false)
+        } else {
+            setIsRailroadCarIdInteger(() => true)
+        }
+    }
+
     useEffect(() => {
         if (isGetFilterRailroadCarInTheTrainSuccess) {
             setRailroadCarsInTheTrain(getFilterRailroadCarInTheTrains)
@@ -51,6 +62,12 @@ const RailroadCarsInTheTrain = () => {
         }
     }, [getFilterRailroadCarInTheTrains, getRailroadCars, isFirstRender,
         isGetFilterRailroadCarInTheTrainSuccess, isGetRailroadCarsFetching, isGetRailroadCarsInTheTrainSuccess])
+
+    const searchValues = () => {
+        if (isRailroadCarIdInteger) {
+            setShowSearchResponse(!showSearchResponse)
+        }
+    }
 
     if (railroadCars === undefined) {
         return <Loading/>
@@ -80,31 +97,42 @@ const RailroadCarsInTheTrain = () => {
                         <input type="text"
                                placeholder="Minimum id wagonu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsRailroadCarIdInteger()}
                                onChange={(e) => setSearchRailroadCarsInTheTrain((prevState: SearchRailroadCarInTheTrain) => {
                                    return {...prevState, idwagonumin: e.target.value}
                                })}/>
                         <input type="text"
                                placeholder="Maksimum id wagonu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsRailroadCarIdInteger()}
                                onChange={(e) => setSearchRailroadCarsInTheTrain((prevState: SearchRailroadCarInTheTrain) => {
                                    return {...prevState, idwagonumax: e.target.value}
                                })}/>
                         <input type="text"
-                               placeholder="Minimum id pociągu"
+                               placeholder="Nazwa pociągu"
                                className={"border mb-4 mr-2"}
                                onChange={(e) => setSearchRailroadCarsInTheTrain((prevState: SearchRailroadCarInTheTrain) => {
-                                   return {...prevState, idpociagumin: e.target.value}
+                                   return {...prevState, nazwapociagu: e.target.value}
                                })}/>
 
-                        <input type="text"
-                               placeholder="Maksimum id pociągu"
-                               className={"border mb-4 mr-2"}
-                               onChange={(e) => setSearchRailroadCarsInTheTrain((prevState: SearchRailroadCarInTheTrain) => {
-                                   return {...prevState, idpociagumax: e.target.value}
-                               })}/>
-                        <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
+                        <button className={"mb-4"} onClick={() => searchValues()}>
                             Szukaj
                         </button>
+
+                        <div className={"h-14 flex items-center w-full text-sm flex-col"}>
+                            <div
+                                className={`${!isRailroadCarIdInteger ?
+                                    "visible w-full" : "invisible absolute"}`}>
+                                <div className={"w-96 mb-4 ml-2 text-red-700"}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Id wagonu powinno być liczbą
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className={"flex justify-end w-full mb-4"}>
                             <button onClick={() => navigate("/add-railroad-cars")}>

@@ -5,20 +5,21 @@ import {useNavigate} from "react-router-dom"
 import {v4 as uuidv4} from 'uuid'
 import Loading from "../../components/Loading"
 import Menu from "../../components/Menu";
-import {ReactComponent as MagnifyingGlass} from "../../icons/magnifyingGlass.svg";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchReservation = {
     imie: "",
     nazwisko: "",
     znizka: "",
-    idprzejazdumin: "",
-    idprzejazdumax: ""
+    dataprzejazdumin: "",
+    dataprzejazdumax: ""
 }
 
 const Reservations = () => {
     const [searchReservation, setSearchReservation] = useState<SearchReservation>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+    const [isDateGoodFormat, setIsDateGoodFormat] = useState<boolean>(true)
 
     const [reservations, setReservations] = useState<ReservationResponse[] | undefined>(undefined)
     const navigate = useNavigate()
@@ -32,6 +33,15 @@ const Reservations = () => {
         searchReservation,
         {skip: !showSearchResponse}
     )
+
+    const checkIsDateGoodFormat = () => {
+        if ((!isNaN(new Date(searchReservation.dataprzejazdumax).getMonth()) || searchReservation.dataprzejazdumax === "")
+            && (!isNaN(new Date(searchReservation.dataprzejazdumin).getMonth()) || searchReservation.dataprzejazdumin === "")) {
+            setIsDateGoodFormat(() => true)
+        } else {
+            setIsDateGoodFormat(() => false)
+        }
+    }
 
     const {
         data: getReservations,
@@ -48,7 +58,8 @@ const Reservations = () => {
             setReservations(getReservations)
             setIsFirstRender(() => false)
         }
-    }, [getFilterReservations, getReservations, isFirstRender, isGetFilterReservationSuccess, isGetReservationsFetching, isGetReservationsSuccess])
+    }, [getFilterReservations, getReservations, isFirstRender,
+        isGetFilterReservationSuccess, isGetReservationsFetching, isGetReservationsSuccess])
 
     if (reservations === undefined) {
         return <Loading/>
@@ -80,8 +91,6 @@ const Reservations = () => {
 
                 <div className={"bg-white h-[calc(100vh-6rem)] max-h-[calc(100vh-9rem)] " +
                     "w-full rounded-xl lg:p-8 p-4 border border-stone-200 overflow-auto"}>
-
-
                     <div className={"flex mb-4 w-full"}>
                         <input type="text"
                                placeholder="Imię"
@@ -108,23 +117,38 @@ const Reservations = () => {
                         <div/>
 
                         <input type="text"
-                               placeholder="Minimalne id przejazdu"
+                               placeholder="Data odjazdu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsDateGoodFormat()}
                                onChange={(e) => setSearchReservation((prevState: SearchReservation) => {
-                                   return {...prevState, idprzejazdumin: e.target.value}
+                                   return {...prevState, dataprzejazdumin: e.target.value}
                                })}/>
                         <div/>
 
                         <input type="text"
-                               placeholder="Maksymalne id przejazdu"
+                               placeholder="Data przyjazdu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsDateGoodFormat()}
                                onChange={(e) => setSearchReservation((prevState: SearchReservation) => {
-                                   return {...prevState, idprzejazdumax: e.target.value}
+                                   return {...prevState, dataprzejazdumax: e.target.value}
                                })}/>
 
                         <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
                             Szukaj
                         </button>
+                        <div className={"h-14 flex items-center w-full text-sm flex-col"}>
+                            <div
+                                className={`${!isDateGoodFormat ? "visible w-full items-center h-full flex mb-4" : "invisible absolute"} `}>
+                                <div className={"w-full ml-2 text-red-700 "}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Pola dat są w złym formacie
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div/>
                         <div className={"flex justify-end w-full mb-4"}>

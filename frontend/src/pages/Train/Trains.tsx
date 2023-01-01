@@ -6,6 +6,7 @@ import {useGetTrainsQuery} from "../../services/trainsApi"
 import {useNavigate} from "react-router-dom"
 import Menu from "../../components/Menu"
 import {useFilterTrainQuery} from "../../services/trainsApi"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchTrain = {
     nazwa: "",
@@ -17,9 +18,19 @@ const Trains = () => {
     const [searchTrain, setSearchTrain] = useState<SearchTrain>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+    const [isDateGoodFormat, setIsDateGoodFormat] = useState<boolean>(true)
+    const [isLocomotiveIdInteger, setIsLocomotiveIdInteger] = useState<boolean>(true)
 
     const [trains, setTrains] = useState<Train[] | undefined>(undefined)
     const navigate = useNavigate()
+
+    const checkIsLocomotiveIdInteger = () => {
+        if (isNaN(Number(searchTrain.idlokomotywymin)) || isNaN(Number(searchTrain.idlokomotywymax))) {
+            setIsLocomotiveIdInteger(() => false)
+        } else {
+            setIsLocomotiveIdInteger(() => true)
+        }
+    }
 
     const {
         data: getFilterTrains,
@@ -37,6 +48,12 @@ const Trains = () => {
         isSuccess: isGetTrainsSuccess,
         isError: isGetTrainsError,
     } = useGetTrainsQuery(null)
+
+    const searchValues = () => {
+        if (isLocomotiveIdInteger) {
+            setShowSearchResponse(!showSearchResponse)
+        }
+    }
 
     useEffect(() => {
         if (isGetFilterTrainSuccess) {
@@ -84,6 +101,7 @@ const Trains = () => {
                         <input type="text"
                                placeholder="Minimalne id lokomotywy"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsLocomotiveIdInteger()}
                                onChange={(e) => setSearchTrain((prevState: SearchTrain) => {
                                    return {...prevState, idlokomotywymin: e.target.value}
                                })}/>
@@ -92,16 +110,31 @@ const Trains = () => {
                         <input type="text"
                                placeholder="Maksymalne id lokomotywy"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsLocomotiveIdInteger()}
                                onChange={(e) => setSearchTrain((prevState: SearchTrain) => {
                                    return {...prevState, idlokomotywymax: e.target.value}
                                })}/>
                         <div/>
 
-                        <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
+                        <button className={"mb-4"} onClick={() => searchValues()}>
                             Szukaj
                         </button>
 
-                        <div className={"flex justify-end w-full"}>
+                        <div className={"h-14 flex items-center w-full text-sm flex-col"}>
+                            <div
+                                className={`${!isLocomotiveIdInteger ? "visible w-full items-center h-full flex mb-4" : "invisible absolute"} `}>
+                                <div className={"w-full ml-2 text-red-700"}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Id musi być liczbą
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={"flex justify-end w-full mb-4"}>
                             <button onClick={() => navigate("/add-train")}>
                                 Dodaj pociąg
                             </button>

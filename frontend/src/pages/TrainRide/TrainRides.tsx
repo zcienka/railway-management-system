@@ -6,6 +6,7 @@ import {useGetTrainRidesQuery} from "../../services/trainRideApi"
 import {useNavigate} from "react-router-dom"
 import Menu from "../../components/Menu"
 import {useFilterTrainRideQuery} from "../../services/trainRideApi"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchTrainRide = {
     dataodjazdumin: "",
@@ -20,6 +21,8 @@ const TrainRides = () => {
     const [searchTrainRide, setSearchTrainRide] = useState<SearchTrainRide>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+    const [isTrainLineIdInteger, setIsTrainLineIdInteger] = useState<boolean>(true)
+    const [isDateGoodFormat, setIsDateGoodFormat] = useState<boolean>(true)
 
     const [trainRides, setTrainRides] = useState<TrainRideResponse[] | undefined>(undefined)
     const navigate = useNavigate()
@@ -37,7 +40,6 @@ const TrainRides = () => {
         data: getTrainRides,
         isFetching: isGetTrainRidesFetching,
         isSuccess: isGetTrainRidesSuccess,
-        isError: isGetTrainRidesError,
     } = useGetTrainRidesQuery(null)
 
     useEffect(() => {
@@ -49,6 +51,31 @@ const TrainRides = () => {
             setIsFirstRender(() => false)
         }
     }, [getFilterTrainRides, getTrainRides, isFirstRender, isGetFilterTrainRideSuccess, isGetTrainRidesFetching, isGetTrainRidesSuccess])
+
+    const checkIsTrainLineIdInteger = () => {
+        if (isNaN(Number(searchTrainRide.idliniiprzejazdumin)) || isNaN(Number(searchTrainRide.idliniiprzejazdumax))) {
+            setIsTrainLineIdInteger(() => false)
+        } else {
+            setIsTrainLineIdInteger(() => true)
+        }
+    }
+
+    const checkIsDateGoodFormat = () => {
+        if ((!isNaN(new Date(searchTrainRide.dataodjazdumax).getMonth()) || searchTrainRide.dataodjazdumax === "")
+            && (!isNaN(new Date(searchTrainRide.dataprzyjazdumin).getMonth()) || searchTrainRide.dataprzyjazdumin === "")
+            && (!isNaN(new Date(searchTrainRide.dataodjazdumin).getMonth()) || searchTrainRide.dataodjazdumin === "")
+            && (!isNaN(new Date(searchTrainRide.dataprzyjazdumax).getMonth()) || searchTrainRide.dataprzyjazdumax === "")) {
+            setIsDateGoodFormat(() => true)
+        } else {
+            setIsDateGoodFormat(() => false)
+        }
+    }
+
+    const searchValues = () => {
+        if (isDateGoodFormat && isTrainLineIdInteger) {
+            setShowSearchResponse(!showSearchResponse)
+        }
+    }
 
     if (trainRides === undefined) {
         return <Loading/>
@@ -81,43 +108,75 @@ const TrainRides = () => {
                         <input type="text"
                                placeholder="Minimalna data odjazdu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsDateGoodFormat()}
                                onChange={(e) => setSearchTrainRide((prevState: SearchTrainRide) => {
                                    return {...prevState, dataodjazdumin: e.target.value}
                                })}/>
                         <input type="text"
                                placeholder="Maksymalna data odjazdu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsDateGoodFormat()}
                                onChange={(e) => setSearchTrainRide((prevState: SearchTrainRide) => {
                                    return {...prevState, dataodjazdumax: e.target.value}
                                })}/>
                         <input type="text"
                                placeholder="Minimalna data przyjazdu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsDateGoodFormat()}
                                onChange={(e) => setSearchTrainRide((prevState: SearchTrainRide) => {
                                    return {...prevState, dataprzyjazdumin: e.target.value}
                                })}/>
                         <input type="text"
                                placeholder="Maksymalna data przyjazdu"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsDateGoodFormat()}
                                onChange={(e) => setSearchTrainRide((prevState: SearchTrainRide) => {
                                    return {...prevState, dataprzyjazdumax: e.target.value}
                                })}/>
                         <input type="text"
                                placeholder="Minimalne id linii"
-                               className={"border mb-4 mr-2"}
+                               className={"border mb-4 mr-2 w-40"}
+                               onBlur={() => checkIsTrainLineIdInteger()}
                                onChange={(e) => setSearchTrainRide((prevState: SearchTrainRide) => {
                                    return {...prevState, idliniiprzejazdumin: e.target.value}
                                })}/>
                         <input type="text"
                                placeholder="Maksymalne id linii"
-                               className={"border mb-4 mr-2"}
+                               className={"border mb-4 mr-2 w-40"}
+                               onBlur={() => checkIsTrainLineIdInteger()}
                                onChange={(e) => setSearchTrainRide((prevState: SearchTrainRide) => {
                                    return {...prevState, idliniiprzejazdumax: e.target.value}
                                })}/>
 
-                        <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
+                        <button className={"mb-4"} onClick={() => searchValues()}>
                             Szukaj
                         </button>
+
+                        <div className={"h-14 flex items-center w-full text-sm flex-col"}>
+                            <div
+                                className={`${!isDateGoodFormat ? `visible w-48 items-center h-full flex 
+                                ${!isTrainLineIdInteger ? "mb-1" : "mb-4"} ` : "invisible absolute"} `}>
+                                <div className={"w-96 ml-2 text-red-700"}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Niepoprawny zapis dat
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                className={`${!isTrainLineIdInteger ? "visible w-full items-center h-full flex mb-4" : "invisible absolute"} `}>
+                                <div className={"w-full ml-2 text-red-700 "}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Id musi być liczbą
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className={"flex justify-end w-full mb-4"}>
                             <button onClick={() => navigate("/add-train-ride")}>

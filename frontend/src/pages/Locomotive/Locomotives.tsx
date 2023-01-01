@@ -5,6 +5,7 @@ import {v4 as uuidv4} from "uuid"
 import {useGetLocomotivesQuery, useFilterLocomotiveQuery} from "../../services/locomotivesApi"
 import {useNavigate} from "react-router-dom";
 import Menu from "../../components/Menu";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchLocomotive = {
     databadaniamin: "",
@@ -25,6 +26,7 @@ const Locomotives = () => {
         isFetching: isGetFilterLocomotiveFetching,
         isSuccess: isGetFilterLocomotiveSuccess,
         isError: isGetFilterLocomotiveError,
+        error: getFilterLocomotiveError
     } = useFilterLocomotiveQuery(
         searchLocomotive,
         {skip: !showSearchResponse}
@@ -71,32 +73,44 @@ const Locomotives = () => {
 
                 <div className={"bg-white h-[calc(100vh-6rem)] max-h-[calc(100vh-9rem)] " +
                     "w-full rounded-xl lg:p-8 p-4 border border-stone-200 overflow-auto"}>
-                    <div className={"flex mb-4 w-full"}>
+                    <div className={"flex items-center mr-4"}>
                         <input type="text"
                                placeholder="Minimalna data badania"
-                               className={"border mb-4 mr-2 w-96"}
+                               className={"border mb-4 mr-2"}
                                onChange={(e) => setSearchLocomotive((prevState: SearchLocomotive) => {
                                    return {...prevState, databadaniamin: e.target.value}
                                })}/>
                         <div/>
                         <input type="text"
                                placeholder="Maksymalna data badania"
-                               className={"border mb-4 mr-2 w-96"}
+                               className={"border mb-4 mr-2"}
                                onChange={(e) => setSearchLocomotive((prevState: SearchLocomotive) => {
                                    return {...prevState, databadaniamax: e.target.value}
                                })}/>
                         <div/>
                         <input type="text"
-                               placeholder="Nazwa zniżki"
-                               className={"border mb-4 mr-2 w-96"}
+                               placeholder="Nazwa lokomotywy"
+                               className={"border mb-4 mr-2"}
                                onChange={(e) => setSearchLocomotive((prevState: SearchLocomotive) => {
                                    return {...prevState, nazwa: e.target.value}
                                })}/>
-                        <div/>
 
                         <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
                             Szukaj
                         </button>
+
+                        <div className={`${isGetFilterLocomotiveError ? "visible w-full" : "invisible absolute"} `}>
+                            <div className={"w-96 mb-4 ml-2 text-red-700"}>
+                                <div className={"flex items-center w-full"}>
+                                    <ExclamationMark className={"h-5 mr-2"}/>
+                                    <p className={"w-full"}>
+
+                                        {// @ts-ignore
+                                            getFilterLocomotiveError !== undefined ? getFilterLocomotiveError!.data : ""}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className={"flex justify-end w-full mb-4"}>
                             <button onClick={() => navigate("/add-locomotive")}>
