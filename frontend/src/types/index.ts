@@ -75,6 +75,16 @@ export type TrainRide = {
     idpociagu: number,
 }
 
+export type TrainRideRequest = {
+    id?: number,
+    dataodjazdu: string,
+    dataprzyjazdu: string,
+    idkonduktora: number,
+    idmaszynisty: number,
+    idliniiprzejazdu: number,
+    idpociagu: number,
+}
+
 export type SearchTrainRide = {
     dataodjazdumin: string,
     dataodjazdumax: string,

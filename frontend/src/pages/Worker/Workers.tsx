@@ -5,6 +5,7 @@ import {v4 as uuidv4} from "uuid"
 import {useGetWorkersQuery, useFilterWorkerQuery} from "../../services/workersApi"
 import {useNavigate} from "react-router-dom"
 import Menu from "../../components/Menu";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchWorker = {
     imie: "",
@@ -18,6 +19,7 @@ const Workers = () => {
     const [searchWorker, setSearchWorker] = useState<SearchWorker>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+    const [isWageGoodFormat, setIsWageGoodFormat] = useState<boolean>(true)
 
     const [workers, setWorkers] = useState<Worker[] | undefined>(undefined)
     const navigate = useNavigate()
@@ -48,6 +50,20 @@ const Workers = () => {
             setIsFirstRender(() => false)
         }
     }, [getFilterWorkers, getWorkers, isFirstRender, isGetFilterWorkerSuccess, isGetWorkersFetching, isGetWorkersSuccess])
+
+    const checkIsWageInteger = () => {
+        if (isNaN(Number(searchWorker.placamax)) || isNaN(Number(searchWorker.placamin))) {
+            setIsWageGoodFormat(() => false)
+        } else {
+            setIsWageGoodFormat(() => true)
+        }
+    }
+
+    const searchValues = () => {
+        if (isWageGoodFormat) {
+            setShowSearchResponse(!showSearchResponse)
+        }
+    }
 
     if (workers === undefined) {
         return <Loading/>
@@ -95,6 +111,7 @@ const Workers = () => {
                         <input type="text"
                                placeholder="Minimalna płaca"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsWageInteger()}
                                onChange={(e) => setSearchWorker((prevState: SearchWorker) => {
                                    return {...prevState, placamin: e.target.value}
                                })}/>
@@ -103,6 +120,7 @@ const Workers = () => {
                         <input type="text"
                                placeholder="Maksymalna płaca"
                                className={"border mb-4 mr-2"}
+                               onBlur={() => checkIsWageInteger()}
                                onChange={(e) => setSearchWorker((prevState: SearchWorker) => {
                                    return {...prevState, placamax: e.target.value}
                                })}/>
@@ -116,9 +134,23 @@ const Workers = () => {
                                })}/>
                         <div/>
 
-                        <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
+                        <button className={"mb-4"} onClick={() => searchValues()}>
                             Szukaj
                         </button>
+
+                        <div className={"h-14 flex items-center w-64 text-sm flex-col"}>
+                            <div
+                                className={`${!isWageGoodFormat ? "visible w-full items-center h-full flex mb-4" : "invisible absolute"} `}>
+                                <div className={"w-96 ml-2 text-red-700"}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Pola płac muszą być liczbami
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className={"flex justify-end w-full mb-4"}>
                             <button onClick={() => navigate("/add-worker")}>

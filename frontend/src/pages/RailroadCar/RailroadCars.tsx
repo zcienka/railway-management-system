@@ -33,8 +33,6 @@ const RailroadCars = () => {
     const {
         data: getFilterRailroadCars,
         isSuccess: isGetFilterRailroadCarSuccess,
-        error: getFilterRailroadCarError,
-        isError: isGetFilterRailroadCarError,
     } = useFilterRailroadCarQuery(
         searchRailroadCar,
         {skip: !showSearchResponse}

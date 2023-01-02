@@ -5,16 +5,21 @@ import {useGetSingleDiscountQuery} from "../../services/discountsApi";
 import {Discount} from "../../types";
 import {useDeleteDiscountMutation, useUpdateDiscountMutation} from "../../services/discountsApi";
 import Menu from "../../components/Menu";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const EditDiscounts = () => {
     const [discountName, setDiscountName] = useState<string>("")
-    const [discountNameInput, setDiscountNameInput] = useState<boolean>(true)
+    const [discountInput, setDiscountNameInput] = useState<boolean>(true)
+    const [isDiscountNameValidLength, setIsDiscountNameValidLength] = useState<boolean>(true)
 
     const [discountPercentage, setDiscountPercentage] = useState<string>("")
     const [discountPercentageInput, setDiscountPercentageInput] = useState<boolean>(true)
+    const [isDiscountPercentageInteger, setIsDiscountPercentageInteger] = useState<boolean>(true)
+    const [isDiscountPercentageValidLength, setIsDiscountPercentageValidLength] = useState<boolean>(true)
 
     const [identityDocument, setIdentityDocument] = useState<string>("")
     const [identityDocumentInput, setIdentityDocumentInput] = useState<boolean>(true)
+    const [isDocumentValidLength, setIsDocumentValidLength] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -39,6 +44,37 @@ const EditDiscounts = () => {
         }
         await updateDiscount(singleDiscount)
         navigate("/discounts")
+    }
+
+    const checkDiscountPercentageInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsDiscountPercentageInteger(() => false)
+            setIsDiscountPercentageValidLength(() => true)
+        } else {
+            setIsDiscountPercentageInteger(() => true)
+
+            if (100 < parseInt(userInput) || 0 > parseInt(userInput)) {
+                setIsDiscountPercentageValidLength(() => false)
+            } else {
+                setIsDiscountPercentageValidLength(() => true)
+            }
+        }
+    }
+
+    const checkDiscountNameValidLength = (userInput: string) => {
+        if (userInput.length > 32) {
+            setIsDiscountNameValidLength(false)
+        } else {
+            setIsDiscountNameValidLength(true)
+        }
+    }
+
+    const checkDocumentValidLength = (userInput: string) => {
+        if (userInput.length > 32) {
+            setIsDocumentValidLength(false)
+        } else {
+            setIsDocumentValidLength(true)
+        }
     }
 
     const [deleteDiscount] = useDeleteDiscountMutation()
@@ -69,11 +105,36 @@ const EditDiscounts = () => {
                                        setDiscountName(e.target.value)
                                        setDiscountNameInput(false)
                                    }}
+                                   onBlur={(e) => checkDiscountNameValidLength(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${discountName === "" && !discountInput && isDiscountNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole nazwa zniżki jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isDiscountNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Nazwa zniżki musi mieć długość do 32 znaków
+                            </p>
+                        </div>
+                        {/*<div className={`flex items-center ${isCreateDiscountError ?*/}
+                        {/*    "visible w-full" : "invisible absolute"}`}>*/}
+                        {/*    <ExclamationMark className={"h-5 mr-2"}/>*/}
+                        {/*    <p className={"w-full"}>*/}
+                        {/*        {// @ts-ignore*/}
+                        {/*            createDiscountError !== undefined ? createDiscountError!.data : ""}*/}
+                        {/*    </p>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -85,11 +146,39 @@ const EditDiscounts = () => {
                                        setDiscountPercentage(e.target.value)
                                        setDiscountPercentageInput(false)
                                    }}
+                                   onBlur={(e) => {
+                                       checkDiscountPercentageInteger(e.target.value)
+                                   }}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${discountPercentage === "" && !discountPercentageInput && isDiscountPercentageInteger &&
+                            isDiscountPercentageValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole procent zniżki jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isDiscountPercentageInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole procent zniżki musi być liczbą
+                            </p>
+                        </div>
+
+                        <div
+                            className={`flex items-center ${!isDiscountPercentageValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Procent zniżki musi być między 0 a 100
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -101,11 +190,30 @@ const EditDiscounts = () => {
                                        setIdentityDocument(e.target.value)
                                        setIdentityDocumentInput(false)
                                    }}
+                                   onBlur={(e) => {
+                                       checkDocumentValidLength(e.target.value)
+                                   }}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${identityDocument === "" && !identityDocumentInput ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole dokument potwierdzający jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isDocumentValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Dokument musi mieć długość do 32 znaków
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"flex"}>

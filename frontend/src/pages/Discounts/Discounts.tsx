@@ -18,7 +18,6 @@ const Discounts = () => {
     const [searchDiscount, setSearchDiscount] = useState<SearchDiscount>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
-    const [errorMessage, setErrorMessage] = useState<string>("")
 
     const [discounts, setDiscounts] = useState<Discount[] | undefined>(undefined)
     const navigate = useNavigate()

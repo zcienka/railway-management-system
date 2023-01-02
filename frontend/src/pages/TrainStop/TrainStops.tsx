@@ -5,6 +5,7 @@ import {v4 as uuidv4} from "uuid"
 import {useGetTrainStopsQuery, useFilterTrainStopQuery} from "../../services/trainStopApi"
 import {useNavigate} from "react-router-dom"
 import Menu from "../../components/Menu"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const initialState: SearchTrainStop = {
     numerprzystankumin: "",
@@ -18,6 +19,8 @@ const TrainStops = () => {
     const [searchTrainStop, setSearchTrainStop] = useState<SearchTrainStop>(initialState)
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
+    const [isLineIdInteger, setIsLineIdInteger] = useState<boolean>(true)
+    const [isTrainStopNumberInteger, setIsTrainStopNumberInteger] = useState<boolean>(true)
 
     const [trainStop, setTrainStops] = useState<TrainStop[] | undefined>(undefined)
     const navigate = useNavigate()
@@ -32,11 +35,26 @@ const TrainStops = () => {
         {skip: !showSearchResponse}
     )
 
+    const checkIsLineIdInteger = () => {
+        if (isNaN(Number(searchTrainStop.idliniimin)) || isNaN(Number(searchTrainStop.idliniimax))) {
+            setIsLineIdInteger(() => false)
+        } else {
+            setIsLineIdInteger(() => true)
+        }
+    }
+
+    const checkIsTrainStopNumberInteger = () => {
+        if (isNaN(Number(searchTrainStop.numerprzystankumin)) || isNaN(Number(searchTrainStop.numerprzystankumax))) {
+            setIsTrainStopNumberInteger(() => false)
+        } else {
+            setIsTrainStopNumberInteger(() => true)
+        }
+    }
+
     const {
         data: getTrainStops,
         isFetching: isGetTrainStopsFetching,
         isSuccess: isGetTrainStopsSuccess,
-        isError: isGetTrainStopsError,
     } = useGetTrainStopsQuery(null)
 
     useEffect(() => {
@@ -49,6 +67,12 @@ const TrainStops = () => {
         }
     }, [getFilterTrainStops, getTrainStops, isFirstRender, isGetFilterTrainStopSuccess,
         isGetTrainStopsFetching, isGetTrainStopsSuccess])
+
+    const searchValues = () => {
+        if (isLineIdInteger && isTrainStopNumberInteger) {
+            setShowSearchResponse(!showSearchResponse)
+        }
+    }
 
     if (trainStop === undefined) {
         return <Loading/>
@@ -76,47 +100,76 @@ const TrainStops = () => {
                     "w-full rounded-xl lg:p-8 p-4 border border-stone-200 overflow-auto"}>
                     <div className={"flex mb-4 w-full"}>
 
-                        <div className={"w-2/3 mr-2"}>
                             <input type="text"
                                    placeholder="Minimalny numer przystanku"
-                                   className={"border mb-4 inline-block w-full"}
+                                   onBlur={() => checkIsTrainStopNumberInteger()}
+                                   className={"border mb-4  mr-2 w-3/4"}
                                    onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
                                        return {...prevState, numerprzystankumin: e.target.value}
                                    })}/>
-                        </div>
 
-                        <div className={"w-2/3 mr-2"}>
                             <input type="text"
                                    placeholder="Maksymalny numer przystanku"
-                                   className={"border mb-4 inline-block w-full"}
+                                   onBlur={() => checkIsTrainStopNumberInteger()}
+                                   className={"border mb-4 w-3/4 mr-2"}
                                    onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
                                        return {...prevState, numerprzystankumax: e.target.value}
                                    })}/>
-                        </div>
+
                         <input type="text"
                                placeholder="Nazwa stacji"
-                               className={"border mb-4 mr-2"}
+                               className={"border mb-4 mr-2 w-36"}
                                onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
                                    return {...prevState, nazwastacji: e.target.value}
                                })}/>
 
                         <input type="text"
                                placeholder="Minimalne id linii"
-                               className={"border mb-4 mr-2"}
+                               className={"border mb-4 mr-2 w-40"}
+                               onBlur={() => checkIsLineIdInteger()}
                                onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
                                    return {...prevState, idliniimin: e.target.value}
                                })}/>
 
                         <input type="text"
                                placeholder="Maksymalne id linii"
-                               className={"border mb-4 mr-2"}
+                               className={"border mb-4 mr-2 w-40"}
+                               onBlur={() => checkIsLineIdInteger()}
                                onChange={(e) => setSearchTrainStop((prevState: SearchTrainStop) => {
                                    return {...prevState, idliniimax: e.target.value}
                                })}/>
 
-                        <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
+                        <button className={"mb-4"} onClick={() => searchValues()}>
                             Szukaj
                         </button>
+
+                        <div className={"h-14 w-full flex items-center text-sm flex-col"}>
+                            <div
+                                className={`${!isTrainStopNumberInteger ?
+                                    `visible w-full items-center h-full flex ${!isLineIdInteger ? "mb-1" : "mb-4"}` : "invisible absolute"}`}>
+                                <div className={"w-full ml-2 text-red-700"}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Numer przystanku powinien być liczbą
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                className={`${!isLineIdInteger ? "visible w-full items-center h-full flex mb-4" : "invisible absolute"} `}>
+                                <div className={"w-full ml-2 text-red-700 "}>
+                                    <div className={"flex items-center w-full"}>
+                                        <ExclamationMark className={"h-5 mr-2"}/>
+                                        <p className={"w-full"}>
+                                            Id musi być liczbą
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className={"flex justify-end w-full mb-4"}>
                             <button onClick={() => navigate("/add-train-stop")}>
                                 Dodaj przystanek

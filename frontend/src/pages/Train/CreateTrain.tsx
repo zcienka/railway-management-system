@@ -1,29 +1,62 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import Menu from "../../components/Menu"
 import {useNavigate} from "react-router-dom";
 import {useCreateTrainMutation} from "../../services/trainsApi";
 import {Train} from "../../types";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const CreateTrain = () => {
     const navigate = useNavigate()
 
     const [name, setName] = useState<string>("")
     const [nameInput, setNameInput] = useState<boolean>(true)
+    const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
 
     const [locomotiveName, setLocomotiveId] = useState<string>("")
     const [locomotiveNameInput, setLocomotiveIdInput] = useState<boolean>(true)
+    const [isLocomotiveIdInteger, setIsLocomotiveIdInteger] = useState<boolean>(true)
 
-    const [createTrain] = useCreateTrainMutation()
+    const [createTrain, {
+        error: createTrainError,
+        isError: isCreateTrainError,
+        isSuccess: isCreateTrainSuccess
+    }] = useCreateTrainMutation()
 
     const createSingleTrain = async () => {
-        const singleTrain: Train = {
-            nazwa: name,
-            idlokomotywy: parseInt(locomotiveName)
+        if (name === "" || locomotiveName === "" || !isLocomotiveIdInteger || !isNameValidLength) {
+            setLocomotiveIdInput(false)
+            setNameInput(false)
+        } else {
+            const singleTrain: Train = {
+                nazwa: name,
+                idlokomotywy: parseInt(locomotiveName)
+            }
+            await createTrain(singleTrain)
         }
-        await createTrain(singleTrain)
-        navigate("/train")
     }
+
+    const checkNameValidLength = (userInput: string) => {
+        if (userInput.length > 32) {
+            setIsNameValidLength(false)
+        } else {
+            setIsNameValidLength(true)
+        }
+    }
+
+    const checkIdInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsLocomotiveIdInteger(() => false)
+        } else {
+            setIsLocomotiveIdInteger(() => true)
+        }
+    }
+
+    useEffect(() => {
+        if (isCreateTrainSuccess) {
+            navigate("/train")
+        }
+    }, [isCreateTrainSuccess, navigate])
 
     return <div className={"flex"}>
         <Menu/>
@@ -41,11 +74,28 @@ const CreateTrain = () => {
                                    setName(e.target.value)
                                    setNameInput(false)
                                }}
+                               onBlur={(e) => checkNameValidLength(e.target.value)}
                         />
                     </div>
                 </div>
 
                 <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    <div
+                        className={`${name === "" && !nameInput  ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole nazwa jest wymagane
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        className={`flex items-center ${!isNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            Nazwa musi mieć długość do 32 znaków
+                        </p>
+                    </div>
                 </div>
 
                 <div className={"w-160 flex items-center"}>
@@ -57,7 +107,35 @@ const CreateTrain = () => {
                                    setLocomotiveId(e.target.value)
                                    setLocomotiveIdInput(false)
                                }}
+                               onBlur={(e) => checkIdInteger(e.target.value)}
                         />
+                    </div>
+                </div>
+
+                <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    <div
+                        className={`${locomotiveName === "" && !locomotiveNameInput && isLocomotiveIdInteger  ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole id lokomotywy jest wymagane
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        className={`flex items-center ${!isLocomotiveIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            Id lokomotywy powinno być liczbą
+                        </p>
+                    </div>
+                    <div className={`flex items-center ${isCreateTrainError ?
+                        "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            {// @ts-ignore
+                                createTrainError !== undefined ? createTrainError!.data : ""}
+                        </p>
                     </div>
                 </div>
 

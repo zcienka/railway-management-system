@@ -47,7 +47,7 @@ export const trainRideApi = createApi({
         createTrainRide: builder.mutation({
             query: (body) => ({
                 url: "/train-ride/create",
-                method: "GET",
+                method: "POST",
                 params: body
             }),
             invalidatesTags: ["TrainRide"]

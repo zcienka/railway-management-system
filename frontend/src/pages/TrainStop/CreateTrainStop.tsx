@@ -1,32 +1,79 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import Menu from "../../components/Menu"
 import {useNavigate} from "react-router-dom"
 import {useCreateTrainStopMutation} from "../../services/trainStopApi"
 import {TrainStop} from "../../types"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const CreateTrainStop = () => {
     const navigate = useNavigate()
 
     const [trainStopNumber, setTrainStopNumber] = useState<string>("")
     const [trainStopNumberInput, setTrainStopNumberInput] = useState<boolean>(true)
+    const [isTrainStopNumberInteger, setIsTrainStopNumberInteger] = useState<boolean>(true)
+    const [isTrainStopNumberPositive, setIsTrainStopNumberPositive] = useState<boolean>(true)
 
     const [stationName, setStationName] = useState<string>("")
     const [stationNameInput, setStationNameInput] = useState<boolean>(true)
 
     const [lineId, setLineId] = useState<string>("")
     const [lineIdInput, setLineIdInput] = useState<boolean>(true)
+    const [isLineIdInteger, setIsLineIdInteger] = useState<boolean>(true)
+    const [isLineIdPositive, setIsLineIdPositive] = useState<boolean>(true)
 
-    const [createTrainStop] = useCreateTrainStopMutation()
+    const [createTrainStop, {
+        error: createTrainStopError,
+        isError: isCreateTrainStopError,
+        isSuccess: isCreateTrainStopSuccess
+    }] = useCreateTrainStopMutation()
 
     const createSingleTrainStop = async () => {
-        const singleTrainStop: TrainStop = {
-            numerprzystanku: parseInt(trainStopNumber),
-            nazwastacji: stationName,
-            idlinii: parseInt(lineId),
+        if (trainStopNumber === "" || stationName === "" || lineId === "" || !isTrainStopNumberInteger || !isLineIdInteger) {
+            setTrainStopNumberInput(false)
+            setStationNameInput(false)
+            setLineIdInput(false)
+        } else {
+            const singleTrainStop: TrainStop = {
+                numerprzystanku: parseInt(trainStopNumber),
+                nazwastacji: stationName,
+                idlinii: parseInt(lineId),
+            }
+            await createTrainStop(singleTrainStop)
         }
-        await createTrainStop(singleTrainStop)
-        navigate("/train-stops")
+    }
+
+    useEffect(() => {
+        if (isCreateTrainStopSuccess) {
+            navigate("/train-stops")
+        }
+    }, [isCreateTrainStopSuccess, navigate])
+
+    const checkTrainStopNumberInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsTrainStopNumberInteger(() => false)
+        } else {
+            if (parseInt(userInput) < 0) {
+                setIsTrainStopNumberPositive(false)
+            } else {
+                setIsTrainStopNumberPositive(() => true)
+            }
+            setIsTrainStopNumberInteger(() => true)
+        }
+    }
+
+    const checkLineIdInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsLineIdInteger(() => false)
+        } else {
+            if (parseInt(userInput) < 0) {
+                setIsLineIdPositive(false)
+            } else {
+                setIsLineIdPositive(() => true)
+            }
+
+            setIsLineIdInteger(() => true)
+        }
     }
 
     return <div className={"flex"}>
@@ -45,11 +92,28 @@ const CreateTrainStop = () => {
                                    setTrainStopNumber(e.target.value)
                                    setTrainStopNumberInput(false)
                                }}
+                               onBlur={(e) => checkTrainStopNumberInteger(e.target.value)}
                         />
                     </div>
                 </div>
 
                 <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    <div
+                        className={`${trainStopNumber === "" && !trainStopNumberInput && isTrainStopNumberInteger ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole numer przystanku jest wymagane
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        className={`flex items-center ${!isTrainStopNumberInteger ? "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            Numer przystanku musi być liczbą
+                        </p>
+                    </div>
                 </div>
 
                 <div className={"w-160 flex items-center"}>
@@ -66,6 +130,16 @@ const CreateTrainStop = () => {
                 </div>
 
                 <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    <div
+                        className={`${stationName === "" && !stationNameInput ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole stacja jest wymagane
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div className={"w-160 flex items-center"}>
@@ -77,7 +151,27 @@ const CreateTrainStop = () => {
                                    setLineId(e.target.value)
                                    setLineIdInput(false)
                                }}
+                               onBlur={(e) => checkLineIdInteger(e.target.value)}
                         />
+                    </div>
+                </div>
+
+                <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    <div
+                        className={`${lineId === "" && !lineIdInput && isLineIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole id linii przejazdu jest wymagane
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        className={`flex items-center ${!isLineIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            Id linii przejazdu musi być liczbą
+                        </p>
                     </div>
                 </div>
 

@@ -55,7 +55,7 @@ const EditRailroadCars = () => {
                 </div>
                 <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Nazwa wagonu</label>
+                        <label className={"w-2/6"}>Liczba miejsc</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
                                    value={seatsNumber}
