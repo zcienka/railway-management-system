@@ -3,6 +3,7 @@ using System.Data;
 using Npgsql;
 using Backend.Models;
 using Newtonsoft.Json;
+using System;
 
 namespace Backend.Controllers
 {
@@ -51,7 +52,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                             select * from lokomotywaReadById(@id);
@@ -81,8 +85,8 @@ namespace Backend.Controllers
 
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Locomotive>>> search(string? nazwa,
-                                                                       string? databadaniamin,
-                                                                       string? databadaniamax)
+            string? databadaniamin,
+            string? databadaniamax)
         {
             if (nazwa == null)
                 nazwa = "";
@@ -90,6 +94,12 @@ namespace Backend.Controllers
                 databadaniamin = "2022-12-31";
             if (databadaniamax == null)
                 databadaniamax = "2122-12-31";
+
+            DateTime dateTime;
+            if (!DateTime.TryParse(databadaniamin, out dateTime))
+            {
+                return StatusCode(409, "Niepoprawny format daty");
+            }
 
             string query = @"
                             select * from lokomotywaFilter(vNazwa => @nazwa, 
@@ -127,10 +137,14 @@ namespace Backend.Controllers
                 return StatusCode(409, "Pole daty następnego badania nie może być puste");
             if (nazwa == null)
                 nazwa = "";
-            try{
+            try
+            {
                 DateOnly.Parse(databadania);
             }
-            catch { return StatusCode(409, "Pole daty badania nie jest datą"); }
+            catch
+            {
+                return StatusCode(409, "Pole daty badania nie jest datą");
+            }
 
             string query = @"
                             select lokomotywaCreate(vData => @databadaniatechnicznego, vNazwa => @nazwa);
@@ -147,7 +161,8 @@ namespace Backend.Controllers
                 {
                     myCommand.Parameters.AddWithValue("@databadaniatechnicznego", DateOnly.Parse(databadania));
                     myCommand.Parameters.AddWithValue("@nazwa", nazwa);
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -157,12 +172,13 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
             else if (val == -1)
                 return StatusCode(409, "Data nie może być przeszła");
             else
-                return StatusCode(409, "Nazwa musi być dlugości maksymalnie 32");
+                return StatusCode(409, "Nazwa lokomotywy musi mieć długość do 32 znaków");
         }
 
         [HttpPatch("update")]
@@ -174,14 +190,23 @@ namespace Backend.Controllers
                 nazwa = "";
             if (databadania == null)
                 return StatusCode(409, "Pole daty następnego badania nie może być puste");
-            try{
+            try
+            {
                 Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Pole id musi być liczbą"); }
-            try{
+            catch
+            {
+                return StatusCode(409, "Pole id musi być liczbą");
+            }
+
+            try
+            {
                 DateOnly.Parse(databadania);
             }
-            catch { return StatusCode(409, "Pole daty badania nie jest datą"); }
+            catch
+            {
+                return StatusCode(409, "Pole daty badania nie jest datą");
+            }
 
             string query = @"
                             select lokomotywaUpdate(vId => @id, vData => @databadaniatechnicznego, vNazwa => @nazwa);
@@ -199,7 +224,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
                     myCommand.Parameters.AddWithValue("@databadaniatechnicznego", DateOnly.Parse(databadania));
                     myCommand.Parameters.AddWithValue("@nazwa", nazwa);
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -209,6 +235,7 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
             if (val == 0)
@@ -226,7 +253,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                            select lokomotywaDelete(@id);
@@ -242,7 +272,8 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -252,11 +283,11 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
+
+            if (val == 1)
                 return Ok();
             else
                 return StatusCode(409, "Nie znaleziono lokomotywy o danym ID");
-
         }
     }
 }

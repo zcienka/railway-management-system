@@ -5,7 +5,7 @@ import BaseQuery from "../utils/baseQuery"
 export const locomotivesApi = createApi({
     reducerPath: "locomotivesApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Locomotive", "LocomotiveFilter"],
+    tagTypes: ["Locomotive", "LocomotiveFilter", "SingleLocomotive"],
     endpoints: (builder) => ({
         getLocomotives: builder.query<Locomotive[], null>({
             query: () => ({
@@ -19,6 +19,7 @@ export const locomotivesApi = createApi({
                 url: `/locomotive/${id}`,
                 method: "GET",
             }),
+            providesTags: ["Locomotive"]
         }),
         deleteLocomotive: builder.mutation({
             query: (id) => ({
@@ -49,9 +50,6 @@ export const locomotivesApi = createApi({
                 url: "/locomotive/search",
                 method: "GET",
                 params: body,
-// {databadaniamin : body.databadaniatechnicznegomin.toISOString().substring(0,10),
-//     databadaniamax : body.databadaniatechnicznegomax.toISOString().substring(0,10),
-//     nazwa : body.nazwa}
             }),
             providesTags: ["LocomotiveFilter"]
         }),

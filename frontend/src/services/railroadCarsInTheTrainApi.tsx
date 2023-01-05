@@ -19,6 +19,7 @@ export const railroadCarsInTheTrainApi = createApi({
                 url: `/railroad-car/${body.trainId}/${body.carId}`,
                 method: "GET",
             }),
+            providesTags: ["RailroadCarInTheTrain"]
         }),
         deleteRailroadCarInTheTrain: builder.mutation({
             query: (body) => ({

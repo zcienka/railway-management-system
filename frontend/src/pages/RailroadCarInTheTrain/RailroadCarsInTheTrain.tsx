@@ -79,7 +79,7 @@ const RailroadCarsInTheTrain = () => {
                 <th className={"py-2 font-semibold border-b  border-stone-200 underline"}><Link to={"/xd"}>Pokaż wagon</Link></th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
-                    onClick={() => navigate(`/railroad-cars/${railroadCar.idwagonu}/${railroadCar.idpociagu}`)}>
+                    onClick={() => navigate(`/railroad-cars-in-the-train/${railroadCar.idwagonu}/${railroadCar.idpociagu}`)}>
                     <div className={"px-3 py-1 border-2 rounded-md cursor-pointer mr-2"}>Edytuj</div>
                 </th>
             </tr>
@@ -135,7 +135,7 @@ const RailroadCarsInTheTrain = () => {
                         </div>
 
                         <div className={"flex justify-end w-full mb-4"}>
-                            <button onClick={() => navigate("/add-railroad-cars")}>
+                            <button onClick={() => navigate("/add-railroad-cars-in-the-train")}>
                                 Dodaj wagon w pociągu
                             </button>
                         </div>

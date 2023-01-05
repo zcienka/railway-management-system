@@ -19,18 +19,22 @@ export const workersApi = createApi({
                 url: `/worker/${id}`,
                 method: "GET",
             }),
+            providesTags: ["Worker"]
+
         }),
         getConductors: builder.query<Worker[], string | null>({
             query: () => ({
                 url: `/worker/conductors`,
                 method: "GET",
             }),
+            providesTags: ["Worker"]
         }),
         getDrivers: builder.query<Worker[], string | null>({
             query: () => ({
                 url: `/worker/drivers`,
                 method: "GET",
             }),
+            providesTags: ["Worker"]
         }),
         deleteWorker: builder.mutation({
             query: (id) => ({

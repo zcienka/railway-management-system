@@ -19,6 +19,7 @@ export const discountsApi = createApi({
                 url: `/discount/${id}`,
                 method: "GET",
             }),
+            providesTags: ["Discount"]
         }),
         deleteDiscount: builder.mutation({
             query: (id) => ({

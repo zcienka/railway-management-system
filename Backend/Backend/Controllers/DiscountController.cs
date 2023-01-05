@@ -74,8 +74,8 @@ namespace Backend.Controllers
         }
 
         [HttpGet("search")]
-        //string? nazwa, 
-        public async Task<ActionResult<IEnumerable<Discount>>> search(string? nazwa, string? procentmin, string? procentmax, string? dokument)
+        public async Task<ActionResult<IEnumerable<Discount>>> search(string? nazwa, string? procentmin,
+            string? procentmax, string? dokument)
         {
             if (nazwa == null)
                 nazwa = "";
@@ -90,7 +90,10 @@ namespace Backend.Controllers
                 Int32.Parse(procentmin);
                 Int32.Parse(procentmax);
             }
-            catch { return StatusCode(409, "Pola procentów muszą być liczbami"); }
+            catch
+            {
+                return StatusCode(409, "Pola procentów muszą być liczbami");
+            }
 
             string query = @"
                             select * from znizkaFilter(vNazwa => @nazwaznizki, vDokument => @dokument, vProcentMin => @procentmin,
@@ -131,9 +134,14 @@ namespace Backend.Controllers
                 return StatusCode(409, "Pole procent zniżki nie może być puste");
             if (dokument == null)
                 return StatusCode(409, "Pole dokument potwierdzający nie może być puste");
-            try{
+            try
+            {
                 Int32.Parse(procent);
-            } catch { return StatusCode(409, "Pole procent zniżki musi być liczbą"); }
+            }
+            catch
+            {
+                return StatusCode(409, "Pole procent zniżki musi być liczbą");
+            }
 
             string query = @"
                             select znizkacreate(vNazwa => @nazwaznizki, vProcent => @procentznizki, vDokument => @dokumentpotwierdzajacy);
@@ -151,7 +159,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@nazwaznizki", nazwa);
                     myCommand.Parameters.AddWithValue("@procentznizki", Int32.Parse(procent));
                     myCommand.Parameters.AddWithValue("@dokumentpotwierdzajacy", dokument);
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -161,6 +170,7 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
             else if (val == 0)
@@ -182,9 +192,14 @@ namespace Backend.Controllers
                 return StatusCode(409, "Pole procent zniżki nie może być puste");
             if (dokument == null)
                 return StatusCode(409, "Pole dokument potwierdzający nie może być puste");
-            try{
+            try
+            {
                 Int32.Parse(procent);
-            } catch { return StatusCode(409, "Pole procent zniżki musi być liczbą"); }
+            }
+            catch
+            {
+                return StatusCode(409, "Pole procent zniżki musi być liczbą");
+            }
 
             string query = @"
                             select znizkaUpdate(vNazwa => @nazwaznizki, vProcent => @procentznizki, vDokument => @dokumentpotwierdzajacy);
@@ -202,7 +217,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@nazwaznizki", nazwa);
                     myCommand.Parameters.AddWithValue("@procentznizki", Int32.Parse(procent));
                     myCommand.Parameters.AddWithValue("@dokumentpotwierdzajacy", dokument);
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -212,6 +228,7 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
             else if (val == 0)
@@ -239,7 +256,8 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@nazwaznizki", nazwaznizki);
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);

@@ -4,18 +4,22 @@ import Menu from "../../components/Menu"
 import {RailroadCarInTheTrain} from "../../types"
 import {useNavigate} from "react-router-dom"
 import {useCreateRailroadCarInTheTrainMutation} from "../../services/railroadCarsInTheTrainApi"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const CreateRailroadCarInTheTrain = () => {
     const navigate = useNavigate()
 
     const [railroadCarInTheTrainNumber, setCarNumber] = useState<string>("")
-    const [carriaInput, setCarNumberInput] = useState<boolean>(true)
+    const [railroadCarInput, setCarNumberInput] = useState<boolean>(true)
+    const [isRailroadCarNumberInteger, setIsRailroadCarNumberInteger] = useState<boolean>(true)
 
     const [railroadCarInTheTrainId, setCarId] = useState<string>("")
     const [railroadCarInTheTrainIdInput, setRailroadCarInTheTrainId] = useState<boolean>(true)
+    const [isRailroadCarIdInteger, setIsRailroadCarIdInteger] = useState<boolean>(true)
 
     const [trainId, setTrainId] = useState<string>("")
     const [trainIdInput, setTrainIdInput] = useState<boolean>(true)
+    const [isTrainIdInteger, setIsTrainIdInteger] = useState<boolean>(true)
 
     const [createRailroadCar] = useCreateRailroadCarInTheTrainMutation()
 
@@ -27,6 +31,30 @@ const CreateRailroadCarInTheTrain = () => {
         }
         await createRailroadCar(singleRailroadCar)
         navigate("/railroad-cars")
+    }
+
+    const checkIsRailroadCarNumberInteger = () => {
+        if (isNaN(Number(railroadCarInTheTrainNumber)) || isNaN(Number(railroadCarInTheTrainNumber))) {
+            setIsRailroadCarNumberInteger(() => false)
+        } else {
+            setIsRailroadCarNumberInteger(() => true)
+        }
+    }
+
+    const checkIsRailroadCarIdInteger = () => {
+        if (isNaN(Number(railroadCarInTheTrainId)) || isNaN(Number(railroadCarInTheTrainId))) {
+            setIsRailroadCarIdInteger(() => false)
+        } else {
+            setIsRailroadCarIdInteger(() => true)
+        }
+    }
+
+    const checkIsTrainIdInteger = () => {
+        if (isNaN(Number(trainId)) || isNaN(Number(trainId))) {
+            setIsTrainIdInteger(() => false)
+        } else {
+            setIsTrainIdInteger(() => true)
+        }
     }
 
     return <div className={"flex"}>
@@ -50,6 +78,16 @@ const CreateRailroadCarInTheTrain = () => {
                 </div>
 
                 <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    {/*<div*/}
+                    {/*    className={`${seatsNumber === "" && !seatsInput && isSeatsNumberInteger && isSeatsNumberValidLength ? "visible w-full"*/}
+                    {/*        : "invisible absolute"}`}>*/}
+                    {/*    <div className={`flex items-center`}>*/}
+                    {/*        <ExclamationMark className={"h-5 mr-2"}/>*/}
+                    {/*        <p className={"w-full"}>*/}
+                    {/*            Pole liczba miejsc jest wymagane*/}
+                    {/*        </p>*/}
+                    {/*    </div>*/}
+                    {/*</div>s*/}
                 </div>
 
                 <div className={"w-160 flex items-center"}>

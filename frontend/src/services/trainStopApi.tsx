@@ -5,7 +5,7 @@ import BaseQuery from "../utils/baseQuery"
 export const trainStopApi = createApi({
     reducerPath: "trainStopApi",
     baseQuery: BaseQuery,
-    tagTypes: ["TrainStop", "SingleTrainStop", "TrainStopInLine", "SearchTrainStop"],
+    tagTypes: ["TrainStop", "TrainStopInLine", "SearchTrainStop"],
     endpoints: (builder) => ({
         getTrainStops: builder.query<TrainStop[], null>({
             query: () => ({
@@ -19,7 +19,7 @@ export const trainStopApi = createApi({
                 url: `/train-stop/${id}`,
                 method: "GET",
             }),
-            providesTags: ["SingleTrainStop"]
+            providesTags: ["TrainStop"]
         }),
 
         deleteTrainStop: builder.mutation({

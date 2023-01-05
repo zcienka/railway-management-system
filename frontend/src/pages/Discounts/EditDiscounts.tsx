@@ -24,6 +24,12 @@ const EditDiscounts = () => {
     const navigate = useNavigate()
     const {id} = useParams()
 
+    const [updateDiscount, {
+        error: updateDiscountError,
+        isError: isUpdateDiscountError,
+        isSuccess: isUpdateDiscountSuccess
+    }] = useUpdateDiscountMutation()
+
     const {
         data: getSingleDiscountData,
         isSuccess: isGetSingleDiscountSuccess
@@ -37,14 +43,27 @@ const EditDiscounts = () => {
     }
 
     const updateSingleDiscount = async () => {
-        const singleDiscount: Discount = {
-            nazwaznizki: discountName,
-            procentznizki: parseInt(discountPercentage),
-            dokumentpotwierdzajacy: identityDocument
+        if (discountName === "" || discountPercentage === "" || identityDocument === "" ||
+            !isDiscountPercentageValidLength || !isDiscountPercentageInteger ||
+            !isDiscountNameValidLength || !isDocumentValidLength) {
+            setDiscountNameInput(false)
+            setDiscountPercentageInput(false)
+            setIdentityDocumentInput(false)
+        } else {
+            const singleDiscount: Discount = {
+                nazwaznizki: discountName,
+                procentznizki: parseInt(discountPercentage),
+                dokumentpotwierdzajacy: identityDocument
+            }
+            await updateDiscount(singleDiscount)
         }
-        await updateDiscount(singleDiscount)
-        navigate("/discounts")
     }
+
+    useEffect(() => {
+        if (isUpdateDiscountSuccess) {
+            navigate("/discounts")
+        }
+    }, [isUpdateDiscountSuccess, navigate])
 
     const checkDiscountPercentageInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {
@@ -78,7 +97,7 @@ const EditDiscounts = () => {
     }
 
     const [deleteDiscount] = useDeleteDiscountMutation()
-    const [updateDiscount] = useUpdateDiscountMutation()
+
 
     useEffect(() => {
         if (isGetSingleDiscountSuccess) {
@@ -99,14 +118,15 @@ const EditDiscounts = () => {
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Nazwa zniżki</label>
                         <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
-                                   value={discountName}
-                                   onChange={(e) => {
-                                       setDiscountName(e.target.value)
-                                       setDiscountNameInput(false)
-                                   }}
-                                   onBlur={(e) => checkDiscountNameValidLength(e.target.value)}
-                            />
+                            {/*<input className={"w-1/2"}*/}
+                            {/*       value={discountName}*/}
+                            {/*       onChange={(e) => {*/}
+                            {/*           setDiscountName(e.target.value)*/}
+                            {/*           setDiscountNameInput(false)*/}
+                            {/*       }}*/}
+                            {/*       onBlur={(e) => checkDiscountNameValidLength(e.target.value)}*/}
+                            {/*/>*/}
+                            <div className={"w-1/2"}>{discountName}</div>
                         </div>
                     </div>
 

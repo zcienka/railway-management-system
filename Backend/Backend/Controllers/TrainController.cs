@@ -47,11 +47,6 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            try
-            {
-                int idInt = Int32.Parse(id);
-            }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
 
             string query = @"
                             select * from pociagReadById(@id);
@@ -160,9 +155,9 @@ namespace Backend.Controllers
             if (val == 1)
                 return Ok();
             else if (val == -1)
-                return StatusCode(409, "Nie znaleziono lokomotywy o danym ID");
+                return StatusCode(409, "Nie znaleziono lokomotywy o danym Id");
             else
-                return StatusCode(409, "Nazwa musi być dlugości maksymalnie 32");
+                return StatusCode(409, "Nazwa musi być dlugość maksymalnie 32");
         }
 
         [HttpPatch("update")]

@@ -50,7 +50,7 @@ namespace Backend.Controllers
 
             return Ok(json);
         }
-        
+
         [HttpGet("{id}/station-by-line")]
         public IActionResult GetStationsByLine(string id)
         {
@@ -58,7 +58,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                             select *
@@ -74,7 +77,7 @@ namespace Backend.Controllers
             {
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
-                {   
+                {
                     myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
 
                     myReader = myCommand.ExecuteReader();
@@ -97,7 +100,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                             select przejazd.id, przejazd.dataodjazdu, przejazd.dataprzyjazdu, 
@@ -134,8 +140,8 @@ namespace Backend.Controllers
 
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<TrainRide>>> search(string? dataodjazdumin, string? dataodjazdumax,
-                                                                       string? dataprzyjazdumin, string? dataprzyjazdumax,
-                                                                       string? idliniiprzejazdumin, string? idliniiprzejazdumax)
+            string? dataprzyjazdumin, string? dataprzyjazdumax,
+            string? idliniiprzejazdumin, string? idliniiprzejazdumax)
         {
             if (dataodjazdumin == null)
                 dataodjazdumin = "2022-12-23";
@@ -155,7 +161,10 @@ namespace Backend.Controllers
                 Int32.Parse(idliniiprzejazdumin);
                 Int32.Parse(idliniiprzejazdumax);
             }
-            catch { return StatusCode(409, "Pola wszelkich id muszą być liczbami"); }
+            catch
+            {
+                return StatusCode(409, "Pola wszelkich id muszą być liczbami");
+            }
 
             try
             {
@@ -163,7 +172,11 @@ namespace Backend.Controllers
                 DateOnly.Parse(dataodjazdumax);
                 DateOnly.Parse(dataprzyjazdumin);
                 DateOnly.Parse(dataprzyjazdumax);
-            } catch { return StatusCode(409, "Niepoprawny zapis dat"); }
+            }
+            catch
+            {
+                return StatusCode(409, "Niepoprawny zapis dat");
+            }
 
             string query = @"
                             select * from przejazdFilter(vOdjazdOd => @dataodjazdumin, vOdjazdDo => @dataodjazdumax,
@@ -200,24 +213,35 @@ namespace Backend.Controllers
 
         [HttpPost("create")]
         public async Task<ActionResult<IEnumerable<TrainRide>>> create(string? dataodjazdu, string? dataprzyjazdu,
-                                                                       string? idkonduktora, string? idmaszynisty,
-                                                                       string? idliniiprzejazdu, string? idpociagu)
+            string? idkonduktora, string? idmaszynisty,
+            string? idliniiprzejazdu, string? idpociagu)
         {
-            if (dataodjazdu == null || dataprzyjazdu == null || idkonduktora == null 
+            if (dataodjazdu == null || dataprzyjazdu == null || idkonduktora == null
                 || idmaszynisty == null || idliniiprzejazdu == null || idpociagu == null)
                 return StatusCode(409, "Wszystkie pola muszą byc wypełnione");
 
-            try{
+            try
+            {
                 DateTime.Parse(dataodjazdu);
                 DateTime.Parse(dataprzyjazdu);
-            } catch { return StatusCode(409, "Pola dat nie zostały wypełnione poprawnie"); }
+            }
+            catch
+            {
+                return StatusCode(409, "Pola dat nie zostały wypełnione poprawnie");
+            }
+
             try
             {
                 Int32.Parse(idkonduktora);
                 Int32.Parse(idmaszynisty);
                 Int32.Parse(idliniiprzejazdu);
                 Int32.Parse(idpociagu);
-            } catch { return StatusCode(409, "Pola id nie zostały wypełnione poprawnie"); }
+            }
+            catch
+            {
+                return StatusCode(409, "Pola id nie zostały wypełnione poprawnie");
+            }
+
             string query = @"
                             select przejazdCreate(vOdjazd => @dataodjazdu,
 										          vPrzyjazd => @dataprzyjazdu,
@@ -242,7 +266,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@idpociagu", Int32.Parse(idpociagu));
                     myCommand.Parameters.AddWithValue("@dataodjazdu", DateTime.Parse(dataodjazdu));
                     myCommand.Parameters.AddWithValue("@dataprzyjazdu", DateTime.Parse(dataprzyjazdu));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -253,12 +278,14 @@ namespace Backend.Controllers
                 }
             }
 
-            if(val == 1)
+            if (val == 1)
                 return Ok();
             else if (val == 0)
                 return StatusCode(409, "Dany pracownik nie jest z zawodu konduktorem");
             else if (val == -1)
                 return StatusCode(409, "Dany pracownik nie jest z zawodu maszynistą");
+            else if (val == -7)
+                return StatusCode(409, "Dana linia przejazdu i pociąg nie istnieje");
             else if (val == -2)
                 return StatusCode(409, "Dana linia przejazdu nie istnieje");
             else if (val == -3)
@@ -271,27 +298,35 @@ namespace Backend.Controllers
 
         [HttpPatch("update")]
         public async Task<ActionResult<IEnumerable<TrainRide>>> update(string? id,
-                                                                       string? dataodjazdu, string? dataprzyjazdu,
-                                                                       string? idkonduktora, string? idmaszynisty,
-                                                                       string? idliniiprzejazdu, string? idpociagu)
+            string? dataodjazdu, string? dataprzyjazdu,
+            string? idkonduktora, string? idmaszynisty,
+            string? idliniiprzejazdu, string? idpociagu)
         {
             if (id == null || dataodjazdu == null || dataprzyjazdu == null || idkonduktora == null
                 || idmaszynisty == null || idliniiprzejazdu == null || idpociagu == null)
                 return StatusCode(409, "Wszystkie pola muszą byc wypełnione");
-            try{
+            try
+            {
                 DateOnly.Parse(dataodjazdu);
                 DateOnly.Parse(dataprzyjazdu);
             }
-            catch { return StatusCode(409, "Pola dat nie zostały wypełnione poprawnie"); }
+            catch
+            {
+                return StatusCode(409, "Pola dat nie zostały wypełnione poprawnie");
+            }
 
-            try{
+            try
+            {
                 Int32.Parse(id);
                 Int32.Parse(idkonduktora);
                 Int32.Parse(idmaszynisty);
                 Int32.Parse(idliniiprzejazdu);
                 Int32.Parse(idpociagu);
             }
-            catch { return StatusCode(409, "Pola id nie zostały wypełnione poprawnie"); }
+            catch
+            {
+                return StatusCode(409, "Pola id nie zostały wypełnione poprawnie");
+            }
 
             string query = @"
                            select przejazdUpdate(vId => @id,
@@ -319,7 +354,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@idpociagu", Int32.Parse(idpociagu));
                     myCommand.Parameters.AddWithValue("@dataodjazdu", DateOnly.Parse(dataodjazdu));
                     myCommand.Parameters.AddWithValue("@dataprzyjazdu", DateOnly.Parse(dataprzyjazdu));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -329,6 +365,7 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
             else if (val == 0)
@@ -345,8 +382,8 @@ namespace Backend.Controllers
                 return StatusCode(409, "Data odjazdu musi być późniejsza niż data przyjazdu");
             else
                 return StatusCode(409, "Nie znaleziono przejazdu o danym ID");
-
         }
+
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
@@ -354,7 +391,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(id);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                             select przejazdDelete(@id);
@@ -370,7 +410,8 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -380,7 +421,8 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
+
+            if (val == 1)
                 return NoContent();
             else
                 return StatusCode(409, "Nie znaleziono przejazdu o danym ID");

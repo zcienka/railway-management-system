@@ -411,4 +411,4 @@ AS $$
 	DROP TABLE IF EXISTS rezerwacja 	CASCADE;
 $$;
 
---CALL delete_database();
+-- CALL delete_database();

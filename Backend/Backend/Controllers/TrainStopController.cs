@@ -51,7 +51,10 @@ namespace Backend.Controllers
             {
                 int nrInt = Int32.Parse(numerprzystanku);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                             select * from przystanekFilter(vNrPrzystankuMin => @numerprzystanku, 
@@ -87,7 +90,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(idLinii);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                             select * from przystanekFilter(vNrLiniiMin => @idlinii,
@@ -117,9 +123,10 @@ namespace Backend.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<TrainStop>>> search(string? numerprzystankumin,  string? numerprzystankumax,
-                                                                       string? nazwastacji, 
-                                                                       string? idliniimin, string? idliniimax)
+        public async Task<ActionResult<IEnumerable<TrainStop>>> search(string? numerprzystankumin,
+            string? numerprzystankumax,
+            string? nazwastacji,
+            string? idliniimin, string? idliniimax)
         {
             if (numerprzystankumin == null)
                 numerprzystankumin = "0";
@@ -138,7 +145,11 @@ namespace Backend.Controllers
                 Int32.Parse(idliniimax);
                 Int32.Parse(numerprzystankumin);
                 Int32.Parse(numerprzystankumax);
-            } catch { return StatusCode(409, "Pola id linii i numery przystanków muszą być liczbami"); }
+            }
+            catch
+            {
+                return StatusCode(409, "Pola id linii i numery przystanków muszą być liczbami");
+            }
 
             string query = @"
                             select * from przystanekFilter(vNrPrzystankuMin => @numerprzystankumin, vNrPrzystankuMax => @numerprzystankumax,
@@ -173,15 +184,20 @@ namespace Backend.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<IEnumerable<TrainStop>>> create(string? numerprzystanku, string? nazwastacji, string? idlinii)
+        public async Task<ActionResult<IEnumerable<TrainStop>>> create(string? numerprzystanku, string? nazwastacji,
+            string? idlinii)
         {
-            if(numerprzystanku == null || nazwastacji == null || idlinii == null)
+            if (numerprzystanku == null || nazwastacji == null || idlinii == null)
                 return StatusCode(409, "Wszystkie pola muszą być wypełnione");
-            try{
+            try
+            {
                 Int32.Parse(numerprzystanku);
                 Int32.Parse(idlinii);
             }
-            catch { return StatusCode(409, "Id linii i numer przystanku muszą być liczbami"); }
+            catch
+            {
+                return StatusCode(409, "Id linii i numer przystanku muszą być liczbami");
+            }
 
             string query = @"
                             select przystanekCreate(vNrPrzystanku => @numerprzystanku, 
@@ -201,7 +217,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@numerprzystanku", Int32.Parse(numerprzystanku));
                     myCommand.Parameters.AddWithValue("@nazwastacji", nazwastacji);
                     myCommand.Parameters.AddWithValue("@idlinii", Int32.Parse(idlinii));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -211,21 +228,22 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
-            else if (val == 0)
+            if (val == 0)
                 return StatusCode(409, "Na tej linii znajduje się już ten przystanek");
-            else if (val == -1)
+            if (val == -1)
                 return StatusCode(409, "Id linii oraz numer przystanku muszą być liczbami nieujemnymi");
-            else if (val == -2)
+            if (val == -2)
                 return StatusCode(409, "Nazwa stacji musi być długości od 1 do 64 znaków");
             else
                 return StatusCode(409, "Na tej linii podany numer przystanku jest już zajęty");
-
         }
 
         [HttpPatch("update")]
-        public async Task<ActionResult<IEnumerable<TrainStop>>> update(string? numerprzystanku, string? nazwastacji, string? idlinii)
+        public async Task<ActionResult<IEnumerable<TrainStop>>> update(string? numerprzystanku, string? nazwastacji,
+            string? idlinii)
         {
             if (numerprzystanku == null || nazwastacji == null || idlinii == null)
                 return StatusCode(409, "Wszystkie pola muszą być wypełnione");
@@ -234,7 +252,10 @@ namespace Backend.Controllers
                 Int32.Parse(numerprzystanku);
                 Int32.Parse(idlinii);
             }
-            catch { return StatusCode(409, "Id linii i numer przystanku muszą być liczbami"); }
+            catch
+            {
+                return StatusCode(409, "Id linii i numer przystanku muszą być liczbami");
+            }
 
             string query = @"
                             select przystanekUpdate(vNrPrzystanku => @numerprzystanku,
@@ -254,7 +275,8 @@ namespace Backend.Controllers
                     myCommand.Parameters.AddWithValue("@numerprzystanku", Int32.Parse(numerprzystanku));
                     myCommand.Parameters.AddWithValue("@nazwastacji", nazwastacji);
                     myCommand.Parameters.AddWithValue("@idlinii", Int32.Parse(idlinii));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -264,6 +286,7 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
             else if (val == 0)
@@ -273,7 +296,7 @@ namespace Backend.Controllers
             else
                 return StatusCode(409, "Na tej linii podany numer przystanku jest już zajęty");
         }
-        
+
         [HttpDelete("{nazwastacji}/{idLinii}")]
         public IActionResult Delete(string nazwastacji, string idLinii)
         {
@@ -281,7 +304,10 @@ namespace Backend.Controllers
             {
                 int idInt = Int32.Parse(idLinii);
             }
-            catch { return StatusCode(409, "Id musi być liczbą"); }
+            catch
+            {
+                return StatusCode(409, "Id musi być liczbą");
+            }
 
             string query = @"
                            select przystanekDelete(vNazwaStacji => @nazwastacji, vNrLinii => @idlinii);
@@ -298,7 +324,8 @@ namespace Backend.Controllers
                 {
                     myCommand.Parameters.AddWithValue("@nazwastacji", nazwastacji);
                     myCommand.Parameters.AddWithValue("@idlinii", Int32.Parse(idLinii));
-                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
+                    myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32)
+                        { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -308,7 +335,8 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
-            if(val == 1)
+
+            if (val == 1)
                 return NoContent();
             else
                 return StatusCode(409, "Na tej linii nie ma takiego przystanku");

@@ -1,11 +1,11 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {Discount, SearchDiscount, SearchStation, Station} from "../types"
+import {SearchStation, Station} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const stationsApi = createApi({
     reducerPath: "stationsApi",
     baseQuery: BaseQuery,
-    tagTypes: ["Station", "SingleStation", "SearchStation"],
+    tagTypes: ["Station", "SearchStation"],
     endpoints: (builder) => ({
         getStations: builder.query<Station[], null>({
             query: () => ({
@@ -19,7 +19,7 @@ export const stationsApi = createApi({
                 url: `/station/${id}`,
                 method: "GET",
             }),
-            providesTags: ["SingleStation"]
+            providesTags: ["Station"]
         }),
         deleteStation: builder.mutation({
             query: (id) => ({

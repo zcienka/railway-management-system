@@ -61,7 +61,7 @@ const EditRailroadCarInTheTrain = () => {
             idpociagu: parseInt(trainId),
         }
         await deleteCar(railroadcarNumberless)
-        navigate("/railroad-cars")
+        navigate("/railroad-cars-in-the-train")
     }
 
     const updateSingleCar = async () => {
@@ -71,7 +71,7 @@ const EditRailroadCarInTheTrain = () => {
             idpociagu: parseInt(trainId),
         }
         await updateCar(singleRailroadCar)
-        navigate("/railroad-cars")
+        navigate("/railroad-cars-in-the-train")
     }
 
     useEffect(() => {
@@ -142,7 +142,7 @@ const EditRailroadCarInTheTrain = () => {
                     </div>
 
                     <div className={"flex"}>
-                        <button onClick={() => navigate("/railroad-cars")}>Anuluj</button>
+                        <button onClick={() => navigate("/railroad-cars-in-the-train")}>Anuluj</button>
                         <div className={"flex justify-end w-full"}>
                             <button className={"mr-2 bg-red-600 border-red-700 text-white"}
                                     onClick={() => deleteSingleCar()}>

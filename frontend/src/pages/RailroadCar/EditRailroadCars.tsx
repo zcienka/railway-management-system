@@ -5,13 +5,17 @@ import {useGetSingleRailroadCarQuery} from "../../services/railroadCarsApi"
 import {RailroadCar} from "../../types"
 import {useDeleteRailroadCarMutation, useUpdateRailroadCarMutation} from "../../services/railroadCarsApi"
 import Menu from "../../components/Menu"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const EditRailroadCars = () => {
     const [seatsNumber, setSeatsNumber] = useState<string>("")
-    const [seatsNumberInput, setSeatsNumberInput] = useState<boolean>(true)
+    const [seatsInput, setSeatsInput] = useState<boolean>(true)
+    const [isSeatsNumberInteger, setIsSeatsNumberInteger] = useState<boolean>(true)
+    const [isSeatsNumberValidLength, setIsSeatsNumberValidLength] = useState<boolean>(true)
 
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
     const [technicalResearchInput, setTechnicalResearchInput] = useState<boolean>(true)
+    const [isTechnicalResearchValid, setIsTechnicalResearchValid] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -22,22 +26,66 @@ const EditRailroadCars = () => {
         skip: id === undefined
     })
 
+    const [deleteRailroadCar] = useDeleteRailroadCarMutation()
+    const [updateRailroadCar, {
+        error: updateRailroadCarError,
+        isError: isUpdateRailroadCarError,
+        isSuccess: isUpdateRailroadCarSuccess
+    }] = useUpdateRailroadCarMutation()
+
     const deleteSingleRailroadCar = async () => {
         await deleteRailroadCar(id)
         navigate("/railroad-cars")
     }
 
     const updateSingleRailroadCar = async () => {
-        const singleRailroadCar: RailroadCar = {
-            databadaniatechnicznego: new Date(technicalResearch),
-            liczbamiejsc: parseInt(seatsNumber),
-            id: parseInt(id?.toString() || "undefined")
+        if (seatsNumber === "" || technicalResearch === "" || !isSeatsNumberValidLength || !isTechnicalResearchValid
+            || !isSeatsNumberInteger) {
+            setSeatsInput(false)
+            setTechnicalResearchInput(false)
+        } else {
+            if (id !== undefined) {
+                const singleRailroadCar: RailroadCar = {
+                    id: parseInt(id),
+                    databadaniatechnicznego: new Date(technicalResearch),
+                    liczbamiejsc: parseInt(seatsNumber)
+                }
+                await updateRailroadCar(singleRailroadCar)
+            }
         }
-        await updateRailroadCar(singleRailroadCar)
-        navigate("/railroad-cars")
     }
-    const [deleteRailroadCar] = useDeleteRailroadCarMutation()
-    const [updateRailroadCar] = useUpdateRailroadCarMutation()
+
+    const checkDate = (userInput: string) => {
+        const userDate = new Date(userInput)
+        const todayDate = new Date()
+
+        if (userDate > todayDate) {
+            setIsTechnicalResearchValid(true)
+        } else {
+            setIsTechnicalResearchValid(false)
+        }
+    }
+
+    const checkSeatsNumberInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsSeatsNumberInteger(() => false)
+            setIsSeatsNumberValidLength(() => true)
+        } else {
+            setIsSeatsNumberInteger(() => true)
+
+            if (0 > parseInt(userInput)) {
+                setIsSeatsNumberValidLength(() => false)
+            } else {
+                setIsSeatsNumberValidLength(() => true)
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (isUpdateRailroadCarSuccess) {
+            navigate("/railroad-cars")
+        }
+    }, [isUpdateRailroadCarSuccess, navigate])
 
     useEffect(() => {
         if (isGetSingleRailroadCarSuccess) {
@@ -61,13 +109,40 @@ const EditRailroadCars = () => {
                                    value={seatsNumber}
                                    onChange={(e) => {
                                        setSeatsNumber(e.target.value)
-                                       setSeatsNumberInput(false)
+                                       setSeatsInput(false)
                                    }}
+                                   onBlur={(e) => checkSeatsNumberInteger(e.target.value)}
+
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${seatsNumber === "" && !seatsInput && isSeatsNumberInteger && isSeatsNumberValidLength ? "visible w-full"
+                                : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole liczba miejsc jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isSeatsNumberInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole liczby miejsc musi być liczbą
+                            </p>
+                        </div>
+
+                        <div
+                            className={`flex items-center ${!isSeatsNumberValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Liczba miejsc musi mieć wartość większą od 0
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -79,24 +154,38 @@ const EditRailroadCars = () => {
                                        setTechnicalResearch(e.target.value)
                                        setTechnicalResearchInput(false)
                                    }}
+                                   onBlur={(e) => checkDate(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${technicalResearch === "" && !technicalResearchInput && isTechnicalResearchValid ? "visible w-full"
+                                : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole data badania technicznego jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isTechnicalResearchValid ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Data nie może być przeszła
+                            </p>
+                        </div>
                     </div>
 
-                    <div className={"flex"}>
-                        <button onClick={() => navigate("/railroad-cars")}>Anuluj</button>
+                    <div className={"flex mt-8"}>
+                        <button onClick={() => navigate('/railroad-cars')}>Anuluj</button>
                         <div className={"flex justify-end w-full"}>
-                            <button className={"mr-2 bg-red-600 border-red-700 text-white"}
-                                    onClick={() => deleteSingleRailroadCar()}>
-                                Usuń
-                            </button>
                             <button
-                                className={`${"cursor-pointer"}`}
+                                className={"cursor-pointer"}
                                 onClick={() => updateSingleRailroadCar()}>
-                                Zapisz zmiany
+                                Dodaj
                             </button>
                         </div>
                     </div>

@@ -5,6 +5,7 @@ import {useGetSingleLocomotiveQuery} from "../../services/locomotivesApi";
 import {Locomotive} from "../../types";
 import {useDeleteLocomotiveMutation, useUpdateLocomotiveMutation} from "../../services/locomotivesApi";
 import Menu from "../../components/Menu";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const EditLocomotive = () => {
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
@@ -13,14 +14,25 @@ const EditLocomotive = () => {
     const [locomotiveName, setLocomotiveName] = useState<string>("")
     const [locomotiveInput, setLocomotiveNameInput] = useState<boolean>(true)
 
+    const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
+    const [isTechnicalResearchValid, setIsTechnicalResearchValid] = useState<boolean>(true)
+
+
     const navigate = useNavigate()
     const {id} = useParams()
     const {
         data: getSingleLocomotiveData,
-        isSuccess: isGetSingleLocomotiveSuccess
+        isSuccess: isGetSingleLocomotiveSuccess,
     } = useGetSingleLocomotiveQuery(id, {
         skip: id === undefined
     })
+
+    const [deleteLocomotive] = useDeleteLocomotiveMutation()
+    const [updateLocomotive, {
+        error: updateLocomotiveError,
+        isError: isUpdateLocomotiveError,
+        isSuccess: isUpdateLocomotiveSuccess
+    }] = useUpdateLocomotiveMutation()
 
     const deleteSingleLocomotive = async () => {
         await deleteLocomotive(id)
@@ -28,17 +40,27 @@ const EditLocomotive = () => {
     }
 
     const updateSingleLocomotive = async () => {
-        const singleLocomotive: Locomotive = {
-            databadaniatechnicznego: new Date(technicalResearch),
-            nazwa: locomotiveName,
-            id: parseInt(id?.toString() || "undefined")
+        if (technicalResearch === "" || locomotiveName === "" || !isTechnicalResearchValid || !isNameValidLength) {
+            setTechnicalResearchInput(false)
+            setLocomotiveNameInput(false)
+        } else {
+            if (id !== undefined) {
+                const singleLocomotive: Locomotive = {
+                    id: parseInt(id),
+                    databadaniatechnicznego: new Date(technicalResearch),
+                    nazwa: locomotiveName,
+                }
+                await updateLocomotive(singleLocomotive)
+            }
         }
-        await updateLocomotive(singleLocomotive)
-        navigate("/locomotive")
     }
 
-    const [deleteLocomotive] = useDeleteLocomotiveMutation()
-    const [updateLocomotive] = useUpdateLocomotiveMutation()
+    useEffect(() => {
+        if (isUpdateLocomotiveSuccess) {
+            navigate("/locomotive")
+        }
+    }, [isUpdateLocomotiveSuccess, navigate])
+
 
     useEffect(() => {
         if (isGetSingleLocomotiveSuccess) {
@@ -46,6 +68,25 @@ const EditLocomotive = () => {
             setLocomotiveName(getSingleLocomotiveData[0].nazwa)
         }
     }, [getSingleLocomotiveData, isGetSingleLocomotiveSuccess])
+
+    const checkNameValidLength = (userInput: string) => {
+        if (userInput.length > 32) {
+            setIsNameValidLength(false)
+        } else {
+            setIsNameValidLength(true)
+        }
+    }
+
+    const checkDate = (userInput: string) => {
+        const userDate = new Date(userInput)
+        const todayDate = new Date()
+
+        if (userDate > todayDate) {
+            setIsTechnicalResearchValid(true)
+        } else {
+            setIsTechnicalResearchValid(false)
+        }
+    }
 
     if (getSingleLocomotiveData !== undefined) {
         return <div className={"flex"}>
@@ -65,11 +106,29 @@ const EditLocomotive = () => {
                                        setTechnicalResearch(e.target.value)
                                        setTechnicalResearchInput(false)
                                    }}
+                                   onBlur={(e) => checkDate(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${technicalResearch === "" && !technicalResearchInput && isTechnicalResearchValid ? "visible w-full"
+                                : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole data badania technicznego jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isTechnicalResearchValid ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Data nie może być przeszła
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -81,24 +140,38 @@ const EditLocomotive = () => {
                                        setLocomotiveName(e.target.value)
                                        setLocomotiveNameInput(false)
                                    }}
+                                   onBlur={(e) => checkNameValidLength(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${locomotiveName === "" && !locomotiveInput && isNameValidLength ? "visible w-full"
+                                : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole nazwa jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Nazwa lokomotywy musi mieć długość do 32 znaków
+                            </p>
+                        </div>
                     </div>
 
-                    <div className={"flex"}>
-                        <button onClick={() => navigate("/locomotive")}>Anuluj</button>
+                    <div className={"flex mt-8"}>
+                        <button onClick={() => navigate('/locomotive')}>Anuluj</button>
                         <div className={"flex justify-end w-full"}>
-                            <button className={"mr-2 bg-red-600 border-red-700 text-white"}
-                                    onClick={() => deleteSingleLocomotive()}>
-                                Usuń
-                            </button>
                             <button
-                                className={`${"cursor-pointer"}`}
+                                className={"cursor-pointer"}
                                 onClick={() => updateSingleLocomotive()}>
-                                Zapisz zmiany
+                                Dodaj
                             </button>
                         </div>
                     </div>
