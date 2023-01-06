@@ -655,6 +655,11 @@ BEGIN
            and numerprzystanku = vNrPrzystanku) != 0) then
         return -2;
     end if;
+	if ((select count(*)
+         from stacja
+         where nazwastacji = vNazwaStacji) != 1) then
+        return -3;
+    end if; -- dana stacja nie istnieje
     update przystanek
     SET numerprzystanku = vNrPrzystanku
     where nazwastacji = vNazwaStacji
@@ -683,7 +688,12 @@ BEGIN
            and numerprzystanku = vNrPrzystanku) != 0) then
         return -3;
     end if; -- na linii jest już ten numer zajęty
-
+	if ((select count(*)
+         from stacja
+         where nazwastacji = vNazwaStacji) != 1) then
+        return -4;
+    end if; -- dana stacja nie istnieje
+	
     insert into przystanek(numerprzystanku, nazwastacji, idlinii)
     values (vNrPrzystanku, vNazwaStacji, vNrLinii);
     return 1;
@@ -728,10 +738,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
--- drop function przejazdfilter(vidmin integer, vidmax integer, vodjazdod timestamp, vodjazddo timestamp, vprzyjazdod timestamp, vprzyjazddo timestamp, vidkonduktoraod integer, vidkonduktorado integer, vidmaszynistyod integer, vidmaszynistydo integer, vidliniiprzejazduod integer, vidliniiprzejazdudo integer, vidpociaguod integer, vidpociagudo integer);
--- drop function przejazdfilter(vodjazdod timestamp, vodjazddo timestamp, vprzyjazdod timestamp, vprzyjazddo timestamp, vidkonduktoraod integer, vidkonduktorado integer, vidmaszynistyod integer, vidmaszynistydo integer, vidliniiprzejazduod integer, vidliniiprzejazdudo integer, vidpociaguod integer, vidpociagudo integer)
--- drop function przejazdFilter(vOdjazdOd TIMESTAMP, vOdjazdDo TIMESTAMP, vPrzyjazdOd TIMESTAMP, vPrzyjazdDo TIMESTAMP, vIdLiniiPrzejazduOd INTEGER, vIdLiniiPrzejazduDo INTEGER);
+select p.*, maszynista.Imie, maszynista.Nazwisko, konduktor.Imie, konduktor.Nazwisko from 
+(select * from przejazdFilter()) p 
+join pracownik maszynista on p.idmaszynisty = maszynista.id
+join pracownik konduktor on p.idkonduktora = konduktor.id;
+--drop function przejazdfilter(vidmin integer, vidmax integer, vodjazdod timestamp, vodjazddo timestamp, vprzyjazdod timestamp, vprzyjazddo timestamp, vidkonduktoraod integer, vidkonduktorado integer, vidmaszynistyod integer, vidmaszynistydo integer, vidliniiprzejazduod integer, vidliniiprzejazdudo integer, vidpociaguod integer, vidpociagudo integer);
+--drop function przejazdfilter(vodjazdod timestamp, vodjazddo timestamp, vprzyjazdod timestamp, vprzyjazddo timestamp, vidkonduktoraod integer, vidkonduktorado integer, vidmaszynistyod integer, vidmaszynistydo integer, vidliniiprzejazduod integer, vidliniiprzejazdudo integer, vidpociaguod integer, vidpociagudo integer)
+--drop function przejazdFilter(vOdjazdOd TIMESTAMP, vOdjazdDo TIMESTAMP, vPrzyjazdOd TIMESTAMP, vPrzyjazdDo TIMESTAMP, vIdLiniiPrzejazduOd INTEGER, vIdLiniiPrzejazduDo INTEGER);
 ---------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION przejazdDelete(IN vId INTEGER)
     RETURNS INTEGER AS
