@@ -9,6 +9,8 @@ import {
     useUpdateTrainStopMutation
 } from "../../services/trainStopApi"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetStationsQuery} from "../../services/stationsApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
 
 const EditTrainStop = () => {
     const [lineNumber, setLineNumber] = useState<string>("")
@@ -33,7 +35,12 @@ const EditTrainStop = () => {
         skip: numerprzystanku === undefined
     })
 
-    const [deleteTrainStop] = useDeleteTrainStopMutation()
+    const [deleteTrainStop,{
+        error: deleteTrainStopError,
+        isError: isDeleteTrainStopError,
+        isSuccess: isDeleteTrainStopSuccess
+    }] = useDeleteTrainStopMutation()
+    
     const [updateTrainStop, {
         error: updateTrainStopError,
         isError: isUpdateTrainStopError,
@@ -46,8 +53,13 @@ const EditTrainStop = () => {
             idlinii: parseInt(lineId)
         }
         await deleteTrainStop(singleTrainStop)
-        navigate("/train-stops")
     }
+
+    useEffect(() => {
+        if (isDeleteTrainStopSuccess) {
+            navigate("/train-stops")
+        }
+    }, [isDeleteTrainStopSuccess, navigate])
 
     useEffect(() => {
         if (isUpdateTrainStopSuccess) {
@@ -257,6 +269,19 @@ const EditTrainStop = () => {
                                 onClick={() => updateSingleTrainStop()}>
                                 Zapisz zmiany
                             </button>
+                        </div>
+                    </div>
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteTrainStopError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteTrainStopError !== undefined && deleteTrainStopError.data ? deleteTrainStopError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

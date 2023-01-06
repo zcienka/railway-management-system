@@ -5,6 +5,8 @@ import {Train} from "../../types";
 import Menu from "../../components/Menu";
 import {useDeleteTrainMutation, useGetSingleTrainQuery, useUpdateTrainMutation} from "../../services/trainsApi";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
 
 const EditTrains = () => {
     const [name, setName] = useState<string>("")
@@ -14,6 +16,8 @@ const EditTrains = () => {
     const [locomotiveName, setLocomotiveName] = useState<string>("")
     const [locomotiveNameInput, setLocomotiveNameInput] = useState<boolean>(true)
     const [isLocomotiveIdInteger, setIsLocomotiveIdInteger] = useState<boolean>(true)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -24,7 +28,13 @@ const EditTrains = () => {
         skip: id === undefined
     })
 
-    const [deleteTrain] = useDeleteTrainMutation()
+    const [deleteTrain,
+        {
+            error: deleteTrainError,
+            isError: isDeleteTrainError,
+            isSuccess: isDeleteTrainSuccess
+        }] = useDeleteTrainMutation()
+
     const [updateTrain, {
         error: updateTrainError,
         isError: isUpdateTrainError,
@@ -32,9 +42,16 @@ const EditTrains = () => {
     }] = useUpdateTrainMutation()
 
     const deleteSingleTrain = async () => {
+        refetchTrainRides()
+        refetchRailroadCarsInTheTrain()
         await deleteTrain(id)
-        navigate("/train")
     }
+
+    useEffect(() => {
+        if (isDeleteTrainSuccess) {
+            navigate("/train")
+        }
+    }, [isDeleteTrainSuccess, navigate])
 
     const checkIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {
@@ -86,7 +103,7 @@ const EditTrains = () => {
                 <div className={"h-24 w-full flex items-center"}>
                     <p className={"text-4xl"}>Edytuj pociąg</p>
                 </div>
-                <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+                <div className={"bg-white w-full rounded-xl pt-8 px-16 border border-stone-200"}>
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Nazwa</label>
                         <div className={"flex w-4/6"}>
@@ -173,6 +190,20 @@ const EditTrains = () => {
                                 onClick={() => updateSingleTrain()}>
                                 Zapisz zmiany
                             </button>
+                        </div>
+                    </div>
+
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteTrainError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteTrainError !== undefined && deleteTrainError.data ? deleteTrainError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

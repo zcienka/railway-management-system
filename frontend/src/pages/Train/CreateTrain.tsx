@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 import {useCreateTrainMutation} from "../../services/trainsApi";
 import {Train} from "../../types";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
 
 const CreateTrain = () => {
     const navigate = useNavigate()

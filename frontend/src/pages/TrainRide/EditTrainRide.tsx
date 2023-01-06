@@ -5,12 +5,13 @@ import {Discount, TrainRide, Worker} from "../../types"
 import Menu from "../../components/Menu"
 import {
     useDeleteTrainRideMutation,
-    useGetSingleTrainRideQuery,
+    useGetSingleTrainRideQuery, useGetTrainRidesQuery,
     useUpdateTrainRideMutation
 } from "../../services/trainRideApi"
-import {useGetConductorsQuery, useGetDriversQuery, useGetSingleWorkerQuery} from "../../services/workersApi";
+import {useGetConductorsQuery, useGetDriversQuery} from "../../services/workersApi";
 import {v4 as uuidv4} from "uuid";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
 
 const EditTrainRide = () => {
     const [departureDate, setDepartureDate] = useState<string>("")
@@ -35,6 +36,7 @@ const EditTrainRide = () => {
     const [trainId, setTrainId] = useState<string>("")
     const [trainIdInput, setTrainIdInput] = useState<boolean>(true)
     const [isTrainIdInteger, setIsTrainIdInteger] = useState<boolean>(true)
+    const {refetch: refetchReservation} = useGetReservationsQuery(null)
 
     const navigate = useNavigate()
     const {idParam} = useParams()
@@ -42,7 +44,7 @@ const EditTrainRide = () => {
         data: getSingleTrainRideData,
         isSuccess: isGetSingleTrainRideSuccess
     } = useGetSingleTrainRideQuery(idParam, {
-        skip: idParam === undefined
+        skip: idParam === undefined,
     })
 
     const {
@@ -55,7 +57,13 @@ const EditTrainRide = () => {
         isSuccess: isGetDriversSuccess
     } = useGetDriversQuery(null)
 
-    const [deleteTrainRide] = useDeleteTrainRideMutation()
+    const [deleteTrainRide,
+        {
+            error: deleteTrainRideError,
+            isError: isDeleteTrainRideError,
+            isSuccess: isDeleteTrainRideSuccess
+        }] = useDeleteTrainRideMutation()
+
     const [updateTrainRide, {
         error: updateTrainRideError,
         isError: isUpdateTrainRideError,
@@ -64,14 +72,13 @@ const EditTrainRide = () => {
 
     const deleteSingleTrainRide = async () => {
         await deleteTrainRide(idParam)
-        navigate("/train-rides")
     }
 
     const updateSingleTrainRide = async () => {
         const singleTrainRide: TrainRide = {
             id: parseInt(idParam?.toString() || "undefined"),
-            dataodjazdu: new Date(departureDate),
-            dataprzyjazdu: new Date(arrivalDate),
+            dataodjazdu: departureDate,
+            dataprzyjazdu: arrivalDate,
             idkonduktora: parseInt(conductorId),
             idmaszynisty: parseInt(driverId),
             idliniiprzejazdu: parseInt(railConnectionId),
@@ -87,13 +94,20 @@ const EditTrainRide = () => {
     }, [isUpdateTrainRideSuccess, navigate])
 
     useEffect(() => {
+        if (isDeleteTrainRideSuccess) {
+            refetchReservation()
+            navigate("/train-rides")
+        }
+    }, [isDeleteTrainRideSuccess, navigate, refetchReservation])
+
+    useEffect(() => {
         if (isGetSingleTrainRideSuccess) {
             setDepartureDate(getSingleTrainRideData[0].dataodjazdu.toString())
             setArrivalDate(getSingleTrainRideData[0].dataprzyjazdu.toString())
-            setConductorId(getSingleTrainRideData[0].imiekonduktora)
-            setDriverId(getSingleTrainRideData[0].imiemaszynisty)
+            setConductorId(getSingleTrainRideData[0].idkonduktora.toString())
+            setDriverId(getSingleTrainRideData[0].idmaszynisty.toString())
             setRailConnectionId(getSingleTrainRideData[0].idliniiprzejazdu.toString())
-            setTrainId(getSingleTrainRideData[0].nazwapociagu)
+            setTrainId(getSingleTrainRideData[0].idpociagu.toString())
         }
     }, [getSingleTrainRideData, isGetSingleTrainRideSuccess])
 
@@ -406,6 +420,19 @@ const EditTrainRide = () => {
                                 Zapisz zmiany
                             </button>
                         </div>
+                    </div>
+                </div>
+                <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                    <div
+                        className={`flex items-center ${
+                            // @ts-ignore
+                            deleteTrainRideError !== undefined ?
+                                "visible w-full justify-end flex" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2 flex"}/>
+                        <p className={"flex justify-end"}>
+                            {// @ts-ignore
+                                deleteTrainRideError !== undefined && deleteTrainRideError.data ? deleteTrainRideError.data : ""}
+                        </p>
                     </div>
                 </div>
 

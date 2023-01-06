@@ -55,7 +55,12 @@ const EditRailroadCarInTheTrain = () => {
         skip: trainIdParam === undefined || carIdParam === undefined
     })
 
-    const [deleteCar] = useDeleteRailroadCarInTheTrainMutation()
+    const [deleteCar, {
+        error: deleteRailroadCarError,
+        isError: isDeleteRailroadCarError,
+        isSuccess: isDeleteRailroadCarSuccess
+    }] = useDeleteRailroadCarInTheTrainMutation()
+
     const [updateCar, {
         error: updateRailroadCarError,
         isError: isUpdateRailroadCarError,
@@ -68,7 +73,6 @@ const EditRailroadCarInTheTrain = () => {
             idpociagu: parseInt(trainId),
         }
         await deleteCar(railroadcarNumberless)
-        navigate("/railroad-cars-in-the-train")
     }
 
     const updateSingleCar = async () => {
@@ -90,6 +94,12 @@ const EditRailroadCarInTheTrain = () => {
             navigate("/railroad-cars-in-the-train")
         }
     }, [isUpdateRailroadCarSuccess, navigate])
+
+    useEffect(() => {
+        if (isDeleteRailroadCarSuccess) {
+            navigate("/railroad-cars-in-the-train")
+        }
+    }, [isDeleteRailroadCarSuccess, navigate])
 
     useEffect(() => {
         if (isGetSingleRailroadCarSuccess) {
@@ -220,6 +230,19 @@ const EditRailroadCarInTheTrain = () => {
                                 onClick={() => updateSingleCar()}>
                                 Zapisz zmiany
                             </button>
+                        </div>
+                    </div>
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteRailroadCarError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteRailroadCarError !== undefined && deleteRailroadCarError.data ? deleteRailroadCarError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

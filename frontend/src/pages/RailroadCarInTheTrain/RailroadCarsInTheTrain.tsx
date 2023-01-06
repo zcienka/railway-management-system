@@ -49,7 +49,9 @@ const RailroadCarsInTheTrain = () => {
         isFetching: isGetCarsFetching,
         isSuccess: isGetCarsSuccess,
         isError: isGetCarsError,
-    } = useGetRailroadCarsQuery(null)
+    } = useGetRailroadCarsQuery(null,{
+        refetchOnMountOrArgChange: true
+    })
 
     const checkIsRailroadCarIdInteger = () => {
         if (isNaN(Number(searchRailroadCarsInTheTrain.idwagonumin)) || isNaN(Number(searchRailroadCarsInTheTrain.idwagonumax))) {

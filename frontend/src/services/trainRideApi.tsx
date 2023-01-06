@@ -39,7 +39,7 @@ export const trainRideApi = createApi({
             query: (body) => ({
                 url: "/train-ride/update",
                 method: "PATCH",
-                params: {id: body.id, dataodjazdu: body.dataodjazdu.toISOString(), dataprzyjazdu: body.dataprzyjazdu.toISOString(),
+                params: {id: body.id, dataodjazdu: body.dataodjazdu, dataprzyjazdu: body.dataprzyjazdu,
                     idkonduktora: body.idkonduktora, idmaszynisty: body.idmaszynisty, idliniiprzejazdu: body.idliniiprzejazdu, idpociagu: body.idpociagu}
             }),
             invalidatesTags: ["TrainRide"]

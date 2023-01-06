@@ -47,8 +47,11 @@ const Reservations = () => {
         data: getReservations,
         isFetching: isGetReservationsFetching,
         isSuccess: isGetReservationsSuccess,
-        isError: isGetReservationsError,
-    } = useGetReservationsQuery(null)
+        isError: isGetReservationsError
+    } = useGetReservationsQuery(null,
+        {
+            refetchOnMountOrArgChange: true,
+        })
 
     useEffect(() => {
         if (isGetFilterReservationSuccess) {

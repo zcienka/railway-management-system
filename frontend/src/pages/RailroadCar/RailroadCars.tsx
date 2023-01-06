@@ -28,7 +28,10 @@ const RailroadCars = () => {
         data: getRailroadCars,
         isFetching: isGetRailroadCarsFetching,
         isSuccess: isGetRailroadCarsSuccess,
-    } = useGetRailroadCarsQuery(null)
+    } = useGetRailroadCarsQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     const {
         data: getFilterRailroadCars,

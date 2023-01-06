@@ -39,7 +39,10 @@ const Workers = () => {
         isFetching: isGetWorkersFetching,
         isSuccess: isGetWorkersSuccess,
         isError: isGetWorkersError,
-    } = useGetWorkersQuery(null)
+    } = useGetWorkersQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     useEffect(() => {
         if (isGetFilterWorkerSuccess) {

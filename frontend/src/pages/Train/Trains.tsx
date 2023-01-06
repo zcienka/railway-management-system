@@ -47,7 +47,10 @@ const Trains = () => {
         isFetching: isGetTrainsFetching,
         isSuccess: isGetTrainsSuccess,
         isError: isGetTrainsError,
-    } = useGetTrainsQuery(null)
+    } = useGetTrainsQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     const searchValues = () => {
         if (isLocomotiveIdInteger) {

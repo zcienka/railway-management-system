@@ -6,6 +6,7 @@ import {Discount} from "../../types";
 import {useDeleteDiscountMutation, useUpdateDiscountMutation} from "../../services/discountsApi";
 import Menu from "../../components/Menu";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
 
 const EditDiscounts = () => {
     const [discountName, setDiscountName] = useState<string>("")
@@ -39,7 +40,6 @@ const EditDiscounts = () => {
 
     const deleteSingleDiscount = async () => {
         await deleteDiscount(id)
-        navigate("/discounts")
     }
 
     const updateSingleDiscount = async () => {
@@ -58,12 +58,26 @@ const EditDiscounts = () => {
             await updateDiscount(singleDiscount)
         }
     }
+    const [deleteDiscount, {
+        error: deleteDiscountError,
+        isError: isDeleteDiscountError,
+        isSuccess: isDeleteDiscountSuccess
+    }] = useDeleteDiscountMutation()
 
     useEffect(() => {
         if (isUpdateDiscountSuccess) {
             navigate("/discounts")
         }
     }, [isUpdateDiscountSuccess, navigate])
+    const {refetch: refetchReservations} =useGetReservationsQuery(null)
+
+    useEffect(() => {
+        if (isDeleteDiscountSuccess) {
+            navigate("/discounts")
+            refetchReservations()
+        }
+    }, [isDeleteDiscountSuccess, navigate, refetchReservations])
+    
 
     const checkDiscountPercentageInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {
@@ -96,9 +110,6 @@ const EditDiscounts = () => {
         }
     }
 
-    const [deleteDiscount] = useDeleteDiscountMutation()
-
-
     useEffect(() => {
         if (isGetSingleDiscountSuccess) {
             setDiscountPercentage(getSingleDiscountData[0].procentznizki.toString())
@@ -114,7 +125,7 @@ const EditDiscounts = () => {
                 <div className={"h-24 w-full flex items-center"}>
                     <p className={"text-4xl"}>Edytuj zniżkę</p>
                 </div>
-                <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+                <div className={"bg-white w-full rounded-xl pt-8 px-16 border border-stone-200"}>
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Nazwa zniżki</label>
                         <div className={"flex w-4/6"}>
@@ -248,6 +259,20 @@ const EditDiscounts = () => {
                                 onClick={() => updateSingleDiscount()}>
                                 Zapisz zmiany
                             </button>
+                        </div>
+                    </div>
+
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteDiscountError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteDiscountError !== undefined && deleteDiscountError.data ? deleteDiscountError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

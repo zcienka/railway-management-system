@@ -34,7 +34,10 @@ const Stations = () => {
         isFetching: isGetStationsFetching,
         isSuccess: isGetStationsSuccess,
         isError: isGetStationsError,
-    } = useGetStationsQuery(null)
+    } = useGetStationsQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     useEffect(() => {
         if (isGetFilterStationSuccess) {

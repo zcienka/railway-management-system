@@ -67,8 +67,8 @@ export type SearchStation = {
 
 export type TrainRide = {
     id?: number,
-    dataodjazdu: Date,
-    dataprzyjazdu: Date,
+    dataodjazdu: string,
+    dataprzyjazdu: string,
     idkonduktora: number,
     idmaszynisty: number,
     idliniiprzejazdu: number,
@@ -106,6 +106,7 @@ export type TrainRideResponse = {
     nazwiskomaszynisty: string,
     idliniiprzejazdu: number,
     nazwapociagu: string,
+    idpociagu: number,
 }
 
 export type RailConnection = {

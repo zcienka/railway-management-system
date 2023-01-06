@@ -15,7 +15,10 @@ const RailConnections = () => {
         isFetching: isGetRailConnectionsFetching,
         isSuccess: isGetRailConnectionsSuccess,
         isError: isGetRailConnectionsError,
-    } = useGetRailConnectionsQuery(null)
+    } = useGetRailConnectionsQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     useEffect(() => {
         if (isGetRailConnectionsSuccess) {

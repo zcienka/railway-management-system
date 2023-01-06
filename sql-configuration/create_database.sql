@@ -100,7 +100,6 @@ values (3, 3, 3);
 insert into wagonWPociagu(numerwagonu, idWagonu, idpociagu)
 values (4, 4, 4);
 
-
 CREATE TABLE IF NOT EXISTS pracownik (
     id       INTEGER NOT NULL CONSTRAINT pracownik_pk PRIMARY KEY,
     imie     VARCHAR(16) NOT NULL,

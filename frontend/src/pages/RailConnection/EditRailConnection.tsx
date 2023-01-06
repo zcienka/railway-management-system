@@ -2,8 +2,15 @@ import React, {useEffect, useState} from "react"
 import Menu from "../../components/Menu"
 import {RailConnection} from "../../types"
 import {useNavigate, useParams} from "react-router-dom"
-import {useEditRailConnectionMutation, useGetSingleRailConnectionQuery, useDeleteRailConnectionMutation} from "../../services/railConnectionsApi"
+import {
+    useEditRailConnectionMutation,
+    useGetSingleRailConnectionQuery,
+    useDeleteRailConnectionMutation
+} from "../../services/railConnectionsApi"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
 
 const EditRailConnection = () => {
     const navigate = useNavigate()
@@ -14,6 +21,8 @@ const EditRailConnection = () => {
     const [isIdInteger, setIsIdInteger] = useState<boolean>(true)
     const [isIdValidLength, setIsIdValidLength] = useState<boolean>(true)
     const {railConnectionId} = useParams()
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
 
     const {
         data: getSingleRailConnectionData,
@@ -21,7 +30,11 @@ const EditRailConnection = () => {
     } = useGetSingleRailConnectionQuery(railConnectionId, {
         skip: railConnectionId === undefined
     })
-    const [deleteRailConnection] = useDeleteRailConnectionMutation()
+    const [deleteRailConnection, {
+        error: deleteRailConnectionError,
+        isError: isDeleteRailConnectionError,
+        isSuccess: isDeleteRailConnectionSuccess
+    }] = useDeleteRailConnectionMutation()
 
     const [editRailConnection, {
         error: editRailConnectionError,
@@ -31,6 +44,8 @@ const EditRailConnection = () => {
 
     const deleteSingleRailConnection = async () => {
         await deleteRailConnection(id)
+        refetchTrainStop()
+        refetchTrainRides()
         navigate("/rail-connection")
     }
 
@@ -39,6 +54,12 @@ const EditRailConnection = () => {
             setId(getSingleRailConnectionData[0].id.toString())
         }
     }, [getSingleRailConnectionData, isGetSingleRailConnectionSuccess])
+
+    useEffect(() => {
+        if (isDeleteRailConnectionSuccess) {
+            navigate("/rail-connection")
+        }
+    }, [navigate, isDeleteRailConnectionSuccess])
 
     const checkIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {
@@ -67,7 +88,7 @@ const EditRailConnection = () => {
             <div className={"h-24 w-full flex items-center"}>
                 <p className={"text-4xl"}>Edycja linii przejazdu</p>
             </div>
-            <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+            <div className={"bg-white w-full rounded-xl pt-8 px-16 border border-stone-200"}>
                 <div className={"w-160 flex items-center"}>
                     <label className={"w-2/6"}>Id</label>
                     <div className={"flex w-4/6"}>
@@ -113,6 +134,20 @@ const EditRailConnection = () => {
                         </button>
                     </div>
                 </div>
+                <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    <div
+                        className={`flex items-center ${
+                            // @ts-ignore
+                            deleteRailConnectionError !== undefined  ?
+                                "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            {// @ts-ignore
+                                deleteRailConnectionError !== undefined && deleteRailConnectionError.data ? deleteRailConnectionError.data : ""}
+                        </p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

@@ -4,11 +4,13 @@ import {Station} from "../../types"
 import {useNavigate, useParams} from "react-router-dom"
 import {
     useDeleteStationMutation,
-    useGetSingleStationQuery,
+    useGetSingleStationQuery, useGetStationsQuery,
     useUpdateStationMutation
 } from "../../services/stationsApi"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
 
 const EditStations = () => {
     const [name, setName] = useState<string>("")
@@ -16,6 +18,7 @@ const EditStations = () => {
 
     const [address, setAddress] = useState<string>("")
     const [addressInput, setAddressInput] = useState<boolean>(true)
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -26,7 +29,12 @@ const EditStations = () => {
         skip: id === undefined
     })
 
-    const [deleteStation] = useDeleteStationMutation()
+    const [deleteStation, {
+        error: deleteStationError,
+        isError: isDeleteStationError,
+        isSuccess: isDeleteStationSuccess
+    }] = useDeleteStationMutation()
+
     const [updateStation, {
         error: updateStationError,
         isError: isUpdateStationError,
@@ -35,8 +43,14 @@ const EditStations = () => {
 
     const deleteSingleStation = async () => {
         await deleteStation(id)
-        navigate("/stations")
+        refetchTrainStop()
     }
+
+    useEffect(() => {
+        if (isDeleteStationSuccess) {
+            navigate("/stations")
+        }
+    }, [isDeleteStationSuccess, navigate])
 
     const updateSingleStation = async () => {
         const singleStation: Station = {
@@ -65,7 +79,7 @@ const EditStations = () => {
                 <div className={"h-24 w-full flex items-center"}>
                     <p className={"text-4xl"}>Edytuj stację</p>
                 </div>
-                <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+                <div className={"bg-white w-full rounded-xl pt-8 px-16 border border-stone-200"}>
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Nazwa</label>
                         <div className={"flex w-4/6"}>
@@ -114,6 +128,19 @@ const EditStations = () => {
                                 onClick={() => updateSingleStation()}>
                                 Zapisz zmiany
                             </button>
+                        </div>
+                    </div>
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteStationError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteStationError !== undefined && deleteStationError.data ? deleteStationError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

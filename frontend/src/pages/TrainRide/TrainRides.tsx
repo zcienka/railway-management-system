@@ -32,15 +32,18 @@ const TrainRides = () => {
         isSuccess: isGetFilterTrainRideSuccess,
         isError: isGetFilterTrainRideError,
     } = useFilterTrainRideQuery(
-        searchTrainRide,
-        {skip: !showSearchResponse}
+        searchTrainRide, {
+            skip: !showSearchResponse,
+        }
     )
 
     const {
         data: getTrainRides,
         isFetching: isGetTrainRidesFetching,
         isSuccess: isGetTrainRidesSuccess,
-    } = useGetTrainRidesQuery(null)
+    } = useGetTrainRidesQuery(null, {
+        refetchOnMountOrArgChange: true
+    })
 
     useEffect(() => {
         if (isGetFilterTrainRideSuccess) {

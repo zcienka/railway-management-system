@@ -6,6 +6,7 @@ import {RailroadCar} from "../../types"
 import {useDeleteRailroadCarMutation, useUpdateRailroadCarMutation} from "../../services/railroadCarsApi"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
 
 const EditRailroadCars = () => {
     const [seatsNumber, setSeatsNumber] = useState<string>("")
@@ -16,6 +17,7 @@ const EditRailroadCars = () => {
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
     const [technicalResearchInput, setTechnicalResearchInput] = useState<boolean>(true)
     const [isTechnicalResearchValid, setIsTechnicalResearchValid] = useState<boolean>(true)
+    const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -26,7 +28,12 @@ const EditRailroadCars = () => {
         skip: id === undefined
     })
 
-    const [deleteRailroadCar] = useDeleteRailroadCarMutation()
+    const [deleteRailroadCar,{
+        error: deleteRailroadCarError,
+        isError: isDeleteRailroadCarError,
+        isSuccess: isDeleteRailroadCarSuccess
+    }] = useDeleteRailroadCarMutation()
+
     const [updateRailroadCar, {
         error: updateRailroadCarError,
         isError: isUpdateRailroadCarError,
@@ -35,7 +42,7 @@ const EditRailroadCars = () => {
 
     const deleteSingleRailroadCar = async () => {
         await deleteRailroadCar(id)
-        navigate("/railroad-cars")
+        refetchRailroadCarsInTheTrain()
     }
 
     const updateSingleRailroadCar = async () => {
@@ -88,6 +95,12 @@ const EditRailroadCars = () => {
     }, [isUpdateRailroadCarSuccess, navigate])
 
     useEffect(() => {
+        if (isDeleteRailroadCarSuccess) {
+            navigate("/railroad-cars")
+        }
+    }, [isDeleteRailroadCarSuccess, navigate])
+
+    useEffect(() => {
         if (isGetSingleRailroadCarSuccess) {
             setSeatsNumber(getSingleRailroadCarData[0].liczbamiejsc.toString())
             setTechnicalResearch(getSingleRailroadCarData[0].databadaniatechnicznego.toString().split('T')[0])
@@ -101,7 +114,7 @@ const EditRailroadCars = () => {
                 <div className={"h-24 w-full flex items-center"}>
                     <p className={"text-4xl"}>Edytuj wagon</p>
                 </div>
-                <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+                <div className={"bg-white w-full rounded-xl pt-8 px-16 border border-stone-200"}>
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Liczba miejsc</label>
                         <div className={"flex w-4/6"}>
@@ -179,14 +192,32 @@ const EditRailroadCars = () => {
                         </div>
                     </div>
 
-                    <div className={"flex mt-8"}>
-                        <button onClick={() => navigate('/railroad-cars')}>Anuluj</button>
+                    <div className={"flex"}>
+                        <button onClick={() => navigate("/railroad-cars")}>Anuluj</button>
                         <div className={"flex justify-end w-full"}>
-                            <button
-                                className={"cursor-pointer"}
-                                onClick={() => updateSingleRailroadCar()}>
-                                Dodaj
+                            <button className={"mr-2 bg-red-600 border-red-700 text-white"}
+                                    onClick={() => deleteSingleRailroadCar()}>
+                                Usuń
                             </button>
+                            <button
+                                className={`${"cursor-pointer"}`}
+                                onClick={() => updateSingleRailroadCar()}>
+                                Zapisz zmiany
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteRailroadCarError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteRailroadCarError !== undefined && deleteRailroadCarError.data ? deleteRailroadCarError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -22,8 +22,8 @@ export const trainStopApi = createApi({
             providesTags: ["TrainStop"]
         }),
         deleteTrainStop: builder.mutation({
-            query: (id) => ({
-                url: `/train-stop/${id}`,
+            query: (body) => ({
+                url: `/train-stop/${body.nazwastacji}/${body.idlinii}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["TrainStop"]

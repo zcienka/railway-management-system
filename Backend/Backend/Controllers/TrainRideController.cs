@@ -110,7 +110,9 @@ namespace Backend.Controllers
                                    konduktor.imie as imiekonduktora, konduktor.nazwisko as nazwiskokonduktora,
 	                               maszynista.imie as imiemaszynisty, maszynista.nazwisko as nazwiskomaszynisty, 
                                    przejazd.idliniiprzejazdu, 
-                                   pociag.nazwa as nazwapociagu from przejazdReadById(@id) przejazd 
+                                   pociag.nazwa, pociag.id as idpociagu, 
+                                   konduktor.id as idkonduktora, maszynista.id as idmaszynisty 
+                                    from przejazdReadById(@id) przejazd 
                                    join pracownik maszynista on maszynista.id = idmaszynisty
 								   join pracownik konduktor on konduktor.id = idkonduktora
 								   join pociag on pociag.id = idpociagu;

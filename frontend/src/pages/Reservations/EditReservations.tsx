@@ -3,15 +3,15 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {
     useGetSingleReservationQuery,
     useDeleteReservationMutation,
-    useUpdateReservationMutation
+    useUpdateReservationMutation, useGetReservationsQuery
 } from "../../services/reservationsApi"
-import {Discount, Reservation, TrainStop} from "../../types"
+import {Discount, Reservation} from "../../types"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
 import {useGetDiscountsQuery} from "../../services/discountsApi"
 import {v4 as uuidv4} from 'uuid'
 import Loading from "../../components/Loading"
-import {useGetTrainStopByLineQuery} from "../../services/trainRideApi"
+import {useGetTrainRidesQuery, useGetTrainStopByLineQuery} from "../../services/trainRideApi"
 
 
 const EditReservations = () => {
@@ -19,12 +19,12 @@ const EditReservations = () => {
     const [name, setName] = useState<string>("")
     const [lastName, setLastName] = useState<string>("")
     const [trainPassageId, setTrainPassageId] = useState<string>("")
+    const [isTrainPassageIdInteger, setIsTrainPassageIdInteger] =  useState<boolean>(true)
     const [discountName, setDiscountName] = useState<string>("")
-    const [initialStation, setInitialStation] = useState<string>("")
-    const [finalStation, setFinalStation] = useState<string>("")
 
     const [isLastNameValidLength, setIsLastNameValidLength] = useState<boolean>(true)
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
+    const {refetch: refetchTrainRides} =useGetTrainRidesQuery(null)
 
     const navigate = useNavigate()
 
@@ -36,21 +36,23 @@ const EditReservations = () => {
         skip: id === undefined
     })
 
-    const {
-        data: getTrainStopByLineData,
-        isSuccess: isGetTrainStopByLineSuccess
-    } = useGetTrainStopByLineQuery(trainPassageId, {
-        skip: trainPassageId === ""
-    })
-
     const {data: getDiscountData} = useGetDiscountsQuery(null)
 
-    const [deleteReservation] = useDeleteReservationMutation()
-    const [updateReservation] = useUpdateReservationMutation()
+    const [deleteReservation, {
+        error: deleteReservationError,
+        isError: isDeleteReservationError,
+        isSuccess: isDeleteReservationSuccess
+    }] = useDeleteReservationMutation()
+
+    const [updateReservation, {
+        error: updateReservationError,
+        isError: isUpdateReservationError,
+        isSuccess: isUpdateReservationSuccess
+    }] = useUpdateReservationMutation()
 
     const updateSingleReservation = async () => {
         if (name !== "" && lastName !== ""
-            && isNameValidLength && isLastNameValidLength) {
+            && isNameValidLength && isLastNameValidLength && trainPassageId !== "" && isTrainPassageIdInteger) {
             const trainPassageIdNumber = parseInt(trainPassageId)
 
             if (typeof id === "string") {
@@ -62,14 +64,13 @@ const EditReservations = () => {
                     "nazwisko": lastName,
                     "znizka": discountName
                 })
-                navigate("/reservations")
             }
         }
     }
 
     const deleteSingleReservation = async () => {
         await deleteReservation(id)
-        navigate("/reservations")
+        refetchTrainRides()
     }
 
     const handleDiscountChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -92,6 +93,14 @@ const EditReservations = () => {
         }
     }
 
+    const checkTrainPassageIdInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsTrainPassageIdInteger(() => false)
+        } else {
+            setIsTrainPassageIdInteger(() => true)
+        }
+    }
+
     useEffect(() => {
         if (isGetSingleReservationSuccess) {
             setReservation(getSingleReservation[0])
@@ -108,13 +117,18 @@ const EditReservations = () => {
     }, [reservation])
 
     useEffect(() => {
-        if (isGetTrainStopByLineSuccess) {
-            setFinalStation(getTrainStopByLineData[getTrainStopByLineData.length - 1].nazwastacji)
-            setInitialStation(getTrainStopByLineData[0].nazwastacji)
+        if (isDeleteReservationSuccess) {
+            navigate("/reservations")
         }
-    }, [isGetTrainStopByLineSuccess, getTrainStopByLineData])
+    }, [isDeleteReservationSuccess, navigate])
 
-    if (reservation !== undefined && getDiscountData !== undefined && getTrainStopByLineData !== undefined) {
+    useEffect(() => {
+        if (isUpdateReservationSuccess) {
+            navigate("/reservations")
+        }
+    }, [isUpdateReservationSuccess, navigate])
+
+    if (reservation !== undefined && getDiscountData !== undefined) {
         const discounts = getDiscountData.map((discount: Discount) => {
             return <option key={uuidv4()} value={discount.nazwaznizki}>
                 {discount.nazwaznizki} ({discount.procentznizki} %)
@@ -127,7 +141,7 @@ const EditReservations = () => {
                 <div className={"h-24 w-full flex items-center"}>
                     <p className={"text-4xl"}>Rezerwacja</p>
                 </div>
-                <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
+                <div className={"bg-white w-full rounded-xl pt-8 px-16 border border-stone-200"}>
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Imię</label>
                         <div className={"flex w-4/6"}>
@@ -189,7 +203,7 @@ const EditReservations = () => {
                         </div>
                     </div>
 
-                    <div className={"w-160 flex items-center mb-6"}>
+                    <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Zniżka</label>
                         <div className={"flex w-4/6"}>
                             <select className={"w-1/2"} value={discountName} onChange={handleDiscountChange}>
@@ -198,30 +212,44 @@ const EditReservations = () => {
                         </div>
                     </div>
 
+                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                    </div>
+
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Stacja początkowa</label>
+                        <label className={"w-2/6"}>Id przejazdu</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
-                                   value={initialStation}
-                                   onChange={(e) => setInitialStation(e.target.value)}
+                                   value={trainPassageId}
+                                   onChange={(e) => setTrainPassageId(e.target.value)}
+                                onBlur={(e) => checkTrainPassageIdInteger(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
-                    </div>
-
-                    <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Stacja końcowa</label>
-                        <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
-                                   value={finalStation}
-                                   onChange={(e) => setFinalStation(e.target.value)}
-                            />
+                        <div className={`flex items-center ${trainPassageId === "" && isTrainPassageIdInteger ?
+                            "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Pole id przejazdu jest wymagane
+                            </p>
                         </div>
-                    </div>
-
-                    <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`flex items-center ${!isTrainPassageIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Id przejazdu powinno być liczbą
+                            </p>
+                        </div>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                updateReservationError && updateReservationError.data === "Nie znaleziono przejazdu o danym id" ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Nie znaleziono przejazdu o danym id
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"flex"}>
@@ -233,12 +261,25 @@ const EditReservations = () => {
                             </button>
                             <button
                                 className={`${(discountName === "" || lastName === "" || name === "" ||
-                                    !isNameValidLength || !isLastNameValidLength ||
-                                    initialStation === "" || finalStation === "")
+                                    !isNameValidLength || !isLastNameValidLength || !isTrainPassageIdInteger)
                                     ? "cursor-not-allowed bg-slate-200 border-stone-100" : "cursor-pointer"}`}
                                 onClick={() => updateSingleReservation()}>
                                 Zapisz zmiany
                             </button>
+                        </div>
+                    </div>
+
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteReservationError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteReservationError !== undefined && deleteReservationError.data ? deleteReservationError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

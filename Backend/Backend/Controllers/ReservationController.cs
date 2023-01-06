@@ -174,7 +174,7 @@ namespace Backend.Controllers
             if (val == 1)
                 return Ok();
             else if (val == 0)
-                return StatusCode(409, "Nie znaleziono przejazdu o danym Id");
+                return StatusCode(409, "Nie znaleziono przejazdu o danym id");
             else if (val == -1)
                 return StatusCode(409, "Nie znaleziono zniżki o danej nazwie");
             else if (val == -2)
@@ -230,7 +230,7 @@ namespace Backend.Controllers
             if (val == 1)
                 return Ok();
             else if (val == 0)
-                return StatusCode(409, "Nie znaleziono przejazdu o danym ID");
+                return StatusCode(409, "Nie znaleziono przejazdu o danym id");
             else if (val == -1)
                 return StatusCode(409, "Nie znaleziono zniżki o danej nazwie");
             else if (val == -2)

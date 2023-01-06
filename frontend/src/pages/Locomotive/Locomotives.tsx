@@ -37,7 +37,10 @@ const Locomotives = () => {
         isFetching: isGetLocomotivesFetching,
         isSuccess: isGetLocomotivesSuccess,
         isError: isGetLocomotivesError,
-    } = useGetLocomotivesQuery(null)
+    } = useGetLocomotivesQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     useEffect(() => {
         if (isGetFilterLocomotiveSuccess) {

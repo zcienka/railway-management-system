@@ -5,10 +5,11 @@ import {Worker} from "../../types";
 import Menu from "../../components/Menu";
 import {
     useDeleteWorkerMutation,
-    useGetSingleWorkerQuery,
+    useGetSingleWorkerQuery, useGetWorkersQuery,
     useUpdateWorkerMutation
 } from "../../services/workersApi";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
 
 const EditWorkers = () => {
     const [name, setName] = useState<string>("")
@@ -26,6 +27,7 @@ const EditWorkers = () => {
 
     const [occupation, setOccupation] = useState<string>("")
     const [occupationInput, setOccupationInput] = useState<boolean>(true)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -36,17 +38,22 @@ const EditWorkers = () => {
         skip: id === undefined
     })
 
-    const [deleteWorker] = useDeleteWorkerMutation()
+    const [deleteWorker,
+        {
+            error: deleteWorkerError,
+            isError: isDeleteWorkerError,
+            isSuccess: isDeleteWorkerSuccess
+        }] = useDeleteWorkerMutation()
     const [updateWorker,
         {
-            error: updateTrainStopError,
-            isError: isUpdateTrainStopError,
-            isSuccess: isUpdateTrainStopSuccess
+            error: updateWorkerError,
+            isError: isUpdateWorkerError,
+            isSuccess: isUpdateWorkerSuccess
         }] = useUpdateWorkerMutation()
 
     const deleteSingleWorker = async () => {
         await deleteWorker(id)
-        navigate("/workers")
+        refetchTrainRides()
     }
 
     const updateSingleWorker = async () => {
@@ -69,10 +76,16 @@ const EditWorkers = () => {
     }
 
     useEffect(() => {
-        if (isUpdateTrainStopSuccess) {
+        if (isUpdateWorkerSuccess) {
             navigate("/workers")
         }
-    }, [isUpdateTrainStopSuccess, navigate])
+    }, [isUpdateWorkerSuccess, navigate])
+
+    useEffect(() => {
+        if (isDeleteWorkerSuccess) {
+            navigate("/workers")
+        }
+    }, [isDeleteWorkerSuccess, navigate])
 
     const checkNameValidLength = (userInput: string) => {
         if (userInput.length > 32) {
@@ -270,6 +283,19 @@ const EditWorkers = () => {
                                 onClick={() => updateSingleWorker()}>
                                 Zapisz zmiany
                             </button>
+                        </div>
+                    </div>
+                    <div className={"h-8 flex w-full text-red-900 text-xs justify-end"}>
+                        <div
+                            className={`flex items-center ${
+                                // @ts-ignore
+                                deleteWorkerError !== undefined ?
+                                    "visible w-full justify-end flex" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2 flex"}/>
+                            <p className={"flex justify-end"}>
+                                {// @ts-ignore
+                                    deleteWorkerError !== undefined && deleteWorkerError.data ? deleteWorkerError.data : ""}
+                            </p>
                         </div>
                     </div>
                 </div>

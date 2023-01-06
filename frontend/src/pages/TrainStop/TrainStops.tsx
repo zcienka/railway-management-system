@@ -55,7 +55,10 @@ const TrainStops = () => {
         data: getTrainStops,
         isFetching: isGetTrainStopsFetching,
         isSuccess: isGetTrainStopsSuccess,
-    } = useGetTrainStopsQuery(null)
+    } = useGetTrainStopsQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     useEffect(() => {
         if (isGetFilterTrainStopSuccess) {

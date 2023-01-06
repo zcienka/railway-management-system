@@ -6,6 +6,7 @@ import {useFilterDiscountQuery, useGetDiscountsQuery} from "../../services/disco
 import {useNavigate} from "react-router-dom";
 import Menu from "../../components/Menu";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
 
 const initialState: SearchDiscount = {
     nazwa: "",
@@ -31,11 +32,16 @@ const Discounts = () => {
         {skip: !showSearchResponse}
     )
 
+
+
     const {
         data: getDiscounts,
         isFetching: isGetDiscountsFetching,
         isSuccess: isGetDiscountsSuccess,
-    } = useGetDiscountsQuery(null)
+    } = useGetDiscountsQuery(null,
+        {
+            refetchOnMountOrArgChange: true
+        })
 
     useEffect(() => {
         if (isGetFilterDiscountSuccess) {
