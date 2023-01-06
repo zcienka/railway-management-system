@@ -8,16 +8,21 @@ import {
     useGetSingleWorkerQuery,
     useUpdateWorkerMutation
 } from "../../services/workersApi";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const EditWorkers = () => {
     const [name, setName] = useState<string>("")
     const [nameInput, setNameInput] = useState<boolean>(true)
+    const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
 
     const [lastName, setLastName] = useState<string>("")
     const [lastNameInput, setLastNameInput] = useState<boolean>(true)
+    const [isLastNameValidLength, setIsLastNameValidLength] = useState<boolean>(true)
 
     const [wage, setWage] = useState<string>("")
     const [wageInput, setWageInput] = useState<boolean>(true)
+    const [isWageInteger, setIsWageInteger] = useState<boolean>(true)
+    const [isWagePositive, setIsWagePositive] = useState<boolean>(true)
 
     const [occupation, setOccupation] = useState<string>("")
     const [occupationInput, setOccupationInput] = useState<boolean>(true)
@@ -32,7 +37,12 @@ const EditWorkers = () => {
     })
 
     const [deleteWorker] = useDeleteWorkerMutation()
-    const [updateWorker] = useUpdateWorkerMutation()
+    const [updateWorker,
+        {
+            error: updateTrainStopError,
+            isError: isUpdateTrainStopError,
+            isSuccess: isUpdateTrainStopSuccess
+        }] = useUpdateWorkerMutation()
 
     const deleteSingleWorker = async () => {
         await deleteWorker(id)
@@ -40,15 +50,59 @@ const EditWorkers = () => {
     }
 
     const updateSingleWorker = async () => {
-        const singleWorker: Worker = {
-            imie: name,
-            nazwisko: lastName,
-            placa: parseInt(wage),
-            zawod: occupation,
-            id: parseInt(id?.toString() || "undefined")
+        if (name === "" || lastName === "" || wage === "" || occupation === "" || !isNameValidLength || !isLastNameValidLength
+            || !isWageInteger || !isWagePositive) {
+            setNameInput(false)
+            setLastNameInput(false)
+            setWageInput(false)
+            setOccupationInput(false)
+        } else {
+            const singleWorker: Worker = {
+                imie: name,
+                nazwisko: lastName,
+                placa: parseInt(wage),
+                zawod: occupation,
+                id: parseInt(id?.toString() || "undefined")
+            }
+            await updateWorker(singleWorker)
         }
-        await updateWorker(singleWorker)
-        navigate("/workers")
+    }
+
+    useEffect(() => {
+        if (isUpdateTrainStopSuccess) {
+            navigate("/workers")
+        }
+    }, [isUpdateTrainStopSuccess, navigate])
+
+    const checkNameValidLength = (userInput: string) => {
+        if (userInput.length > 32) {
+            setIsNameValidLength(false)
+        } else {
+            setIsNameValidLength(true)
+        }
+    }
+
+    const checkLastNameValidLength = (userInput: string) => {
+        if (userInput.length > 32) {
+            setIsLastNameValidLength(false)
+        } else {
+            setIsLastNameValidLength(true)
+        }
+    }
+
+    const checkWageInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsWageInteger(() => false)
+            setIsWagePositive(() => true)
+        } else {
+            setIsWageInteger(() => true)
+
+            if (0 > parseInt(userInput)) {
+                setIsWagePositive(() => false)
+            } else {
+                setIsWagePositive(() => true)
+            }
+        }
     }
 
     useEffect(() => {
@@ -77,11 +131,28 @@ const EditWorkers = () => {
                                        setName(e.target.value)
                                        setNameInput(false)
                                    }}
+                                   onBlur={(e) => checkNameValidLength(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${name === "" && !nameInput && isNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole imię jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Imię musi mieć długość do 32 znaków
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -93,11 +164,28 @@ const EditWorkers = () => {
                                        setLastName(e.target.value)
                                        setLastNameInput(false)
                                    }}
+                                   onBlur={(e) => checkLastNameValidLength(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${lastName === "" && !lastNameInput && isLastNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole nazwisko jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isLastNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Nazwisko musi mieć długość do 32 znaków
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -109,27 +197,65 @@ const EditWorkers = () => {
                                        setWage(e.target.value)
                                        setWageInput(false)
                                    }}
+                                   onBlur={(e) => checkWageInteger(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${wage === "" && !wageInput && isWageInteger && isWagePositive ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole płaca jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isWageInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Płaca powinna być liczbą
+                            </p>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isWagePositive ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Płaca powinna być większa od zera
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Zawód</label>
                         <div className={"flex w-4/6"}>
-                            <input className={"w-1/2"}
-                                   value={occupation}
-                                   onChange={(e) => {
-                                       setOccupation(e.target.value)
-                                       setOccupationInput(false)
-                                   }}
-                            />
+
+                            <select className={"w-1/2"} value={occupation} onChange={(e) => {
+                                setOccupation(e.target.value)
+                                setOccupationInput(false)
+                            }}>
+                                <option value={"Maszynista"}>
+                                    Maszynista
+                                </option>
+                                <option value={"Konduktor"}>
+                                    Konduktor
+                                </option>
+                            </select>
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${occupation === "" && !occupationInput ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole zawód jest wymagane
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div className={"flex"}>

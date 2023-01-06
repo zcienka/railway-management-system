@@ -183,11 +183,14 @@ export type RailroadCarNumberless = {
     idpociagu: number,
 }
 
+
 export type RailroadCarInTheTrainResponse = {
     numerwagonu: number,
     idwagonu: number,
     idpociagu: number,
     nazwapociagu: string,
+    liczbamiejsc: number,
+    databadaniatechnicznego: string,
 }
 
 export type RailroadCarSearch = {

@@ -14,14 +14,13 @@ export const trainStopApi = createApi({
             }),
             providesTags: ["TrainStop"]
         }),
-        getSingleTrainStop: builder.query<TrainStop[], string | undefined>({
-            query: (id) => ({
-                url: `/train-stop/${id}`,
+        getSingleTrainStop: builder.query<TrainStop[], any>({
+            query: (body) => ({
+                url: `/train-stop/${body.numerprzystanku}/${body.nazwastacji}/${body.idlinii}`,
                 method: "GET",
             }),
             providesTags: ["TrainStop"]
         }),
-
         deleteTrainStop: builder.mutation({
             query: (id) => ({
                 url: `/train-stop/${id}`,

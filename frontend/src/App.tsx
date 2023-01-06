@@ -54,7 +54,7 @@ function App() {
                 <Route path={"/add-train-ride"} element={<CreateTrainRide/>}/>
 
                 <Route path={"/train-stops"} element={<TrainStops/>}/>
-                <Route path={"/train-stops/:id"} element={<EditTrainStop/>}/>
+                <Route path={"/train-stops/:numerprzystanku/:nazwastacji/:idlinii"} element={<EditTrainStop/>}/>
                 <Route path={"/add-train-stop"} element={<CreateTrainStop/>}/>
 
                 <Route path={"/railroad-cars"} element={<RailroadCars/>}/>

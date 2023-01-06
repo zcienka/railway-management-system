@@ -79,12 +79,12 @@ const TrainStops = () => {
     } else {
         const allTrainStops = Object.values(trainStop).map((trainStop: TrainStop) => {
             return <tr key={uuidv4()}>
-                <th className={"py-2 font-semibold border-b border-l border-stone-200 underline"}>Pokaż linię</th>
+                <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{trainStop.idlinii}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.nazwastacji}</th>
                 <th className={"py-2 font-semibold border-b border-stone-200"}>{trainStop.numerprzystanku}</th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
-                    onClick={() => navigate(`/train-stops/${trainStop.numerprzystanku}`)}>
+                    onClick={() => navigate(`/train-stops/${trainStop.numerprzystanku}/${trainStop.nazwastacji}/${trainStop.idlinii}`)}>
                     <div className={"px-3 py-1 border-2 rounded-md cursor-pointer mr-2"}>Edytuj</div>
                 </th>
             </tr>
@@ -179,7 +179,7 @@ const TrainStops = () => {
                     <table className={"w-full border-spacing-0 border-separate overflow-y-auto"}>
                         <tbody>
                         <tr className={"rounded-tl-xl text-slate-600"}>
-                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Linia</th>
+                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Id linii</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Nazwa stacji</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Numer przystanku</th>
                             <th className={"rounded-tr-xl bg-slate-100 w-20 border-y border-r border-stone-200"}></th>

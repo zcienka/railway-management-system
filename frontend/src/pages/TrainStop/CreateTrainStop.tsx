@@ -29,7 +29,8 @@ const CreateTrainStop = () => {
     }] = useCreateTrainStopMutation()
 
     const createSingleTrainStop = async () => {
-        if (trainStopNumber === "" || stationName === "" || lineId === "" || !isTrainStopNumberInteger || !isLineIdInteger) {
+        if (trainStopNumber === "" || stationName === "" || lineId === "" || !isTrainStopNumberInteger || !isLineIdInteger
+        || !isLineIdPositive || !isTrainStopNumberPositive) {
             setTrainStopNumberInput(false)
             setStationNameInput(false)
             setLineIdInput(false)
@@ -114,6 +115,13 @@ const CreateTrainStop = () => {
                             Numer przystanku musi być liczbą
                         </p>
                     </div>
+                    <div
+                        className={`flex items-center ${!isTrainStopNumberPositive ? "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            Numer przystanku musi większy od zera
+                        </p>
+                    </div>
                 </div>
 
                 <div className={"w-160 flex items-center"}>
@@ -172,6 +180,25 @@ const CreateTrainStop = () => {
                         <p className={"w-full"}>
                             Id linii przejazdu musi być liczbą
                         </p>
+                    </div>
+                    <div
+                        className={`flex items-center ${!isLineIdPositive ? "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            Id linii przejazdu musi większe od zera
+                        </p>
+                    </div>
+                    <div
+                        className={`${
+                            // @ts-ignore
+                            createTrainStopError !== undefined && createTrainStopError.data === "Na tej linii podany numer przystanku jest już zajęty"
+                                ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Na tej linii podany numer przystanku jest już zajęty
+                            </p>
+                        </div>
                     </div>
                 </div>
 

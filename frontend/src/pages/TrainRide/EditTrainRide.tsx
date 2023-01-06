@@ -10,13 +10,17 @@ import {
 } from "../../services/trainRideApi"
 import {useGetConductorsQuery, useGetDriversQuery, useGetSingleWorkerQuery} from "../../services/workersApi";
 import {v4 as uuidv4} from "uuid";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const EditTrainRide = () => {
     const [departureDate, setDepartureDate] = useState<string>("")
     const [departureDateInput, setDepartureDateInput] = useState<boolean>(true)
+    const [isDepartureDateValid, setIsDepartureDateValid] = useState<boolean>(true)
 
     const [arrivalDate, setArrivalDate] = useState<string>("")
     const [arrivalDateInput, setArrivalDateInput] = useState<boolean>(true)
+    const [isArrivalDateValid, setIsArrivalDateValid] = useState<boolean>(true)
+    const [isArrivalDateLater, setIsArrivalDateLater] = useState<boolean>(true)
 
     const [conductorId, setConductorId] = useState<string>("")
     const [conductorIdInput, setConductorIdInput] = useState<boolean>(true)
@@ -26,9 +30,11 @@ const EditTrainRide = () => {
 
     const [railConnectionId, setRailConnectionId] = useState<string>("")
     const [railConnectionIdInput, setRailConnectionIdInput] = useState<boolean>(true)
+    const [isLineIdInteger, setIsLineIdInteger] = useState<boolean>(true)
 
     const [trainId, setTrainId] = useState<string>("")
     const [trainIdInput, setTrainIdInput] = useState<boolean>(true)
+    const [isTrainIdInteger, setIsTrainIdInteger] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {idParam} = useParams()
@@ -50,7 +56,11 @@ const EditTrainRide = () => {
     } = useGetDriversQuery(null)
 
     const [deleteTrainRide] = useDeleteTrainRideMutation()
-    const [updateTrainRide] = useUpdateTrainRideMutation()
+    const [updateTrainRide, {
+        error: updateTrainRideError,
+        isError: isUpdateTrainRideError,
+        isSuccess: isUpdateTrainRideSuccess
+    }] = useUpdateTrainRideMutation()
 
     const deleteSingleTrainRide = async () => {
         await deleteTrainRide(idParam)
@@ -68,8 +78,14 @@ const EditTrainRide = () => {
             idpociagu: parseInt(trainId),
         }
         await updateTrainRide(singleTrainRide)
-        navigate("/train-rides")
     }
+
+    useEffect(() => {
+        if (isUpdateTrainRideSuccess) {
+            navigate("/train-rides")
+        }
+    }, [isUpdateTrainRideSuccess, navigate])
+
     useEffect(() => {
         if (isGetSingleTrainRideSuccess) {
             setDepartureDate(getSingleTrainRideData[0].dataodjazdu.toString())
@@ -80,6 +96,61 @@ const EditTrainRide = () => {
             setTrainId(getSingleTrainRideData[0].nazwapociagu)
         }
     }, [getSingleTrainRideData, isGetSingleTrainRideSuccess])
+
+    const checkLineIdInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsLineIdInteger(() => false)
+        } else {
+            setIsLineIdInteger(() => true)
+        }
+    }
+
+    const checkTrainIdInteger = (userInput: string) => {
+        if (userInput !== "") {
+            if (isNaN(Number(userInput))) {
+                setIsTrainIdInteger(() => false)
+            } else {
+                setIsTrainIdInteger(() => true)
+            }
+        }
+    }
+
+    const checkDepartureDate = (userInput: string) => {
+        const userDate = new Date(userInput)
+        const todayDate = new Date()
+
+        if (userInput !== "") {
+            if (userDate > todayDate) {
+                setIsDepartureDateValid(true)
+            } else {
+                setIsDepartureDateValid(false)
+            }
+        }
+    }
+
+    const checkIfArrivalDateIsLaterThanDepartureDate = () => {
+        const departure = new Date(departureDate)
+        const arrival = new Date(arrivalDate)
+
+        if (arrivalDate !== "" && departureDate !== "") {
+            if (arrival > departure) {
+                setIsArrivalDateLater(true)
+            } else {
+                setIsArrivalDateLater(false)
+            }
+        }
+    }
+
+    const checkArrivalDate = (userInput: string) => {
+        const userDate = new Date(userInput)
+        const todayDate = new Date()
+
+        if (userDate > todayDate) {
+            setIsArrivalDateValid(true)
+        } else {
+            setIsArrivalDateValid(false)
+        }
+    }
 
     if (getSingleTrainRideData !== undefined && getDriversData !== undefined && getConductorsData !== undefined) {
         const drivers = getDriversData.map((worker: Worker) => {
@@ -111,11 +182,31 @@ const EditTrainRide = () => {
                                        setDepartureDate(e.target.value)
                                        setDepartureDateInput(false)
                                    }}
+                                   onBlur={(e) => {
+                                       checkDepartureDate(e.target.value)
+                                       checkIfArrivalDateIsLaterThanDepartureDate()
+                                   }}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${departureDate === "" && !departureDateInput && isDepartureDateValid ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole data odjazdu jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isDepartureDateValid ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Data odjazdu musi przyszła
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -128,47 +219,94 @@ const EditTrainRide = () => {
                                        setArrivalDate(e.target.value)
                                        setArrivalDateInput(false)
                                    }}
+                                   onBlur={(e) => {
+                                       checkArrivalDate(e.target.value)
+                                       checkIfArrivalDateIsLaterThanDepartureDate()
+                                   }}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${arrivalDate === "" && !arrivalDateInput && isArrivalDateValid && isArrivalDateLater
+                                ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole data przyjazdu jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isArrivalDateLater ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Data przyjazdu musi być późniejsza od daty odjazdu
+                            </p>
+                        </div>
+
+                        <div
+                            className={`flex items-center ${!isArrivalDateValid ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Data przyjazdu musi przyszła
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Konduktor</label>
                         <div className={"flex w-4/6"}>
                             <select className={"w-1/2"}
-                                   value={conductorId}
-                                   onChange={(e) => {
-                                       setConductorId(e.target.value)
-                                       setConductorIdInput(false)
-                                   }}
+                                    value={conductorId}
+                                    onChange={(e) => {
+                                        setConductorId(e.target.value)
+                                        setConductorIdInput(false)
+                                    }}
                             >
+
                                 {conductors}
                             </select>
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${conductorId === "" && !conductorIdInput ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole konduktor jest wymagane
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Maszynista</label>
                         <div className={"flex w-4/6"}>
                             <select className={"w-1/2"}
-                                   value={driverId}
-                                   onChange={(e) => {
-                                       setDriverId(e.target.value)
-                                       setDriverIdInput(false)
-                                   }}
-                            >
+                                    value={driverId}
+                                    onChange={(e) => {
+                                        setDriverId(e.target.value)
+                                        setDriverIdInput(false)
+                                    }}>
                                 {drivers}
                             </select>
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${driverId === "" && !driverIdInput ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole maszynista jest wymagane
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
@@ -180,15 +318,41 @@ const EditTrainRide = () => {
                                        setRailConnectionId(e.target.value)
                                        setRailConnectionIdInput(false)
                                    }}
+                                   onBlur={(e) => checkLineIdInteger(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${railConnectionId === "" && !railConnectionIdInput && isLineIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole id linii przejazdu jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isLineIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Id linii musi być liczbą
+                            </p>
+                        </div>
+                        <div className={`flex items-center ${isUpdateTrainRideError &&
+                        // @ts-ignore
+                        (updateTrainRideError!.data === "Dana linia przejazdu i pociąg nie istnieje" || updateTrainRideError!.data === "Dana linia przejazdu nie istnieje") ?
+                            "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Dana linia nie istnieje
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Pociąg</label>
+                        <label className={"w-2/6"}>Id pociągu</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
                                    value={trainId}
@@ -196,11 +360,37 @@ const EditTrainRide = () => {
                                        setTrainId(e.target.value)
                                        setTrainIdInput(false)
                                    }}
+                                   onBlur={(e) => checkTrainIdInteger(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${trainId === "" && !trainIdInput && isTrainIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole id pociągu jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isTrainIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Id pociągu musi być liczbą
+                            </p>
+                        </div>
+                        <div className={`flex items-center ${isUpdateTrainRideError &&
+                        // @ts-ignore
+                        (updateTrainRideError!.data === "Dana linia przejazdu i pociąg nie istnieje" || updateTrainRideError!.data === "Dany pociąg nie istnieje") ?
+                            "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Dany pociąg nie istnieje
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"flex"}>
@@ -218,6 +408,7 @@ const EditTrainRide = () => {
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     } else {

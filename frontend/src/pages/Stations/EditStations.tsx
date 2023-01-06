@@ -8,6 +8,7 @@ import {
     useUpdateStationMutation
 } from "../../services/stationsApi"
 import Menu from "../../components/Menu"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const EditStations = () => {
     const [name, setName] = useState<string>("")
@@ -26,7 +27,11 @@ const EditStations = () => {
     })
 
     const [deleteStation] = useDeleteStationMutation()
-    const [updateStation] = useUpdateStationMutation()
+    const [updateStation, {
+        error: updateStationError,
+        isError: isUpdateStationError,
+        isSuccess: isUpdateStationSuccess
+    }] = useUpdateStationMutation()
 
     const deleteSingleStation = async () => {
         await deleteStation(id)
@@ -39,9 +44,12 @@ const EditStations = () => {
             adres: address
         }
         await updateStation(singleStation)
-        navigate("/stations")
     }
-
+    useEffect(() => {
+        if (isUpdateStationSuccess) {
+            navigate("/stations")
+        }
+    }, [isUpdateStationSuccess, navigate])
 
     useEffect(() => {
         if (isGetSingleStationSuccess) {
@@ -61,7 +69,7 @@ const EditStations = () => {
                     <div className={"w-160 flex items-center"}>
                         <label className={"w-2/6"}>Nazwa</label>
                         <div className={"flex w-4/6"}>
-                        <label className={"w-2/6"}>{name}</label>
+                            <label className={"w-2/6"}>{name}</label>
                         </div>
                     </div>
 
@@ -82,6 +90,15 @@ const EditStations = () => {
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div className={`flex items-center ${isUpdateStationError ?
+                            "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                {// @ts-ignore
+                                    updateStationError !== undefined ? updateStationError!.data === "Adres stacji musi mieć długość między 1 a 61 znaków" : ""}
+                                Adres stacji musi mieć długość między 1 a 61 znaków
+                            </p>
+                        </div>
                     </div>
 
 

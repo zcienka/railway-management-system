@@ -63,8 +63,6 @@ const CreateTrainRide = () => {
         }
     }
 
-    console.log(departureDate)
-
     const checkLineIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {
             setIsLineIdInteger(() => false)

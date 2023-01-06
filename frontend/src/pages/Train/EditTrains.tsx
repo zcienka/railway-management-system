@@ -4,13 +4,16 @@ import {useNavigate, useParams} from "react-router-dom";
 import {Train} from "../../types";
 import Menu from "../../components/Menu";
 import {useDeleteTrainMutation, useGetSingleTrainQuery, useUpdateTrainMutation} from "../../services/trainsApi";
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 
 const EditTrains = () => {
     const [name, setName] = useState<string>("")
     const [nameInput, setNameInput] = useState<boolean>(true)
+    const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
 
     const [locomotiveName, setLocomotiveName] = useState<string>("")
     const [locomotiveNameInput, setLocomotiveNameInput] = useState<boolean>(true)
+    const [isLocomotiveIdInteger, setIsLocomotiveIdInteger] = useState<boolean>(true)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -22,23 +25,53 @@ const EditTrains = () => {
     })
 
     const [deleteTrain] = useDeleteTrainMutation()
-    const [updateTrain] = useUpdateTrainMutation()
+    const [updateTrain, {
+        error: updateTrainError,
+        isError: isUpdateTrainError,
+        isSuccess: isUpdateTrainSuccess
+    }] = useUpdateTrainMutation()
 
     const deleteSingleTrain = async () => {
         await deleteTrain(id)
         navigate("/train")
     }
 
-    const updateSingleTrain = async () => {
-        const singleTrain: Train = {
-            nazwa: name,
-            idlokomotywy: parseInt(locomotiveName),
-            id: parseInt(id?.toString() || "undefined")
+    const checkIdInteger = (userInput: string) => {
+        if (isNaN(Number(userInput))) {
+            setIsLocomotiveIdInteger(() => false)
+        } else {
+            setIsLocomotiveIdInteger(() => true)
         }
-        await updateTrain(singleTrain)
-        navigate("/train")
     }
-console.log({getSingleTrainData})
+
+    const checkNameValidLength = (userInput: string) => {
+        if (userInput.length > 32) {
+            setIsNameValidLength(false)
+        } else {
+            setIsNameValidLength(true)
+        }
+    }
+
+    const updateSingleTrain = async () => {
+        if (name === "" || locomotiveName === "" || !isLocomotiveIdInteger || !isNameValidLength) {
+            setLocomotiveNameInput(false)
+            setNameInput(false)
+        } else {
+            const singleTrain: Train = {
+                nazwa: name,
+                idlokomotywy: parseInt(locomotiveName),
+                id: parseInt(id?.toString() || "undefined")
+            }
+            await updateTrain(singleTrain)
+        }
+    }
+
+    useEffect(() => {
+        if (isUpdateTrainSuccess) {
+            navigate("/train")
+        }
+    }, [isUpdateTrainSuccess, navigate])
+
     useEffect(() => {
         if (isGetSingleTrainSuccess) {
             setLocomotiveName(String(getSingleTrainData[0].idlokomotywy))
@@ -63,15 +96,32 @@ console.log({getSingleTrainData})
                                        setName(e.target.value)
                                        setNameInput(false)
                                    }}
+                                   onBlur={(e) => checkNameValidLength(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${name === "" && !nameInput && isNameValidLength  ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole nazwa jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isNameValidLength ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Nazwa musi mieć długość do 32 znaków
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"w-160 flex items-center"}>
-                        <label className={"w-2/6"}>Nazwa lokomotywy</label>
+                        <label className={"w-2/6"}>Id lokomotywy</label>
                         <div className={"flex w-4/6"}>
                             <input className={"w-1/2"}
                                    value={locomotiveName}
@@ -79,11 +129,36 @@ console.log({getSingleTrainData})
                                        setLocomotiveName(e.target.value)
                                        setLocomotiveNameInput(false)
                                    }}
+                                   onBlur={(e) => checkIdInteger(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className={"h-6 flex w-full text-red-900 text-xs"}>
+                        <div
+                            className={`${locomotiveName === "" && !locomotiveNameInput && isLocomotiveIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <div className={`flex items-center`}>
+                                <ExclamationMark className={"h-5 mr-2"}/>
+                                <p className={"w-full"}>
+                                    Pole id lokomotywy jest wymagane
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={`flex items-center ${!isLocomotiveIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Id lokomotywy powinno być liczbą
+                            </p>
+                        </div>
+                        <div className={`flex items-center ${isUpdateTrainError ?
+                            "visible w-full" : "invisible absolute"}`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                {// @ts-ignore
+                                    updateTrainError !== undefined ? updateTrainError!.data : ""}
+                            </p>
+                        </div>
                     </div>
 
                     <div className={"flex"}>

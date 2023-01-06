@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {
+    RailroadCar,
     RailroadCarInTheTrainResponse,
     SearchRailroadCarInTheTrain
 } from "../../types"
@@ -9,12 +10,11 @@ import {useGetRailroadCarsInTheTrainQuery, useFilterRailroadCarInTheTrainQuery} 
 import {Link, useNavigate} from "react-router-dom"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
 
 const initialState: SearchRailroadCarInTheTrain = {
     idwagonumin: "",
     idwagonumax: "",
-    // idpociagumin: "",
-    // idpociagumax: "",
     nazwapociagu: "",
 }
 
@@ -44,6 +44,13 @@ const RailroadCarsInTheTrain = () => {
         isError: isGetRailroadCarsError,
     } = useGetRailroadCarsInTheTrainQuery(null)
 
+    const {
+        data: getCarsData,
+        isFetching: isGetCarsFetching,
+        isSuccess: isGetCarsSuccess,
+        isError: isGetCarsError,
+    } = useGetRailroadCarsQuery(null)
+
     const checkIsRailroadCarIdInteger = () => {
         if (isNaN(Number(searchRailroadCarsInTheTrain.idwagonumin)) || isNaN(Number(searchRailroadCarsInTheTrain.idwagonumax))) {
             setIsRailroadCarIdInteger(() => false)
@@ -72,11 +79,15 @@ const RailroadCarsInTheTrain = () => {
     if (railroadCars === undefined) {
         return <Loading/>
     } else {
+
+
         const allRailroadCars = Object.values(railroadCars).map((railroadCar: RailroadCarInTheTrainResponse) => {
             return <tr key={uuidv4()}>
                 <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{railroadCar.numerwagonu}</th>
                 <th className={"py-2 font-semibold  border-b border-stone-200"}>{railroadCar.nazwapociagu} </th>
-                <th className={"py-2 font-semibold border-b  border-stone-200 underline"}><Link to={"/xd"}>Pokaż wagon</Link></th>
+                <th className={"py-2 font-semibold border-b  border-stone-200"}>
+                    {railroadCar.liczbamiejsc + " miejsc, data badania technicznego: " + railroadCar.databadaniatechnicznego.toString().split("T")[0]}
+                </th>
 
                 <th className={"py-2 border-r border-b border-stone-200 flex align-center justify-center font-semibold"}
                     onClick={() => navigate(`/railroad-cars-in-the-train/${railroadCar.idwagonu}/${railroadCar.idpociagu}`)}>
