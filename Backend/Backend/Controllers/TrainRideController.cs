@@ -179,9 +179,13 @@ namespace Backend.Controllers
             }
 
             string query = @"
+                            select p.*, maszynista.Imie as imiemaszynisty, maszynista.Nazwisko as nazwiskomaszynisty, 
+                                    konduktor.Imie as imiekonduktora, konduktor.Nazwisko as nazwiskokonduktora from (
                             select * from przejazdFilter(vOdjazdOd => @dataodjazdumin, vOdjazdDo => @dataodjazdumax,
                                                          vPrzyjazdOd => @dataprzyjazdumin, vPrzyjazdDo => @dataprzyjazdumax,
-                                                         vIdLiniiPrzejazduOd => @idliniiprzejazdumin, vIdLiniiPrzejazduDo => @idliniiprzejazdumax);
+                                                         vIdLiniiPrzejazduOd => @idliniiprzejazdumin, vIdLiniiPrzejazduDo => @idliniiprzejazdumax)
+                            ) p join pracownik maszynista on p.idmaszynisty = maszynista.id
+                                join pracownik konduktor on p.idkonduktora = konduktor.id;
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");

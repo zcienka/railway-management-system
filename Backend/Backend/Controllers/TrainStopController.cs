@@ -242,8 +242,10 @@ namespace Backend.Controllers
                 return StatusCode(409, "Id linii oraz numer przystanku muszą być liczbami nieujemnymi");
             if (val == -2)
                 return StatusCode(409, "Nazwa stacji musi być długości od 1 do 64 znaków");
-            else
+            else if (val == -3)
                 return StatusCode(409, "Na tej linii podany numer przystanku jest już zajęty");
+            else
+                return StatusCode(409, "Dana stacja nie istnieje");
         }
 
         [HttpPatch("update")]
@@ -298,8 +300,10 @@ namespace Backend.Controllers
                 return StatusCode(409, "Na tej linii nie ma takiego przystanku");
             else if (val == -1)
                 return StatusCode(409, "Numer przystanku oraz Id linii musi być nieujemne");
-            else
+            else if (val == -2)
                 return StatusCode(409, "Na tej linii podany numer przystanku jest już zajęty");
+            else
+                return StatusCode(409, "Dana stacja nie istnieje");
         }
 
         [HttpDelete("{nazwastacji}/{idLinii}")]
