@@ -2,7 +2,6 @@ import {Route, BrowserRouter, Routes} from "react-router-dom"
 import Reservations from "./pages/Reservations/Reservations"
 import EditReservations from "./pages/Reservations/EditReservations"
 import CreateReservation from "./pages/Reservations/CreateReservation"
-import Loading from "./components/Loading"
 import Discounts from "./pages/Discounts/Discounts"
 import CreateDiscount from "./pages/Discounts/CreateDiscount"
 import EditDiscounts from "./pages/Discounts/EditDiscounts"
@@ -27,11 +26,12 @@ import Locomotives from "./pages/Locomotive/Locomotives"
 import EditLocomotive from "./pages/Locomotive/EditLocomotive"
 import CreateLocomotive from "./pages/Locomotive/CreateLocomotive"
 import Trains from "./pages/Train/Trains"
-import EditTrains from "./pages/Train/EditTrains";
-import CreateTrain from "./pages/Train/CreateTrain";
-import RailConnections from "./pages/RailConnection/RailConnections";
-import CreateRailConnection from "./pages/RailConnection/CreateRailConnection";
-import RailroadCarsInTheTrain from "./pages/RailroadCarInTheTrain/RailroadCarsInTheTrain";
+import EditTrains from "./pages/Train/EditTrains"
+import CreateTrain from "./pages/Train/CreateTrain"
+import RailConnections from "./pages/RailConnection/RailConnections"
+import CreateRailConnection from "./pages/RailConnection/CreateRailConnection"
+import RailroadCarsInTheTrain from "./pages/RailroadCarInTheTrain/RailroadCarsInTheTrain"
+import EditRailConnection from "./pages/RailConnection/EditRailConnection"
 
 function App() {
     return (
@@ -83,8 +83,9 @@ function App() {
 
                 <Route path={"/rail-connection"} element={<RailConnections/>}/>
                 <Route path={"/add-rail-connection"} element={<CreateRailConnection/>}/>
+                <Route path={"/update-rail-connection/:railConnectionId"} element={<EditRailConnection/>}/>
 
-                <Route path={"/"} element={<Loading/>}/>
+                <Route path={"/"} element={<Discounts/>}/>
             </Routes>
         </BrowserRouter>
     )

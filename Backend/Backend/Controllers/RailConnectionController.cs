@@ -90,7 +90,7 @@ namespace Backend.Controllers
             } catch { return StatusCode(409, "Pole id musi być liczbą"); }
 
             string query = @"
-                            select liniaprzejazduCreate(@id);
+                            select liniaprzejazduCreate(vId => @id);
                             ";
 
             int val = 0;
@@ -102,7 +102,7 @@ namespace Backend.Controllers
                 myCon.Open();
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
-                    myCommand.Parameters.AddWithValue("@id", id);
+                    myCommand.Parameters.AddWithValue("@id", Int32.Parse(id));
                     myCommand.Parameters.Add(new NpgsqlParameter("output", DbType.Int32) { Direction = ParameterDirection.Output });
 
                     myReader = myCommand.ExecuteReader();
@@ -113,10 +113,11 @@ namespace Backend.Controllers
                     myCon.Close();
                 }
             }
+
             if (val == 1)
                 return Ok();
             else
-                return StatusCode(409, "Linia przejazdu o danym ID już istnieje");
+                return StatusCode(409, "Linia przejazdu o danym id już istnieje");
         }
 
         [HttpDelete("{id}")]
@@ -155,7 +156,7 @@ namespace Backend.Controllers
             if (val == 1)
                 return NoContent();
             else
-                return StatusCode(409, "Linia o danym ID nie istnieje");
+                return StatusCode(409, "Linia o danym Id nie istnieje");
         }
     }
 }

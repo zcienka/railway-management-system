@@ -17,7 +17,6 @@ const EditLocomotive = () => {
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
     const [isTechnicalResearchValid, setIsTechnicalResearchValid] = useState<boolean>(true)
 
-
     const navigate = useNavigate()
     const {id} = useParams()
     const {
@@ -60,7 +59,6 @@ const EditLocomotive = () => {
             navigate("/locomotive")
         }
     }, [isUpdateLocomotiveSuccess, navigate])
-
 
     useEffect(() => {
         if (isGetSingleLocomotiveSuccess) {

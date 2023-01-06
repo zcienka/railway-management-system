@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react"
 import Menu from "../../components/Menu"
 import {RailConnection} from "../../types"
-import {useNavigate} from "react-router-dom"
-import {useCreateRailConnectionMutation} from "../../services/railConnectionsApi"
-import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useNavigate, useParams} from "react-router-dom"
+import {useEditRailConnectionMutation, useGetSingleRailConnectionQuery, useDeleteRailConnectionMutation} from "../../services/railConnectionsApi"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
 
-const CreateRailConnection = () => {
+const EditRailConnection = () => {
     const navigate = useNavigate()
 
     const [id, setId] = useState<string>("")
@@ -13,12 +13,32 @@ const CreateRailConnection = () => {
 
     const [isIdInteger, setIsIdInteger] = useState<boolean>(true)
     const [isIdValidLength, setIsIdValidLength] = useState<boolean>(true)
+    const {railConnectionId} = useParams()
 
-    const [createRailConnection, {
-        error: createRailConnectionError,
-        isError: isCreateRailConnectionError,
-        isSuccess: isCreateRailConnectionSuccess
-    }] = useCreateRailConnectionMutation()
+    const {
+        data: getSingleRailConnectionData,
+        isSuccess: isGetSingleRailConnectionSuccess,
+    } = useGetSingleRailConnectionQuery(railConnectionId, {
+        skip: railConnectionId === undefined
+    })
+    const [deleteRailConnection] = useDeleteRailConnectionMutation()
+
+    const [editRailConnection, {
+        error: editRailConnectionError,
+        isError: isEditRailConnectionError,
+        isSuccess: isEditRailConnectionSuccess
+    }] = useEditRailConnectionMutation()
+
+    const deleteSingleRailConnection = async () => {
+        await deleteRailConnection(id)
+        navigate("/rail-connection")
+    }
+
+    useEffect(() => {
+        if (isGetSingleRailConnectionSuccess) {
+            setId(getSingleRailConnectionData[0].id.toString())
+        }
+    }, [getSingleRailConnectionData, isGetSingleRailConnectionSuccess])
 
     const checkIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {
@@ -35,40 +55,23 @@ const CreateRailConnection = () => {
         }
     }
 
-    const createSingleRailConnection = async () => {
-        if (id === "" || !isIdInteger || !isIdValidLength) {
-            setIdInput(false)
-        } else {
-            const singleRailConnection: RailConnection = {
-                id: parseInt(id),
-            }
-            await createRailConnection(singleRailConnection)
-        }
-    }
     useEffect(() => {
-        if (isCreateRailConnectionSuccess) {
+        if (isEditRailConnectionSuccess) {
             navigate("/rail-connection")
         }
-    }, [isCreateRailConnectionSuccess, navigate])
+    }, [isEditRailConnectionSuccess, navigate])
 
     return <div className={"flex"}>
         <Menu/>
         <div className={"px-16 py-6 w-full"}>
             <div className={"h-24 w-full flex items-center"}>
-                <p className={"text-4xl"}>Dodawanie linii przejazdu</p>
+                <p className={"text-4xl"}>Edycja linii przejazdu</p>
             </div>
             <div className={"bg-white w-full rounded-xl p-8 px-16 border border-stone-200"}>
                 <div className={"w-160 flex items-center"}>
                     <label className={"w-2/6"}>Id</label>
                     <div className={"flex w-4/6"}>
-                        <input className={"w-1/2"}
-                               value={id}
-                               onChange={(e) => {
-                                   setId(e.target.value)
-                                   setIdInput(false)
-                               }}
-                               onBlur={(e) => checkIdInteger(e.target.value)}
-                        />
+                        {id}
                     </div>
                 </div>
 
@@ -92,8 +95,8 @@ const CreateRailConnection = () => {
                     <div
                         className={`flex items-center ${
                             // @ts-ignore
-                            createRailConnectionError !== undefined && createRailConnectionError.data === "Linia przejazdu o danym id już istnieje" ? 
-                            "visible w-full" : "invisible absolute"}`}>
+                            editRailConnectionError !== undefined && editRailConnectionError.data === "Linia przejazdu o danym id już istnieje" ?
+                                "visible w-full" : "invisible absolute"}`}>
                         <ExclamationMark className={"h-5 mr-2"}/>
                         <p className={"w-full"}>
                             Linia przejazdu o danym id już istnieje
@@ -101,13 +104,12 @@ const CreateRailConnection = () => {
                     </div>
                 </div>
 
-                <div className={"flex mt-8"}>
-                    <button onClick={() => navigate('/rail-connection')}>Anuluj</button>
+                <div className={"flex"}>
+                    <button onClick={() => navigate("/rail-connection")}>Anuluj</button>
                     <div className={"flex justify-end w-full"}>
-                        <button
-                            className={"cursor-pointer"}
-                            onClick={() => createSingleRailConnection()}>
-                            Dodaj
+                        <button className={"mr-2 bg-red-600 border-red-700 text-white"}
+                                onClick={() => deleteSingleRailConnection()}>
+                            Usuń
                         </button>
                     </div>
                 </div>
@@ -116,4 +118,4 @@ const CreateRailConnection = () => {
     </div>
 }
 
-export default CreateRailConnection
+export default EditRailConnection

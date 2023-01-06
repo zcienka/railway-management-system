@@ -1,5 +1,5 @@
 import {createApi} from "@reduxjs/toolkit/query/react"
-import {RailConnection} from "../types"
+import {RailConnection, Train} from "../types"
 import BaseQuery from "../utils/baseQuery"
 
 export const railConnectionsApi = createApi({
@@ -29,10 +29,28 @@ export const railConnectionsApi = createApi({
             }),
             invalidatesTags: ["RailConnection"]
         }),
+        editRailConnection: builder.mutation({
+            query: (body) => ({
+                url: "/rail-connection/update",
+                method: "PATCH",
+                params: body,
+            }),
+            invalidatesTags: ["RailConnection"]
+        }),
+        getSingleRailConnection: builder.query({
+            query: (railConnectionId) => ({
+                url: `/rail-connection/${railConnectionId}`,
+                method: "GET",
+            }),
+            providesTags: ["RailConnection"]
+        }),
     }),
 })
 
 export const {
     useGetRailConnectionsQuery,
+    useCreateRailConnectionMutation,
+    useEditRailConnectionMutation,
     useDeleteRailConnectionMutation,
+    useGetSingleRailConnectionQuery
 } = railConnectionsApi

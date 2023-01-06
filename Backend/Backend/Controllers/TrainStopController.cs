@@ -297,7 +297,7 @@ namespace Backend.Controllers
             else if (val == 0)
                 return StatusCode(409, "Na tej linii nie ma takiego przystanku");
             else if (val == -1)
-                return StatusCode(409, "Numer przystanku oraz ID linii musi być nieujemne");
+                return StatusCode(409, "Numer przystanku oraz Id linii musi być nieujemne");
             else
                 return StatusCode(409, "Na tej linii podany numer przystanku jest już zajęty");
         }
