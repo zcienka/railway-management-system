@@ -21,8 +21,9 @@ namespace Backend.Controllers
         public IActionResult Get()
         {
             string query = @"
-                            select numerwagonu, idwagonu, idpociagu, nazwa as nazwapociagu from wagonwpociaguReadAll() 
-                            join pociag on pociag.id=idpociagu order by idwagonu, idpociagu;
+                            select numerwagonu, idwagonu, idpociagu, nazwa as nazwapociagu, w.liczbamiejsc, w.databadaniatechnicznego
+                            from wagonwpociaguReadAll() 
+                            join pociag on pociag.id=idpociagu join wagon w on idwagonu=w.id order by idwagonu, idpociagu;
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");

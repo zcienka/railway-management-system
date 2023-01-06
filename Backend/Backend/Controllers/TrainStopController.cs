@@ -44,8 +44,8 @@ namespace Backend.Controllers
             return Ok(json);
         }
 
-        [HttpGet("{numerprzystanku}")]
-        public IActionResult Get(string numerprzystanku)
+        [HttpGet("{numerprzystanku}/{nazwastacji}/{idLinii}")]
+        public IActionResult Get(string numerprzystanku, string nazwastacji, string idLinii)
         {
             try
             {
@@ -58,7 +58,10 @@ namespace Backend.Controllers
 
             string query = @"
                             select * from przystanekFilter(vNrPrzystankuMin => @numerprzystanku, 
-                                                           vNrPrzystankuMax => @numerprzystanku);
+                                                           vNrPrzystankuMax => @numerprzystanku,
+                                                           vNrLiniiMin => @idLinii,
+                                                           vNrLiniiMax =>  @idLinii,
+                                                           vNazwaStacji => @nazwastacji);
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
@@ -69,6 +72,8 @@ namespace Backend.Controllers
                 using (NpgsqlCommand myCommand = new NpgsqlCommand(query, myCon))
                 {
                     myCommand.Parameters.AddWithValue("@numerprzystanku", Int32.Parse(numerprzystanku));
+                    myCommand.Parameters.AddWithValue("@idLinii", Int32.Parse(idLinii));
+                    myCommand.Parameters.AddWithValue("@nazwastacji", nazwastacji);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
