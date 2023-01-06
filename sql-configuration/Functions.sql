@@ -657,7 +657,7 @@ BEGIN
     end if;
 	if ((select count(*)
          from stacja
-         where nazwastacji = vNazwaStacji) != 1) then
+         where nazwa = vNazwaStacji) != 1) then
         return -3;
     end if; -- dana stacja nie istnieje
     update przystanek
@@ -690,7 +690,7 @@ BEGIN
     end if; -- na linii jest już ten numer zajęty
 	if ((select count(*)
          from stacja
-         where nazwastacji = vNazwaStacji) != 1) then
+         where nazwa = vNazwaStacji) != 1) then
         return -4;
     end if; -- dana stacja nie istnieje
 	
