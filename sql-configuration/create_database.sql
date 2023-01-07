@@ -23,7 +23,6 @@ increment by 1
 minvalue 1 no maxvalue;
 
 
-
 CREATE TABLE IF NOT EXISTS wagon (
 id                       INTEGER NOT NULL CONSTRAINT wagon_pk PRIMARY KEY,
 databadaniatechnicznego  DATE NOT NULL,
@@ -65,7 +64,7 @@ values (nextval('seq_lokomotywa'), date('22-08-28'), 'ET41');
 CREATE TABLE IF NOT EXISTS pociag (
     id            INTEGER NOT NULL CONSTRAINT pociag_pk PRIMARY KEY,
     nazwa         VARCHAR(32),
-    idlokomotywy INTEGER NOT NULL REFERENCES lokomotywa(id)
+    idlokomotywy INTEGER NOT NULL REFERENCES lokomotywa(id) ON DELETE CASCADE
 );
 
 insert into pociag(id, nazwa, idlokomotywy)
@@ -409,5 +408,4 @@ AS $$
 	DROP TABLE IF EXISTS znizka 		CASCADE;
 	DROP TABLE IF EXISTS rezerwacja 	CASCADE;
 $$;
-
--- CALL delete_database();
+--CALL delete_database();
