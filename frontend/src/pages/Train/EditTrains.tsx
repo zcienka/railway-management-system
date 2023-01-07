@@ -1,18 +1,16 @@
 import React, {ChangeEvent, useEffect, useState} from "react"
 import Loading from "../../components/Loading"
-import {useNavigate, useParams} from "react-router-dom";
-import {Train} from "../../types";
-import Menu from "../../components/Menu";
+import {useNavigate, useParams} from "react-router-dom"
+import {Train} from "../../types"
+import Menu from "../../components/Menu"
 import {
     useDeleteTrainMutation,
     useGetSingleTrainQuery,
-    useGetTrainsQuery,
     useUpdateTrainMutation
-} from "../../services/trainsApi";
-import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
-import {useGetTrainRidesQuery} from "../../services/trainRideApi";
-import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
-import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
+} from "../../services/trainsApi"
+import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
+import {useGetTrainRidesQuery} from "../../services/trainRideApi"
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi"
 
 const EditTrains = () => {
     const [name, setName] = useState<string>("")
@@ -27,6 +25,7 @@ const EditTrains = () => {
 
     const navigate = useNavigate()
     const {id} = useParams()
+
     const {
         data: getSingleTrainData,
         isSuccess: isGetSingleTrainSuccess
@@ -48,17 +47,16 @@ const EditTrains = () => {
     }] = useUpdateTrainMutation()
 
     const deleteSingleTrain = async () => {
-        refetchTrainRides()
-        refetchRailroadCarsInTheTrain()
-
         await deleteTrain(id)
     }
 
     useEffect(() => {
         if (isDeleteTrainSuccess) {
+            refetchTrainRides()
+            refetchRailroadCarsInTheTrain()
             navigate("/train")
         }
-    }, [isDeleteTrainSuccess, navigate])
+    }, [isDeleteTrainSuccess, navigate, refetchRailroadCarsInTheTrain, refetchTrainRides])
 
     const checkIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {

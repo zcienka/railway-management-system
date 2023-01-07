@@ -46,7 +46,6 @@ const EditRailConnection = () => {
         await deleteRailConnection(id)
         refetchTrainStop()
         refetchTrainRides()
-        navigate("/rail-connection")
     }
 
     useEffect(() => {
@@ -57,9 +56,11 @@ const EditRailConnection = () => {
 
     useEffect(() => {
         if (isDeleteRailConnectionSuccess) {
+            refetchTrainStop()
+            refetchTrainRides()
             navigate("/rail-connection")
         }
-    }, [navigate, isDeleteRailConnectionSuccess])
+    }, [navigate, isDeleteRailConnectionSuccess, refetchTrainStop, refetchTrainRides])
 
     const checkIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {

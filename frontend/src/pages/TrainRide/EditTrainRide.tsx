@@ -106,7 +106,7 @@ const EditTrainRide = () => {
             refetchRailConnection()
             navigate("/train-rides")
         }
-    }, [isDeleteTrainRideSuccess, navigate, refetchReservation])
+    }, [isDeleteTrainRideSuccess, navigate, refetchRailConnection, refetchReservation, refetchTrains])
 
     useEffect(() => {
         if (isGetSingleTrainRideSuccess) {

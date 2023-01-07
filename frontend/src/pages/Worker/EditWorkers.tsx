@@ -53,7 +53,6 @@ const EditWorkers = () => {
 
     const deleteSingleWorker = async () => {
         await deleteWorker(id)
-        refetchTrainRides()
     }
 
     const updateSingleWorker = async () => {
@@ -83,9 +82,10 @@ const EditWorkers = () => {
 
     useEffect(() => {
         if (isDeleteWorkerSuccess) {
+            refetchTrainRides()
             navigate("/workers")
         }
-    }, [isDeleteWorkerSuccess, navigate])
+    }, [isDeleteWorkerSuccess, navigate, refetchTrainRides])
 
     const checkNameValidLength = (userInput: string) => {
         if (userInput.length > 32) {

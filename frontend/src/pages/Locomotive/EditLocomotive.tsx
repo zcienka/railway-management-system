@@ -42,7 +42,6 @@ const EditLocomotive = () => {
 
     const deleteSingleLocomotive = async () => {
         await deleteLocomotive(id)
-        refetchTrains()
     }
 
     const updateSingleLocomotive = async () => {
@@ -69,9 +68,10 @@ const EditLocomotive = () => {
 
     useEffect(() => {
         if (isDeleteLocomotiveSuccess) {
+            refetchTrains()
             navigate("/locomotive")
         }
-    }, [isDeleteLocomotiveSuccess, navigate])
+    }, [isDeleteLocomotiveSuccess, navigate, refetchTrains])
 
     useEffect(() => {
         if (isGetSingleLocomotiveSuccess) {

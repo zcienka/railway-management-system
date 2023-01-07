@@ -71,8 +71,7 @@ const EditReservations = () => {
 
     const deleteSingleReservation = async () => {
         await deleteReservation(id)
-        refetchTrainRides()
-        refetchDiscounts()
+
     }
 
     const handleDiscountChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -120,9 +119,11 @@ const EditReservations = () => {
 
     useEffect(() => {
         if (isDeleteReservationSuccess) {
+            refetchTrainRides()
+            refetchDiscounts()
             navigate("/reservations")
         }
-    }, [isDeleteReservationSuccess, navigate])
+    }, [isDeleteReservationSuccess, navigate, refetchDiscounts, refetchTrainRides])
 
     useEffect(() => {
         if (isUpdateReservationSuccess) {

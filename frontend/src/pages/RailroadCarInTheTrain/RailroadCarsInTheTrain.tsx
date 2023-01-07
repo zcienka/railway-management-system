@@ -6,7 +6,10 @@ import {
     SearchRailroadCarInTheTrain
 } from "../../types"
 import {v4 as uuidv4} from "uuid"
-import {useGetRailroadCarsInTheTrainQuery, useFilterRailroadCarInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi"
+import {
+    useGetRailroadCarsInTheTrainQuery,
+    useFilterRailroadCarInTheTrainQuery
+} from "../../services/railroadCarsInTheTrainApi"
 import {Link, useNavigate} from "react-router-dom"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
@@ -23,7 +26,6 @@ const RailroadCarsInTheTrain = () => {
     const [showSearchResponse, setShowSearchResponse] = useState<boolean>(false)
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true)
     const [isRailroadCarIdInteger, setIsRailroadCarIdInteger] = useState<boolean>(true)
-
     const [railroadCars, setRailroadCarsInTheTrain] = useState<RailroadCarInTheTrainResponse[] | undefined>(undefined)
 
     const navigate = useNavigate()
@@ -35,21 +37,27 @@ const RailroadCarsInTheTrain = () => {
         isError: isGetFilterRailroadCarInTheTrainError,
     } = useFilterRailroadCarInTheTrainQuery(
         searchRailroadCarsInTheTrain,
-        {skip: !showSearchResponse}
+        {
+            skip: !showSearchResponse,
+            refetchOnMountOrArgChange: true
+        }
     )
+
     const {
         data: getRailroadCars,
         isFetching: isGetRailroadCarsFetching,
         isSuccess: isGetRailroadCarsInTheTrainSuccess,
         isError: isGetRailroadCarsError,
-    } = useGetRailroadCarsInTheTrainQuery(null)
+    } = useGetRailroadCarsInTheTrainQuery(null, {
+        refetchOnMountOrArgChange: true
+    })
 
     const {
         data: getCarsData,
         isFetching: isGetCarsFetching,
         isSuccess: isGetCarsSuccess,
         isError: isGetCarsError,
-    } = useGetRailroadCarsQuery(null,{
+    } = useGetRailroadCarsQuery(null, {
         refetchOnMountOrArgChange: true
     })
 
@@ -81,8 +89,6 @@ const RailroadCarsInTheTrain = () => {
     if (railroadCars === undefined) {
         return <Loading/>
     } else {
-
-
         const allRailroadCars = Object.values(railroadCars).map((railroadCar: RailroadCarInTheTrainResponse) => {
             return <tr key={uuidv4()}>
                 <th className={"py-2 font-semibold border-b border-l border-stone-200"}>{railroadCar.numerwagonu}</th>
@@ -156,7 +162,9 @@ const RailroadCarsInTheTrain = () => {
                     <table className={"w-full border-spacing-0 border-separate overflow-y-auto"}>
                         <tbody>
                         <tr className={"rounded-tl-xl text-slate-600"}>
-                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Numer wagonu</th>
+                            <th className={"rounded-tl-xl  bg-slate-100 py-2 border-y border-l border-stone-200"}>Numer
+                                wagonu
+                            </th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Pociąg</th>
                             <th className={"bg-slate-100 py-2 border-y border-stone-200"}>Wagon</th>
                             <th className={"rounded-tr-xl bg-slate-100 w-20 border-y  border-r border-stone-200"}></th>

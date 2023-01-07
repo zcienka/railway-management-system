@@ -42,7 +42,6 @@ const EditRailroadCars = () => {
 
     const deleteSingleRailroadCar = async () => {
         await deleteRailroadCar(id)
-        refetchRailroadCarsInTheTrain()
     }
 
     const updateSingleRailroadCar = async () => {
@@ -96,9 +95,10 @@ const EditRailroadCars = () => {
 
     useEffect(() => {
         if (isDeleteRailroadCarSuccess) {
+            refetchRailroadCarsInTheTrain()
             navigate("/railroad-cars")
         }
-    }, [isDeleteRailroadCarSuccess, navigate])
+    }, [isDeleteRailroadCarSuccess, navigate, refetchRailroadCarsInTheTrain])
 
     useEffect(() => {
         if (isGetSingleRailroadCarSuccess) {

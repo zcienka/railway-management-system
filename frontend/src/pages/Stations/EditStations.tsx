@@ -9,7 +9,6 @@ import {
 } from "../../services/stationsApi"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
-import {useGetTrainRidesQuery} from "../../services/trainRideApi";
 import {useGetTrainStopsQuery} from "../../services/trainStopApi";
 
 const EditStations = () => {
@@ -43,11 +42,11 @@ const EditStations = () => {
 
     const deleteSingleStation = async () => {
         await deleteStation(id)
-        refetchTrainStop()
     }
 
     useEffect(() => {
         if (isDeleteStationSuccess) {
+            refetchTrainStop()
             navigate("/stations")
         }
     }, [isDeleteStationSuccess, navigate])
