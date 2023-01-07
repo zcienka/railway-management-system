@@ -116,8 +116,10 @@ namespace Backend.Controllers
 
             if (val == 1)
                 return Ok();
-            else
+            else if (val == 0)
                 return StatusCode(409, "Linia przejazdu o danym id już istnieje");
+            else
+                return StatusCode(409, "Linia nie może być ujemna");
         }
 
         [HttpDelete("{id}")]

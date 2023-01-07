@@ -97,8 +97,10 @@ namespace Backend.Controllers
                 nazwapociagu = "";
 
             string query = @"
-                            select * from wagonwpociagufilter(vIdWagonuMin => @idwagonumin, vIdWagonuMax => @idwagonumax,
-                                                       vNazwaPociagu => @nazwapociagu);
+                            select numerwagonu, idwagonu, idpociagu, nazwa as nazwapociagu, w.liczbamiejsc, w.databadaniatechnicznego 
+                            from wagonwpociagufilter(vIdWagonuMin => @idwagonumin, vIdWagonuMax => @idwagonumax, vNazwaPociagu => @nazwapociagu) wwp 
+                            join wagon w on wwp.idwagonu=w.id 
+                            join pociag p on p.id=wwp.idpociagu order by idwagonu, idpociagu;
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
