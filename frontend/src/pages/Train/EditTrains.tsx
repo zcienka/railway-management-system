@@ -3,10 +3,16 @@ import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom";
 import {Train} from "../../types";
 import Menu from "../../components/Menu";
-import {useDeleteTrainMutation, useGetSingleTrainQuery, useUpdateTrainMutation} from "../../services/trainsApi";
+import {
+    useDeleteTrainMutation,
+    useGetSingleTrainQuery,
+    useGetTrainsQuery,
+    useUpdateTrainMutation
+} from "../../services/trainsApi";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetTrainRidesQuery} from "../../services/trainRideApi";
 import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
 
 const EditTrains = () => {
     const [name, setName] = useState<string>("")
@@ -44,6 +50,7 @@ const EditTrains = () => {
     const deleteSingleTrain = async () => {
         refetchTrainRides()
         refetchRailroadCarsInTheTrain()
+
         await deleteTrain(id)
     }
 

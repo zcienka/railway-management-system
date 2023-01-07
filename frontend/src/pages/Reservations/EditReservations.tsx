@@ -24,7 +24,8 @@ const EditReservations = () => {
 
     const [isLastNameValidLength, setIsLastNameValidLength] = useState<boolean>(true)
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
-    const {refetch: refetchTrainRides} =useGetTrainRidesQuery(null)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
 
     const navigate = useNavigate()
 
@@ -71,6 +72,7 @@ const EditReservations = () => {
     const deleteSingleReservation = async () => {
         await deleteReservation(id)
         refetchTrainRides()
+        refetchDiscounts()
     }
 
     const handleDiscountChange = (event: ChangeEvent<HTMLSelectElement>) => {

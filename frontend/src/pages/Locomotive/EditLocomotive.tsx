@@ -6,6 +6,7 @@ import {Locomotive} from "../../types";
 import {useDeleteLocomotiveMutation, useUpdateLocomotiveMutation} from "../../services/locomotivesApi";
 import Menu from "../../components/Menu";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
+import {useGetTrainsQuery} from "../../services/trainsApi";
 
 const EditLocomotive = () => {
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
@@ -16,7 +17,7 @@ const EditLocomotive = () => {
 
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
     const [isTechnicalResearchValid, setIsTechnicalResearchValid] = useState<boolean>(true)
-    const {refetch: refetchLocomotive} = useGetLocomotivesQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -41,7 +42,7 @@ const EditLocomotive = () => {
 
     const deleteSingleLocomotive = async () => {
         await deleteLocomotive(id)
-        refetchLocomotive()
+        refetchTrains()
     }
 
     const updateSingleLocomotive = async () => {

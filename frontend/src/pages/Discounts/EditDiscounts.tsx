@@ -69,7 +69,8 @@ const EditDiscounts = () => {
             navigate("/discounts")
         }
     }, [isUpdateDiscountSuccess, navigate])
-    const {refetch: refetchReservations} =useGetReservationsQuery(null)
+
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
 
     useEffect(() => {
         if (isDeleteDiscountSuccess) {
@@ -77,7 +78,7 @@ const EditDiscounts = () => {
             refetchReservations()
         }
     }, [isDeleteDiscountSuccess, navigate, refetchReservations])
-    
+
 
     const checkDiscountPercentageInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {

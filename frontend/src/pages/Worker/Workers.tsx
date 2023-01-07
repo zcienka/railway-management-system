@@ -22,6 +22,7 @@ const Workers = () => {
     const [isWageGoodFormat, setIsWageGoodFormat] = useState<boolean>(true)
 
     const [workers, setWorkers] = useState<Worker[] | undefined>(undefined)
+
     const navigate = useNavigate()
 
     const {

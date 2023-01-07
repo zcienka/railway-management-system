@@ -11,6 +11,8 @@ import {
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetStationsQuery} from "../../services/stationsApi";
 import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetDiscountsQuery} from "../../services/discountsApi";
 
 const EditTrainStop = () => {
     const [lineNumber, setLineNumber] = useState<string>("")
@@ -25,6 +27,8 @@ const EditTrainStop = () => {
     const [lineIdInput, setLineIdInput] = useState<boolean>(true)
     const [isLineIdInteger, setIsLineIdInteger] = useState<boolean>(true)
     const [isLineIdPositive, setIsLineIdPositive] = useState<boolean>(true)
+    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
 
     const navigate = useNavigate()
     const {numerprzystanku, nazwastacji, idlinii} = useParams()
@@ -35,12 +39,12 @@ const EditTrainStop = () => {
         skip: numerprzystanku === undefined
     })
 
-    const [deleteTrainStop,{
+    const [deleteTrainStop, {
         error: deleteTrainStopError,
         isError: isDeleteTrainStopError,
         isSuccess: isDeleteTrainStopSuccess
     }] = useDeleteTrainStopMutation()
-    
+
     const [updateTrainStop, {
         error: updateTrainStopError,
         isError: isUpdateTrainStopError,
@@ -57,9 +61,11 @@ const EditTrainStop = () => {
 
     useEffect(() => {
         if (isDeleteTrainStopSuccess) {
+            refetchRailConnections()
+            refetchStations()
             navigate("/train-stops")
         }
-    }, [isDeleteTrainStopSuccess, navigate])
+    }, [isDeleteTrainStopSuccess, navigate, refetchRailConnections, refetchStations])
 
     useEffect(() => {
         if (isUpdateTrainStopSuccess) {

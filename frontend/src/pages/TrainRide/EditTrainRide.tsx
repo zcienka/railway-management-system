@@ -12,6 +12,8 @@ import {useGetConductorsQuery, useGetDriversQuery} from "../../services/workersA
 import {v4 as uuidv4} from "uuid";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
 
 const EditTrainRide = () => {
     const [departureDate, setDepartureDate] = useState<string>("")
@@ -36,7 +38,11 @@ const EditTrainRide = () => {
     const [trainId, setTrainId] = useState<string>("")
     const [trainIdInput, setTrainIdInput] = useState<boolean>(true)
     const [isTrainIdInteger, setIsTrainIdInteger] = useState<boolean>(true)
+
     const {refetch: refetchReservation} = useGetReservationsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchRailConnection} = useGetRailConnectionsQuery(null)
+
 
     const navigate = useNavigate()
     const {idParam} = useParams()
@@ -96,6 +102,8 @@ const EditTrainRide = () => {
     useEffect(() => {
         if (isDeleteTrainRideSuccess) {
             refetchReservation()
+            refetchTrains()
+            refetchRailConnection()
             navigate("/train-rides")
         }
     }, [isDeleteTrainRideSuccess, navigate, refetchReservation])
