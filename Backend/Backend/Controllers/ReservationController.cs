@@ -101,9 +101,10 @@ namespace Backend.Controllers
             } catch { return StatusCode(409, "Id muszą byc liczbami"); }
 
             string query = @"
-                            select * from rezerwacjaFilter(vImie => @imie, vNazwisko => @nazwisko,
+                            select r.id, r.imie, r.nazwisko, p.dataodjazdu, p.dataprzyjazdu, r.znizka from 
+                            (select * from rezerwacjaFilter(vImie => @imie, vNazwisko => @nazwisko,
                                                          vIdPrzejazduMin => @idprzejazdumin, vIdPrzejazduMax => @idprzejazdumax,
-                                                         vZnizka => @znizka);
+                                                         vZnizka => @znizka)) r join przejazd p on p.id=r.idprzejazdu;
                             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("railway_database");
