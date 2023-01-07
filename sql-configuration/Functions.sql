@@ -402,7 +402,7 @@ CREATE OR REPLACE FUNCTION wagonwpociaguFilter(IN vIdWagonuMin INTEGER DEFAULT 0
     RETURNS SETOF wagonwpociagu AS
 $$
 BEGIN
-    RETURN QUERY SELECT numerwagonu, idwagonu, nazwa
+    RETURN QUERY SELECT wagonwpociagu.*
                  FROM wagonwpociagu
                           join pociag on wagonwpociagu.idpociagu = pociag.id
                  where vIdWagonuMin <= idwagonu
@@ -412,8 +412,7 @@ END
 $$ LANGUAGE plpgsql;
 
 -- select * from wagonwpociagufilter(vIdWagonuMin => 1, vIdWagonuMax => 5,
---                                                        vNazwaPociagu => 'IC');
-
+--                     
 -- drop function wagonwpociagufilter(vidwagonumin integer, vidwagonumax integer, vidpociagumin integer, vidpociagumax integer)
 -- drop function wagonwpociagufilter(vidwagonumin integer, vidwagonumax integer, vnazwa varchar);
 
@@ -660,6 +659,11 @@ BEGIN
          where nazwa = vNazwaStacji) != 1) then
         return -3;
     end if; -- dana stacja nie istnieje
+	if ((select count(*)
+        from liniaprzejazdu
+        where id = vNrLinii) != 1) then
+        return -4;
+    end if; -- dana linia nie istnieje
     update przystanek
     SET numerprzystanku = vNrPrzystanku
     where nazwastacji = vNazwaStacji
@@ -693,6 +697,11 @@ BEGIN
          where nazwa = vNazwaStacji) != 1) then
         return -4;
     end if; -- dana stacja nie istnieje
+	if ((select count(*)
+        from liniaprzejazdu
+        where id = vNrLinii) != 1) then
+        return -5;
+    end if; -- dana linia nie istnieje
 	
     insert into przystanek(numerprzystanku, nazwastacji, idlinii)
     values (vNrPrzystanku, vNazwaStacji, vNrLinii);
