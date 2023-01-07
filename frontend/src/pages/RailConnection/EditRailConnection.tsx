@@ -11,6 +11,13 @@ import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg
 import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
 import {useGetTrainStopsQuery} from "../../services/trainStopApi";
 import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetStationsQuery} from "../../services/stationsApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
+import {useGetDiscountsQuery} from "../../services/discountsApi";
+import {useGetLocomotivesQuery} from "../../services/locomotivesApi";
 
 const EditRailConnection = () => {
     const navigate = useNavigate()
@@ -21,8 +28,8 @@ const EditRailConnection = () => {
     const [isIdInteger, setIsIdInteger] = useState<boolean>(true)
     const [isIdValidLength, setIsIdValidLength] = useState<boolean>(true)
     const {railConnectionId} = useParams()
-    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
-    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+
+
 
     const {
         data: getSingleRailConnectionData,
@@ -54,13 +61,32 @@ const EditRailConnection = () => {
         }
     }, [getSingleRailConnectionData, isGetSingleRailConnectionSuccess])
 
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
+    const {refetch: refetchLocomotives} = useGetLocomotivesQuery(null)
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchRailroadCarInTheTrains} = useGetRailroadCarsInTheTrainQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+
     useEffect(() => {
         if (isDeleteRailConnectionSuccess) {
-            refetchTrainStop()
+            refetchReservations()
             refetchTrainRides()
+            refetchWorkers()
+            refetchTrainStop()
+            refetchStations()
+            refetchTrains()
+            refetchRailroadCarInTheTrains()
+            refetchRailroadCar()
+            refetchDiscounts()
+            refetchLocomotives()
             navigate("/rail-connection")
         }
-    }, [navigate, isDeleteRailConnectionSuccess, refetchTrainStop, refetchTrainRides])
+    }, [navigate, isDeleteRailConnectionSuccess, refetchTrainStop, refetchTrainRides, refetchReservations, refetchWorkers, refetchStations, refetchTrains, refetchRailroadCarInTheTrains, refetchRailroadCar, refetchDiscounts, refetchLocomotives])
 
     const checkIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {

@@ -11,7 +11,15 @@ import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg
 import {useGetDiscountsQuery} from "../../services/discountsApi"
 import {v4 as uuidv4} from 'uuid'
 import Loading from "../../components/Loading"
-import {useGetTrainRidesQuery, useGetTrainStopByLineQuery} from "../../services/trainRideApi"
+import {useGetTrainRidesQuery} from "../../services/trainRideApi"
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetLocomotivesQuery} from "../../services/locomotivesApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetStationsQuery} from "../../services/stationsApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
 
 
 const EditReservations = () => {
@@ -24,8 +32,16 @@ const EditReservations = () => {
 
     const [isLastNameValidLength, setIsLastNameValidLength] = useState<boolean>(true)
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
     const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
+    const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
     const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
 
     const navigate = useNavigate()
 
@@ -71,7 +87,16 @@ const EditReservations = () => {
 
     const deleteSingleReservation = async () => {
         await deleteReservation(id)
-
+        refetchReservations()
+        refetchTrainRides()
+        refetchWorkers()
+        refetchTrainStop()
+        refetchStations()
+        refetchTrains()
+        refetchRailroadCar()
+        refetchRailConnections()
+        refetchDiscounts()
+        refetchRailroadCarsInTheTrain()
     }
 
     const handleDiscountChange = (event: ChangeEvent<HTMLSelectElement>) => {

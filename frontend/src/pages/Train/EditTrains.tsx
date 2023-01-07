@@ -5,12 +5,19 @@ import {Train} from "../../types"
 import Menu from "../../components/Menu"
 import {
     useDeleteTrainMutation,
-    useGetSingleTrainQuery,
+    useGetSingleTrainQuery, useGetTrainsQuery,
     useUpdateTrainMutation
 } from "../../services/trainsApi"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg"
 import {useGetTrainRidesQuery} from "../../services/trainRideApi"
 import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi"
+import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
+import {useGetDiscountsQuery} from "../../services/discountsApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
+import {useGetStationsQuery} from "../../services/stationsApi";
 
 const EditTrains = () => {
     const [name, setName] = useState<string>("")
@@ -20,8 +27,16 @@ const EditTrains = () => {
     const [locomotiveName, setLocomotiveName] = useState<string>("")
     const [locomotiveNameInput, setLocomotiveNameInput] = useState<boolean>(true)
     const [isLocomotiveIdInteger, setIsLocomotiveIdInteger] = useState<boolean>(true)
+
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
     const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
     const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -52,11 +67,18 @@ const EditTrains = () => {
 
     useEffect(() => {
         if (isDeleteTrainSuccess) {
+            refetchReservations()
             refetchTrainRides()
+            refetchWorkers()
+            refetchTrainStop()
+            refetchStations()
+            refetchRailroadCar()
+            refetchRailConnections()
+            refetchDiscounts()
             refetchRailroadCarsInTheTrain()
             navigate("/train")
         }
-    }, [isDeleteTrainSuccess, navigate, refetchRailroadCarsInTheTrain, refetchTrainRides])
+    }, [isDeleteTrainSuccess, navigate, refetchDiscounts, refetchRailConnections, refetchRailroadCar, refetchRailroadCarsInTheTrain, refetchReservations, refetchTrainRides, refetchTrainStop, refetchStations, refetchWorkers])
 
     const checkIdInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {

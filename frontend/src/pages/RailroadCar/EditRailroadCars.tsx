@@ -1,12 +1,21 @@
 import React, {useEffect, useState} from "react"
 import Loading from "../../components/Loading"
 import {useNavigate, useParams} from "react-router-dom"
-import {useGetSingleRailroadCarQuery} from "../../services/railroadCarsApi"
+import {useGetRailroadCarsQuery, useGetSingleRailroadCarQuery} from "../../services/railroadCarsApi"
 import {RailroadCar} from "../../types"
 import {useDeleteRailroadCarMutation, useUpdateRailroadCarMutation} from "../../services/railroadCarsApi"
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetLocomotivesQuery} from "../../services/locomotivesApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetStationsQuery} from "../../services/stationsApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetDiscountsQuery} from "../../services/discountsApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
 
 const EditRailroadCars = () => {
     const [seatsNumber, setSeatsNumber] = useState<string>("")
@@ -17,7 +26,6 @@ const EditRailroadCars = () => {
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
     const [technicalResearchInput, setTechnicalResearchInput] = useState<boolean>(true)
     const [isTechnicalResearchValid, setIsTechnicalResearchValid] = useState<boolean>(true)
-    const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -71,6 +79,16 @@ const EditRailroadCars = () => {
             setIsTechnicalResearchValid(false)
         }
     }
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
+    const {refetch: refetchLocomotives} = useGetLocomotivesQuery(null)
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchRailroadCarInTheTrains} = useGetRailroadCarsInTheTrainQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
 
     const checkSeatsNumberInteger = (userInput: string) => {
         if (isNaN(Number(userInput))) {
@@ -95,10 +113,19 @@ const EditRailroadCars = () => {
 
     useEffect(() => {
         if (isDeleteRailroadCarSuccess) {
-            refetchRailroadCarsInTheTrain()
+            refetchReservations()
+            refetchTrainRides()
+            refetchWorkers()
+            refetchTrainStop()
+            refetchStations()
+            refetchTrains()
+            refetchRailroadCarInTheTrains()
+            refetchRailConnections()
+            refetchDiscounts()
+            refetchLocomotives()
             navigate("/railroad-cars")
         }
-    }, [isDeleteRailroadCarSuccess, navigate, refetchRailroadCarsInTheTrain])
+    }, [isDeleteRailroadCarSuccess, navigate, refetchDiscounts, refetchLocomotives, refetchRailConnections, refetchRailroadCarInTheTrains, refetchReservations, refetchStations, refetchTrainRides, refetchTrainStop, refetchTrains, refetchWorkers])
 
     useEffect(() => {
         if (isGetSingleRailroadCarSuccess) {

@@ -27,7 +27,7 @@ const CreateRailConnection = () => {
         } else {
             setIsIdInteger(() => true)
 
-            if (100 < parseInt(userInput) || 0 > parseInt(userInput)) {
+            if (0 > parseInt(userInput)) {
                 setIsIdValidLength(() => false)
             } else {
                 setIsIdValidLength(() => true)
@@ -74,7 +74,7 @@ const CreateRailConnection = () => {
 
                 <div className={"h-6 flex w-full text-red-900 text-xs"}>
                     <div
-                        className={`${id === "" && !idInput && isIdInteger ? "visible w-full" : "invisible absolute"}`}>
+                        className={`${id === "" && !idInput && isIdInteger && isIdValidLength ? "visible w-full" : "invisible absolute"}`}>
                         <div className={`flex items-center`}>
                             <ExclamationMark className={"h-5 mr-2"}/>
                             <p className={"w-full"}>
@@ -97,6 +97,13 @@ const CreateRailConnection = () => {
                         <ExclamationMark className={"h-5 mr-2"}/>
                         <p className={"w-full"}>
                             Linia przejazdu o danym id już istnieje
+                        </p>
+                    </div>
+                    <div
+                        className={`flex items-center ${!isIdValidLength ? "visible w-full" : "invisible absolute"}`}>
+                        <ExclamationMark className={"h-5 mr-2"}/>
+                        <p className={"w-full"}>
+                            Pole id musi być liczbą większą od zera
                         </p>
                     </div>
                 </div>

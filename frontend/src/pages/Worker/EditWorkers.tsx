@@ -10,6 +10,14 @@ import {
 } from "../../services/workersApi";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetStationsQuery} from "../../services/stationsApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
+import {useGetDiscountsQuery} from "../../services/discountsApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
 
 const EditWorkers = () => {
     const [name, setName] = useState<string>("")
@@ -27,7 +35,15 @@ const EditWorkers = () => {
 
     const [occupation, setOccupation] = useState<string>("")
     const [occupationInput, setOccupationInput] = useState<boolean>(true)
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchTrainStops} = useGetTrainStopsQuery(null)
+    const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
     const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -82,10 +98,18 @@ const EditWorkers = () => {
 
     useEffect(() => {
         if (isDeleteWorkerSuccess) {
+            refetchReservations()
+            refetchTrains()
+            refetchTrainStops()
             refetchTrainRides()
+            refetchStations()
+            refetchRailroadCar()
+            refetchRailConnections()
+            refetchDiscounts()
+            refetchRailroadCarsInTheTrain()
             navigate("/workers")
         }
-    }, [isDeleteWorkerSuccess, navigate, refetchTrainRides])
+    }, [isDeleteWorkerSuccess, navigate, refetchDiscounts, refetchRailConnections, refetchRailroadCar, refetchRailroadCarsInTheTrain, refetchReservations, refetchStations, refetchTrainRides, refetchTrainStops, refetchTrains])
 
     const checkNameValidLength = (userInput: string) => {
         if (userInput.length > 32) {

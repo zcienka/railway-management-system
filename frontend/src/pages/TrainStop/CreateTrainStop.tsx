@@ -147,7 +147,18 @@ const CreateTrainStop = () => {
                             </p>
                         </div>
                     </div>
-
+                    <div
+                        className={`${
+                            // @ts-ignore
+                            createTrainStopError !== undefined && createTrainStopError.data === "Dana stacja nie istnieje"
+                                ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Dana stacja nie istnieje
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div className={"w-160 flex items-center"}>
@@ -197,6 +208,42 @@ const CreateTrainStop = () => {
                             <ExclamationMark className={"h-5 mr-2"}/>
                             <p className={"w-full"}>
                                 Na tej linii podany numer przystanku jest już zajęty
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        className={`${
+                            // @ts-ignore
+                            createTrainStopError !== undefined && createTrainStopError.data === "Na tej linii znajduje się już ten przystanek"
+                                ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Na tej linii znajduje się już ten przystanek
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        className={`${
+                            // @ts-ignore
+                            createTrainStopError !== undefined && createTrainStopError.data === "Na tej linii nie ma takiego przystanku"
+                                ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Na tej linii nie ma takiego przystanku
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        className={`${
+                            // @ts-ignore
+                            createTrainStopError !== undefined && createTrainStopError.data === "Dana linia nie istnieje"
+                                ? "visible w-full" : "invisible absolute"}`}>
+                        <div className={`flex items-center`}>
+                            <ExclamationMark className={"h-5 mr-2"}/>
+                            <p className={"w-full"}>
+                                Dana linia nie istnieje
                             </p>
                         </div>
                     </div>

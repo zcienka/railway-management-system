@@ -7,6 +7,15 @@ import {useDeleteDiscountMutation, useUpdateDiscountMutation} from "../../servic
 import Menu from "../../components/Menu";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
+import {useGetStationsQuery} from "../../services/stationsApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetLocomotivesQuery} from "../../services/locomotivesApi";
 
 const EditDiscounts = () => {
     const [discountName, setDiscountName] = useState<string>("")
@@ -71,13 +80,31 @@ const EditDiscounts = () => {
     }, [isUpdateDiscountSuccess, navigate])
 
     const {refetch: refetchReservations} = useGetReservationsQuery(null)
+    const {refetch: refetchTrainRide} = useGetTrainRidesQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
+    const {refetch: refetchRailConnection} = useGetRailConnectionsQuery(null)
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchRailroadCarInTheTrains} = useGetRailroadCarsInTheTrainQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
+    const {refetch: refetchLocomotives} = useGetLocomotivesQuery(null)
 
     useEffect(() => {
         if (isDeleteDiscountSuccess) {
-            navigate("/discounts")
             refetchReservations()
+            refetchTrainRide()
+            refetchWorkers()
+            refetchRailConnection()
+            refetchTrainStop()
+            refetchStations()
+            refetchTrains()
+            refetchRailroadCarInTheTrains()
+            refetchRailroadCar()
+            refetchLocomotives()
+            navigate("/discounts")
         }
-    }, [isDeleteDiscountSuccess, navigate, refetchReservations])
+    }, [isDeleteDiscountSuccess, navigate, refetchLocomotives, refetchRailConnection, refetchRailroadCar, refetchRailroadCarInTheTrains, refetchReservations, refetchStations, refetchTrainRide, refetchTrainStop, refetchTrains, refetchWorkers])
 
 
     const checkDiscountPercentageInteger = (userInput: string) => {

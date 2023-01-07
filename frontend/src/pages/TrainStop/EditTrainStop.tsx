@@ -5,7 +5,7 @@ import {TrainStop, TrainStopNumberless} from "../../types"
 import Menu from "../../components/Menu"
 import {
     useDeleteTrainStopMutation,
-    useGetSingleTrainStopQuery,
+    useGetSingleTrainStopQuery, useGetTrainStopsQuery,
     useUpdateTrainStopMutation
 } from "../../services/trainStopApi"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
@@ -13,6 +13,11 @@ import {useGetStationsQuery} from "../../services/stationsApi";
 import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
 import {useGetTrainRidesQuery} from "../../services/trainRideApi";
 import {useGetDiscountsQuery} from "../../services/discountsApi";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
 
 const EditTrainStop = () => {
     const [lineNumber, setLineNumber] = useState<string>("")
@@ -27,8 +32,16 @@ const EditTrainStop = () => {
     const [lineIdInput, setLineIdInput] = useState<boolean>(true)
     const [isLineIdInteger, setIsLineIdInteger] = useState<boolean>(true)
     const [isLineIdPositive, setIsLineIdPositive] = useState<boolean>(true)
-    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
+    
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
+    const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
     const {refetch: refetchStations} = useGetStationsQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
 
     const navigate = useNavigate()
     const {numerprzystanku, nazwastacji, idlinii} = useParams()
@@ -61,11 +74,18 @@ const EditTrainStop = () => {
 
     useEffect(() => {
         if (isDeleteTrainStopSuccess) {
-            refetchRailConnections()
+            refetchReservations()
+            refetchTrains()
+            refetchWorkers()
+            refetchTrainRides()
             refetchStations()
+            refetchRailroadCar()
+            refetchRailConnections()
+            refetchDiscounts()
+            refetchRailroadCarsInTheTrain()
             navigate("/train-stops")
         }
-    }, [isDeleteTrainStopSuccess, navigate, refetchRailConnections, refetchStations])
+    }, [isDeleteTrainStopSuccess, navigate, refetchDiscounts, refetchRailConnections, refetchRailroadCar, refetchRailroadCarsInTheTrain, refetchReservations, refetchStations, refetchTrainRides, refetchTrains, refetchWorkers])
 
     useEffect(() => {
         if (isUpdateTrainStopSuccess) {

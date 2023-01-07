@@ -32,8 +32,6 @@ const Discounts = () => {
         {skip: !showSearchResponse}
     )
 
-
-
     const {
         data: getDiscounts,
         isFetching: isGetDiscountsFetching,

@@ -7,6 +7,15 @@ import {useDeleteLocomotiveMutation, useUpdateLocomotiveMutation} from "../../se
 import Menu from "../../components/Menu";
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
+import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetStationsQuery} from "../../services/stationsApi";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
+import {useGetDiscountsQuery} from "../../services/discountsApi";
 
 const EditLocomotive = () => {
     const [technicalResearch, setTechnicalResearch] = useState<string>("")
@@ -17,7 +26,18 @@ const EditLocomotive = () => {
 
     const [isNameValidLength, setIsNameValidLength] = useState<boolean>(true)
     const [isTechnicalResearchValid, setIsTechnicalResearchValid] = useState<boolean>(true)
+        
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
+    const {refetch: refetchTrainRide} = useGetTrainRidesQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
+    const {refetch: refetchRailConnection} = useGetRailConnectionsQuery(null)
+    const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchStations} = useGetStationsQuery(null)
     const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchRailroadCarInTheTrains} = useGetRailroadCarsInTheTrainQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -68,10 +88,19 @@ const EditLocomotive = () => {
 
     useEffect(() => {
         if (isDeleteLocomotiveSuccess) {
+            refetchReservations()
+            refetchTrainRide()
+            refetchWorkers()
+            refetchRailConnection()
+            refetchTrainStop()
+            refetchStations()
             refetchTrains()
+            refetchRailroadCarInTheTrains()
+            refetchRailroadCar()
+            refetchDiscounts()
             navigate("/locomotive")
         }
-    }, [isDeleteLocomotiveSuccess, navigate, refetchTrains])
+    }, [isDeleteLocomotiveSuccess, navigate, refetchDiscounts, refetchRailConnection, refetchRailroadCar, refetchRailroadCarInTheTrains, refetchReservations, refetchStations, refetchTrainRide, refetchTrainStop, refetchTrains, refetchWorkers])
 
     useEffect(() => {
         if (isGetSingleLocomotiveSuccess) {

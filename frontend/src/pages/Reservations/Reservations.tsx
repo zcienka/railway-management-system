@@ -34,14 +34,6 @@ const Reservations = () => {
         {skip: !showSearchResponse}
     )
 
-    const checkIsDateGoodFormat = () => {
-        if ((!isNaN(new Date(searchReservation.dataprzejazdumax).getMonth()) || searchReservation.dataprzejazdumax === "")
-            && (!isNaN(new Date(searchReservation.dataprzejazdumin).getMonth()) || searchReservation.dataprzejazdumin === "")) {
-            setIsDateGoodFormat(() => true)
-        } else {
-            setIsDateGoodFormat(() => false)
-        }
-    }
 
     const {
         data: getReservations,
@@ -119,41 +111,12 @@ const Reservations = () => {
                                })}/>
                         <div/>
 
-                        <input type="text"
-                               placeholder="Data odjazdu"
-                               className={"border mb-4 mr-2"}
-                               onBlur={() => checkIsDateGoodFormat()}
-                               onChange={(e) => setSearchReservation((prevState: SearchReservation) => {
-                                   return {...prevState, dataprzejazdumin: e.target.value}
-                               })}/>
-                        <div/>
-
-                        <input type="text"
-                               placeholder="Data przyjazdu"
-                               className={"border mb-4 mr-2"}
-                               onBlur={() => checkIsDateGoodFormat()}
-                               onChange={(e) => setSearchReservation((prevState: SearchReservation) => {
-                                   return {...prevState, dataprzejazdumax: e.target.value}
-                               })}/>
-
                         <button className={"mb-4"} onClick={() => setShowSearchResponse(!showSearchResponse)}>
                             Szukaj
                         </button>
-                        <div className={"h-14 flex items-center w-full text-sm flex-col"}>
-                            <div
-                                className={`${!isDateGoodFormat ? "visible w-full items-center h-full flex mb-4" : "invisible absolute"} `}>
-                                <div className={"w-full ml-2 text-red-700 "}>
-                                    <div className={"flex items-center w-full"}>
-                                        <ExclamationMark className={"h-5 mr-2"}/>
-                                        <p className={"w-full"}>
-                                            Pola dat są w złym formacie
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <div/>
+
                         <div className={"flex justify-end w-full mb-4"}>
                             <button onClick={() => navigate("/create-reservation")}>
                                 Składanie rezerwacji

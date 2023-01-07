@@ -10,6 +10,14 @@ import {
 import Menu from "../../components/Menu"
 import {ReactComponent as ExclamationMark} from "../../icons/exclamationMark.svg";
 import {useGetTrainStopsQuery} from "../../services/trainStopApi";
+import {useGetReservationsQuery} from "../../services/reservationsApi";
+import {useGetTrainRidesQuery} from "../../services/trainRideApi";
+import {useGetWorkersQuery} from "../../services/workersApi";
+import {useGetRailroadCarsInTheTrainQuery} from "../../services/railroadCarsInTheTrainApi";
+import {useGetTrainsQuery} from "../../services/trainsApi";
+import {useGetRailroadCarsQuery} from "../../services/railroadCarsApi";
+import {useGetDiscountsQuery} from "../../services/discountsApi";
+import {useGetRailConnectionsQuery} from "../../services/railConnectionsApi";
 
 const EditStations = () => {
     const [name, setName] = useState<string>("")
@@ -17,7 +25,15 @@ const EditStations = () => {
 
     const [address, setAddress] = useState<string>("")
     const [addressInput, setAddressInput] = useState<boolean>(true)
+    const {refetch: refetchReservations} = useGetReservationsQuery(null)
+    const {refetch: refetchTrainRides} = useGetTrainRidesQuery(null)
+    const {refetch: refetchWorkers} = useGetWorkersQuery(null)
+    const {refetch: refetchRailroadCarsInTheTrain} = useGetRailroadCarsInTheTrainQuery(null)
     const {refetch: refetchTrainStop} = useGetTrainStopsQuery(null)
+    const {refetch: refetchTrains} = useGetTrainsQuery(null)
+    const {refetch: refetchRailroadCar} = useGetRailroadCarsQuery(null)
+    const {refetch: refetchDiscounts} = useGetDiscountsQuery(null)
+    const {refetch: refetchRailConnections} = useGetRailConnectionsQuery(null)
 
     const navigate = useNavigate()
     const {id} = useParams()
@@ -46,10 +62,18 @@ const EditStations = () => {
 
     useEffect(() => {
         if (isDeleteStationSuccess) {
+            refetchReservations()
+            refetchTrainRides()
+            refetchWorkers()
             refetchTrainStop()
+            refetchTrains()
+            refetchRailroadCar()
+            refetchRailConnections()
+            refetchDiscounts()
+            refetchRailroadCarsInTheTrain()
             navigate("/stations")
         }
-    }, [isDeleteStationSuccess, navigate])
+    }, [isDeleteStationSuccess, navigate, refetchDiscounts, refetchRailConnections, refetchRailroadCar, refetchRailroadCarsInTheTrain, refetchReservations, refetchTrainRides, refetchTrainStop, refetchTrains, refetchWorkers])
 
     const updateSingleStation = async () => {
         const singleStation: Station = {
